@@ -1,0 +1,2 @@
+ipaddr=localhost
+port=50000
