@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
         <title>Alarmsystem - FFW Mönchzell</title>
         
         <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
@@ -58,20 +58,56 @@
         <div id="longitude1" style="display: none;"></div>
         <div id="longitude2" style="display: none;"></div>
         
-        <div id="page">
-            <div id="left">
-                <div id="tag1"></div>
-                <div id="tag2"></div>
-                <div id="tag3"></div>
-                <div id="tag4"></div>
-            </div>
-            
-            <div id="right">
-                <div id="map"></div>
-            </div>
-            
+         <!-- 
+        <div id="header">CSS-basierte Layouts</div>
+        <div id="left">
+            <div id="tag1"></div>
+            <div id="tag2"></div>
+            <div id="tag3"></div>
+            <div id="tag4"></div>
         </div>
         
+        <div id="map"></div>
         
+        <div id="footer">
+            Diese Fußzeile stellt über die CSS-Eigenschaft 'clear' den Elementenfluss wieder her.
+        </div>
+         -->
+         
+         
+         <div id="aussenwrapper">
+
+<div id="innenwrapper">
+
+<div id="header">
+<h1>100 % Höhe mit fixiertem Header und Footer</h1>
+</div><!--Ende header-->
+
+<div id="leftbox">
+<h3>Leftbox</h3>
+
+            <div id="tag1"></div>
+            <div id="tag2"></div>
+            <div id="tag3"></div>
+            <div id="tag4"></div>
+</div><!--Ende leftbox-->
+
+<div id="content">
+<h3>Content</h3>
+<div id="map"></div>
+
+</div><!--Ende content-->
+
+<span style="clear: both;"></span>
+
+</div><!--Ende innenwrapper-->
+
+<div id="footer">
+Footer
+</div><!--Ende footer-->
+
+</div><!--Ende aussenwrapper-->
+
+
     </body>
 </html>

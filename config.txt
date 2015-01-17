@@ -1,2 +1,2 @@
-ipaddr=localhost
 port=50000
+rigList=174896,
