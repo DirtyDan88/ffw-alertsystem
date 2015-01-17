@@ -20,7 +20,8 @@ public class FFWAlertTrigger {
 	 * 
 	 */
 	
-	
+
+
     public static void main(String[] args) {
         String message = createMessage(args);
         

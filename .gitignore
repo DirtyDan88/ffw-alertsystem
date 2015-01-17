@@ -1,3 +1,6 @@
 bin/
+<<<<<<< HEAD
 html/alerts/
+=======
+>>>>>>> 97a8f7854fbe01bd3c029e03f56237fe9b0d5042
 *.jar

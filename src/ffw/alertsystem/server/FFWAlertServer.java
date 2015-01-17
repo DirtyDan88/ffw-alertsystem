@@ -40,12 +40,16 @@ public class FFWAlertServer {
             
             
             String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
+
             //System.out.println(timestamp);
             template.setElement("#timestamp", timestamp);
             template.setElement("#longitude1", msg[0]);
             template.setElement("#longitude2", msg[1]);
             
             
+            System.out.println(timestamp);
+            template.setElement("#timestamp", timestamp);
+
             
             template.setElement("#tag1", msg[3]);
             template.setElement("#tag2", msg[4]);
@@ -58,6 +62,7 @@ public class FFWAlertServer {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy-HH.mm.ss");
             String dateAndTime = sdf.format(now);
             
+
             String fileName = "html/alerts/" + dateAndTime + ".html";
             template.writeTemplate(fileName);
             
@@ -74,6 +79,8 @@ public class FFWAlertServer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+
             
         }
         
