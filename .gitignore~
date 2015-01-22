@@ -1,0 +1,6 @@
+bin/
+html/alerts/
+log/*
+html/alerts/
+*.jar
+config.txt~
