@@ -3,6 +3,9 @@ package ffw.alertsystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,6 +19,9 @@ public class AlertSystem implements Runnable {
     
     private boolean stopped = false;
     
+    
+    
+    
     public AlertSystem(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
     }
@@ -25,14 +31,14 @@ public class AlertSystem implements Runnable {
         System.out.println("## start alertsystem");
         
         while (!this.stopped) {
-            
-            
+            /* check if there are new messages */
             Message msg = this.messageQueue.poll();
-            
             if (msg != null) {
-                System.out.println("## new message");
-                this.triggerAlert(msg);
+                System.out.println("## got a message");
+                this.handleMessage(msg);
+                
             } else {
+                /* wait a little bit */
                 try {
                     Thread.sleep(10);
                 } catch (Exception e) {
@@ -44,16 +50,23 @@ public class AlertSystem implements Runnable {
         System.out.println("## stop alertsystem");
     }
     
-    private void triggerAlert(Message msg) {
+    private void handleMessage(Message msg) {
         
         msg.evaluate();
         
-        String[] rigList = ConfigReader.getConfigVar("rigList").split(",");
-        for (String rig : rigList) {
+        
+        
+        String watchdogRIC = ConfigReader.getConfigVar("watchdog-ric");
+        String[] listRICs  = ConfigReader.getConfigVar("ric-list").split(",");
+        
+        if (msg.getAddress().equals(watchdogRIC)) {
+            this.resetWatchdog();
+        }
+        
+        for (String RIC : listRICs) {
             
-            //Exception in thread "Thread-1" java.lang.NullPointerException
-            //at ffw.alertsystem.FFWAlertSystem.triggerAlert(FFWAlertSystem.java:53)
-            if (msg.getAddress().equals(rig) || rig.equals("*")) {
+            
+            if (msg.getAddress().equals(RIC) || RIC.equals("*")) {
                 System.out.println("## alert !!!");
                 MessageLogger.log(msg.getPocsag1200Str());
                 break;
@@ -61,6 +74,26 @@ public class AlertSystem implements Runnable {
         }
         
         
+    }
+    
+    public void resetWatchdog() {
+        int port          = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));
+        String addressStr = ConfigReader.getConfigVar("watchdog-addr");
+        byte[] buf        = "I am alive!".getBytes();
+        
+        System.out.println("## reset watchdog on: " + addressStr + ":" + port);
+        
+        try {
+            InetAddress address   = InetAddress.getByName(addressStr);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
+            DatagramSocket socket = new DatagramSocket();
+            
+            socket.send(packet);
+            socket.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public synchronized void stop() {
