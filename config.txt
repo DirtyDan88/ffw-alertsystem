@@ -3,11 +3,11 @@ port=50000
 
 # the RICs which will trigger an alert
 # seperated by ",", add "*" to list for all rigs
-ric-list=158973,*
+alert-rics=158973
 
 
-# determines the RIC which resets the watchdog
-watchdog-ric=174896
+# determines the RICs which resets the watchdog
+watchdog-rics=174896,157601
 # watchdog message will be sent to: 
 watchdog-addr=192.168.1.255
 # port which the watchdog process listens on

@@ -9,9 +9,23 @@ import java.util.Date;
 
 public class MessageLogger {
     
+    public enum LogEvent {
+        WATCHDOG, 
+        ALERT;
+        
+        @Override
+        public String toString() {
+          switch(this) {
+            case WATCHDOG: return "WATCHDOG-RESET";
+            case ALERT:    return "ALERT-TRIGGER ";
+            default: throw new IllegalArgumentException();
+          }
+        }
+    }
+    
     private MessageLogger() {}
     
-    public static void log(String pocsag1200Str) {
+    public static void log(String pocsag1200Str, LogEvent event) {
         BufferedWriter bufWriter = null;
         
         Date now = new java.util.Date();
@@ -24,7 +38,7 @@ public class MessageLogger {
             File logFile = new File("log/log-" + date + ".txt");
             
             bufWriter = new BufferedWriter(new FileWriter(logFile, true));
-            bufWriter.write(dateAndTime + ":    " + pocsag1200Str + "\n");
+            bufWriter.write(dateAndTime + " " + event + "    " + pocsag1200Str + "\n");
             
         } catch(IOException e) {
             e.printStackTrace();

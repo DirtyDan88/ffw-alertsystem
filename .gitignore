@@ -1,5 +1,7 @@
 bin/
 html/alerts/
-log/*
+log/
+script/test.sh~
+
 *.jar
 config.txt~

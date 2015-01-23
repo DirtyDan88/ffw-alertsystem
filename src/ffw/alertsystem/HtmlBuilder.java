@@ -19,18 +19,19 @@ public class HtmlBuilder {
     private String html = "";
     private Document doc;
     
-    public void build(Message msg) {
+    public HtmlBuilder(Message msg) {
         this.loadTemplate("html/template.html");
         
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
         this.setElement("#timestamp", timestamp);
         
-        //this.setElement("#longitude1", message.get(0));
-        //this.setElement("#longitude2", message.get(1));
-        //this.setElement("#tag1", message.get(3));
-        //template.setElement("#tag1", message.get(4));
-        //template.setElement("#tag1", message.get(5));
-        //template.setElement("#tag1", message.get(6));
+        this.setElement("#latitude", msg.getLatitude());
+        this.setElement("#longitude", msg.getLongitude());
+        
+        /* max. 10 keywords */
+        for (int i=0; i<msg.getKeywords().size() && i<10; i++) {
+            this.setElement("#keyword" + (i+1), msg.getKeywords().get(i));
+        }
     }
     
     public String writeTemplate(String path) {

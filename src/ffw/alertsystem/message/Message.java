@@ -11,10 +11,12 @@ public class Message {
     
     private String pocsag1200Str;
     
-    private String address;
-    private String function;
-    private String alpha;
-    private boolean complete = false;
+    private String address = null;
+    private String function = null;
+    private String alpha = null;
+    
+    private boolean isComplete     = false;
+    private boolean hasCoordinates = false;
     
     private String latitude;
     private String longitude;
@@ -26,60 +28,85 @@ public class Message {
     
     
     
-    public void evaluate() {
+    public void evaluateMessageHead() {
         //pocsag1200Str.startsWith("POCSAG1200:")
         
-        this.complete =  pocsag1200Str.contains("Address:") && 
-                         pocsag1200Str.contains("Function:") && 
-                         pocsag1200Str.contains("Alpha:");
+        int startIndex, endIndex;
+        boolean addressExits  = pocsag1200Str.contains("Address:");
+        boolean functionExits = pocsag1200Str.contains("Function:");
+        boolean alphaExits    = pocsag1200Str.contains("Alpha:");
         
-        if (this.complete) {
-            int startIndex, endIndex;
-            
-            startIndex     = pocsag1200Str.indexOf("Address:") + 8;
-            endIndex       = startIndex + 8;
-            this.address   = pocsag1200Str.substring(startIndex, endIndex).trim();
-            
-            startIndex     = pocsag1200Str.indexOf("Function:") + 9;
-            endIndex       = startIndex + 4;
-            this.function  = pocsag1200Str.substring(startIndex, endIndex).trim();;
-            
-            startIndex     = pocsag1200Str.indexOf("Alpha:") + 6;
-            this.alpha     = pocsag1200Str.substring(startIndex).trim();
+        if (addressExits) {
+            startIndex   = pocsag1200Str.indexOf("Address:") + 8;
+            endIndex     = startIndex + 8;
+            this.address = pocsag1200Str.substring(startIndex, endIndex).trim();
         }
         
-    }
-    
-    /*
-    String[] alphaStr = this.cleanAlphaString(this.alpha);
-    
-    this.latitude = msgStr[0];
-    this.longitude = msgStr[1];
-    for (int i = 2; i < msgStr.length; i++) {
-        this.keywords.add(msgStr[i]);
-    }
-    */
-    
-    
-    private String[] cleanAlphaString(String alphaStr) {
-        String[] params = alphaStr.split("/");
-        String msgStr = "";
+        if (functionExits) {
+            startIndex    = pocsag1200Str.indexOf("Function:") + 9;
+            endIndex      = startIndex + 3;
+            this.function = pocsag1200Str.substring(startIndex, endIndex).trim();
+        }
         
-        for (int i = 0; i < params.length; i++) {
-            String tmp = params[i].trim();
+        if (alphaExits) {
+            startIndex = pocsag1200Str.indexOf("Alpha:") + 6;
+            this.alpha = pocsag1200Str.substring(startIndex).trim();
+        }
+        
+        this.isComplete =  addressExits && functionExits && alphaExits;
+    }
+    
+    
+    public void evaluateAlphaString() {
+        if (this.getAlpha() != null) {
+            String[] alphaStr = this.cleanAlphaString().split("#");
+            
+            
+            if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
+                /* alert with latitude and longitude */
+                this.latitude  = alphaStr[0];
+                this.longitude = alphaStr[1];
+                
+                for (int i = 2; i < alphaStr.length; i++) {
+                    this.keywords.add(alphaStr[i]);
+                }
+                
+                this.hasCoordinates = true;
+                
+            } else {
+                /* alert without geo coordinates */
+                for (int i = 0; i < alphaStr.length; i++) {
+                    this.keywords.add(alphaStr[i]);
+                }
+            }
+            
+            
+        }
+    }
+    
+    private boolean isLatOrLong(String latOrlong) {
+        return latOrlong.matches("\\d{1,2}\\.\\d{5,}");
+    }
+    
+    private String cleanAlphaString() {
+        String[] alphaStr  = this.getAlpha().split("/");
+        String newAlphaStr = "";
+        
+        for (int i = 0; i < alphaStr.length; i++) {
+            String tmp = alphaStr[i].trim();
             
             if (!(tmp.startsWith("<") && tmp.endsWith(">")) && 
                     tmp.length() != 0) {
-                msgStr = msgStr.concat(params[i] + "#");
+                newAlphaStr = newAlphaStr.concat(alphaStr[i] + "#");
             }
         }
         
-        msgStr = msgStr.replace("�", "ae");
-        msgStr = msgStr.replace("�", "oe");
-        msgStr = msgStr.replace("�", "ue");
-        msgStr = msgStr.replace("�", "ss");
+        newAlphaStr = newAlphaStr.replace("�", "ae");
+        newAlphaStr = newAlphaStr.replace("�", "oe");
+        newAlphaStr = newAlphaStr.replace("�", "ue");
+        newAlphaStr = newAlphaStr.replace("�", "ss");
         
-        return msgStr.split("#");
+        return newAlphaStr;
     }
     
     public String getPocsag1200Str() {
@@ -99,7 +126,11 @@ public class Message {
     }
     
     public boolean isComplete() {
-        return this.complete;
+        return this.isComplete;
+    }
+    
+    public boolean hasCoordinates() {
+        return this.hasCoordinates;
     }
     
     public String getLatitude() {

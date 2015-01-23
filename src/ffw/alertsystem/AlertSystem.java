@@ -1,17 +1,21 @@
 package ffw.alertsystem;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ffw.alertsystem.listener.AlertListener;
 import ffw.alertsystem.message.Message;
 import ffw.alertsystem.message.MessageLogger;
+import ffw.alertsystem.message.MessageLogger.LogEvent;
 
 public class AlertSystem implements Runnable {
     
@@ -34,7 +38,7 @@ public class AlertSystem implements Runnable {
             /* check if there are new messages */
             Message msg = this.messageQueue.poll();
             if (msg != null) {
-                System.out.println("## got a message");
+                System.out.println("## got the message");
                 this.handleMessage(msg);
                 
             } else {
@@ -51,32 +55,59 @@ public class AlertSystem implements Runnable {
     }
     
     private void handleMessage(Message msg) {
+        String[] watchdogRICs = ConfigReader.getConfigVar("watchdog-rics").split(",");
+        String[] alertRICs    = ConfigReader.getConfigVar("alert-rics").split(",");
         
-        msg.evaluate();
+        msg.evaluateMessageHead();
+        String msgRIC = msg.getAddress();
         
-        
-        
-        String watchdogRIC = ConfigReader.getConfigVar("watchdog-ric");
-        String[] listRICs  = ConfigReader.getConfigVar("ric-list").split(",");
-        
-        if (msg.getAddress().equals(watchdogRIC)) {
-            this.resetWatchdog();
-        }
-        
-        for (String RIC : listRICs) {
+        if (msgRIC != null) {
+            for (String curRIC : watchdogRICs) {
+                if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
+                    MessageLogger.log(msg.getPocsag1200Str(), LogEvent.WATCHDOG);
+                    this.resetWatchdog();
+                    break;
+                }
+            }
             
-            
-            if (msg.getAddress().equals(RIC) || RIC.equals("*")) {
-                System.out.println("## alert !!!");
-                MessageLogger.log(msg.getPocsag1200Str());
-                break;
+            for (String curRIC : alertRICs) {
+                if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
+                    MessageLogger.log(msg.getPocsag1200Str(), LogEvent.ALERT);
+                    this.triggerAlert(msg);
+                    break;
+                }
             }
         }
-        
-        
     }
     
-    public void resetWatchdog() {
+    private void triggerAlert(Message msg) {
+        msg.evaluateAlphaString();
+        
+        if (msg.hasCoordinates()) {
+            System.out.println("## alert was triggered");
+            
+            HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
+            
+            String fileName = htmlBuilder.writeTemplate("html/alerts/");
+            
+            
+            //Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
+            
+            try {
+                Desktop.getDesktop().browse(
+                        new URI("file:///home/max/workspace/eclipse-java/ffw-alertsystem/" + fileName)
+                );
+                
+            } catch (URISyntaxException | IOException e) {
+                e.printStackTrace();
+            }
+            
+        } else {
+            System.out.println("## alert was triggered, but no geo coordinates are given");
+        }
+    }
+    
+    private void resetWatchdog() {
         int port          = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));
         String addressStr = ConfigReader.getConfigVar("watchdog-addr");
         byte[] buf        = "I am alive!".getBytes();
@@ -128,38 +159,3 @@ public class AlertSystem implements Runnable {
         alertSystem.stop();
     }
 }
-
-//POCSAG1200: Address:  160942  Function: 3  Alpha:   11288/bert/Opek/Magen-Darm-Zentrum M/Bismarckplatz 1/MA-Schwetzingerstadt/WB 3 Ida Scipio Heim/Murgstr. 4/MA-Neckarstadt/12, (laut Pflege geht der Bruder zum Bürgermeister sollte es nicht klappen)/
-// Alpha:   <FF><DLE>POCSAG1200: Address:  157601  Function: 3
-
-
-//49.52647/08.66811/26/F1 undefiniertes Kleinfeuer//vorm Kindergarten/Kurpfalzstr. /Weinheim-Lützelsachsen// //brennende Mülleimer/
-// 8624/nefso/Koch/WB EG Caritas/Schönauer Str. 2/Plankstadt// //140 DD 142, 36/
-// POCSAG1200: Address:  160942  Function: 3  Alpha:   11288/bert/Opek/Magen-Darm-Zentrum M/Bismarckplatz 1/MA-Schwetzingerstadt/WB 3 Ida Scipio Heim/Murgstr. 4/MA-Neckarstadt/12, (laut Pflege geht der Bruder zum Bürgermeister sollte es nicht klappen)/
-
-// Alpha:   <FF><DLE>POCSAG1200: Address:  157601  Function: 3
-
-
-/*
-System.out.println("Latitude:  " + msg.getLatitude());
-System.out.println("Longitude: " + msg.getLongitude());
-for (String keyword : msg.getKeywords()) {
-    System.out.println(keyword);
-}
-
-HtmlBuilder htmlBuilder = new HtmlBuilder();
-htmlBuilder.build(msg);
-
-String fileName = htmlBuilder.writeTemplate("html/alerts/");
-
-
-
-
-//Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
-try {
-    URI uri = new URI("file:///home/max/workspace/eclipse-java/ffw-alertsystem/"+fileName);
-    Desktop.getDesktop().browse(uri);
-} catch (URISyntaxException e) {
-    e.printStackTrace();
-}
-*/
