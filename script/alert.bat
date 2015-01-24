@@ -1,3 +1,2 @@
 @Echo off
-
-echo "HEIRHEIORHARUHWERWRJIWHFHWUIFHW"
+start chrome --kiosk file://%cd%/%1
