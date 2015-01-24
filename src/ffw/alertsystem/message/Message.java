@@ -119,10 +119,10 @@ public class Message {
             }
         }
         
-        newAlphaStr = newAlphaStr.replace("�", "ae");
-        newAlphaStr = newAlphaStr.replace("�", "oe");
-        newAlphaStr = newAlphaStr.replace("�", "ue");
-        newAlphaStr = newAlphaStr.replace("�", "ss");
+        //newAlphaStr = newAlphaStr.replace("�", "ae");
+        //newAlphaStr = newAlphaStr.replace("�", "oe");
+        //newAlphaStr = newAlphaStr.replace("�", "ue");
+        //newAlphaStr = newAlphaStr.replace("�", "ss");
         
         return newAlphaStr;
     }
