@@ -1,8 +1,6 @@
 bin/
 html/alerts/
-template.html~
 log/
-script/test.sh~
-
 *.jar
-config.txt~
+.classpath
+.project
