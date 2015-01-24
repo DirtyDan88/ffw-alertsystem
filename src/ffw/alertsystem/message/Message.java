@@ -20,6 +20,8 @@ public class Message {
     
     private String latitude;
     private String longitude;
+    private String shortKeyword;
+    private String alertLevel;
     private Vector<String> keywords = new Vector<String>();
     
     public Message(String pocsag1200Str) {
@@ -67,7 +69,17 @@ public class Message {
                 this.latitude  = alphaStr[0];
                 this.longitude = alphaStr[1];
                 
-                for (int i = 2; i < alphaStr.length; i++) {
+                // TODO: alphaStr[2] ???
+                
+                if (this.isShortKeyword(alphaStr[3])) {
+                    this.shortKeyword = alphaStr[3].substring(0, 1);
+                    this.alertLevel   = alphaStr[3].substring(1, 2);
+                } else {
+                    this.shortKeyword = "-";
+                    this.alertLevel   = "-";
+                }
+                
+                for (int i = 4; i < alphaStr.length; i++) {
                     this.keywords.add(alphaStr[i]);
                 }
                 
@@ -75,13 +87,19 @@ public class Message {
                 
             } else {
                 /* alert without geo coordinates */
+                /*
                 for (int i = 0; i < alphaStr.length; i++) {
                     this.keywords.add(alphaStr[i]);
                 }
+                */
             }
             
             
         }
+    }
+    
+    private Boolean isShortKeyword(String shortKeyword) {
+        return shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]");
     }
     
     private boolean isLatOrLong(String latOrlong) {
@@ -139,6 +157,14 @@ public class Message {
     
     public String getLongitude() {
         return this.longitude;
+    }
+    
+    public String getShortKeyword() {
+        return this.shortKeyword;
+    }
+    
+    public String getAlertLevel() {
+        return this.alertLevel;
     }
     
     public Vector<String> getKeywords() {

@@ -11,7 +11,7 @@ case "$1" in
         ;;
     alertWithGeo)
         echo "Testing alert message with geo coordinates ..."
-        MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.52647/08.66811/26/F1 undefiniertes Kleinfeuer//vorm Kindergarten/Kurpfalzstr. /Weinheim-Lützelsachsen// //brennende Mülleimer/"
+        MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.324291/08.808761/26/F1 undefiniertes Kleinfeuer//vorm Kindergarten/Industriestraße /Meckesheim// //brennende Mülleimer/"
         ;;
     --help)
         echo "Usage: $0 {watchdog | alert | alertWithGeo | <message>}"
