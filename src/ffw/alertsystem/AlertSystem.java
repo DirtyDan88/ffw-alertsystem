@@ -84,12 +84,18 @@ public class AlertSystem implements Runnable {
             System.out.println("## alert was triggered");
             
             HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
-            
             String fileName = htmlBuilder.writeTemplate("html/alerts/");
             
-            
             try {
-                Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
+                String osName = System.getProperty("os.name");
+                if (osName.endsWith("Windows")) {
+                    Runtime.getRuntime().exec("script/alert.bat " + fileName);
+                } else {
+                    Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
+                } 
+                
+                
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }

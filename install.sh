@@ -3,7 +3,12 @@ if [ ! -d bin/ ]; then
     mkdir bin/
 fi
 
-echo ">> compiling source files"
+if [ ! -d log/ ]; then
+    echo ">> make dir log/"
+    mkdir log/
+fi
+
+echo ">> compiling source files ..."
 javac -g:none \
       -d bin/ \
       -cp lib/* \
@@ -11,22 +16,5 @@ javac -g:none \
       src/ffw/alertsystem/message/*.java \
       src/ffw/alertsystem/*.java
 
-
-
-echo ">> building ffw-alertsystem.jar"
-echo ">> building ffw-alertsystem-watchdog.jar"
+echo ">> let ant do the building work ..."
 ant 
-
-#cd lib/
-#mkdir tmp/
-#cd tmp/
-#jar xf ../jsoup-1.7.3.jar
-#cd ..
-#cd ..
-#jar cvfm ffw-alertsystem.jar alertsystem.mf lib/tmp -C bin/ .
-#cd lib
-#rm tmp -r
-#cd ..
-
-
-#jar cvfm ffw-alertsystem-watchdog.jar watchdog.mf -C bin/ .
