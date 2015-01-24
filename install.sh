@@ -1,11 +1,16 @@
-if [ ! -d bin/ ]; then
-    echo ">> make dir bin/"
+if [ ! -d bin ]; then
+    echo ">> make dir bin"
     mkdir bin/
 fi
-
-if [ ! -d log/ ]; then
-    echo ">> make dir log/"
-    mkdir log/
+cd html
+if [ ! -d alerts ]; then
+    echo ">> make dir html/alerts"
+    mkdir alerts
+fi
+cd ..
+if [ ! -d log ]; then
+    echo ">> make dir log"
+    mkdir log
 fi
 
 echo ">> compiling source files ..."
