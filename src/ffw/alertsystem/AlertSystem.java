@@ -88,7 +88,7 @@ public class AlertSystem implements Runnable {
             
             try {
                 String osName = System.getProperty("os.name");
-                if (osName.endsWith("Windows")) {
+                if (osName.equals("Windows")) {
                     Runtime.getRuntime().exec("script/alert.bat " + fileName);
                 } else {
                     Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
