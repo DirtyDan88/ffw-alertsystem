@@ -1,4 +1,4 @@
-package ffw.alertsystem.message;
+package ffw.alertmonitor;
 
 import java.util.Vector;
 

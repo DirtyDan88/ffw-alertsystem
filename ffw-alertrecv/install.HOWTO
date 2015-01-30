@@ -1,0 +1,80 @@
+*** set up shh (from http://jankarres.de/2013/12/raspberry-pi-ssh-schluessel-erstellen-und-passwort-aendern/):
+# generate *.pub file on client machine:
+ssh-keygen -t rsa
+
+# on raspi-alertrecv, copy content from generated *.pub file into:
+mkdir ~/.ssh
+nano ~/.ssh/authorized_keys
+
+# change ssh config:
+sudo nano /etc/ssh/sshd_config
+RSAAuthentification yes
+PubkeyAuthentification yes
+PasswordAuthentification no
+# and restart ssh
+sudo /etc/init.d/ssh restart
+
+
+
+*** build chain for receiver: (from http://www.raspberrypi.org/forums/viewtopic.php?t=45142)
+# install dependencies
+sudo apt-get update
+sudo apt-get -y install git cmake build-essential libusb-1.0 qt4-qmake libpulse-dev libx11-dev
+
+# fetch and compile rtl-sdr source
+mkdir ~/alertrecv
+cd ~/alertrecv/
+git clone git://git.osmocom.org/rtl-sdr.git
+cd rtl-sdr
+mkdir build
+cd build
+cmake ../ -DINSTALL_UDEV_RULES=ON
+make
+sudo make install
+sudo ldconfig
+
+*** blacklist the dvb_usb_rtl2832u driver: (see https://groups.google.com/forum/#!msg/ultra-cheap-sdr/6_sSON94Azo/sOkhU81YINIJ)
+# The problem is the Linux kernel DVB driver is loaded, which means it is making 
+# the device available for TV reception.  Since the device is in use by this 
+# driver, the SDR programs can't access it. 
+sudo nano /etc/modprobe.d/rtl2832u-blacklist.conf 
+# content: 
+blacklist dvb_usb_rtl2832u
+blacklist rtl2832
+
+*** receiver is ready, test with: 
+rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60
+# or for swr3 radio: 
+rtl_fm -M fm -s 48k -o 4 -A fast -l 0 -E deemp -f 99.90M | aplay -r 48k -f S16_LE
+
+
+
+*** build chain for decoder:
+# fetch and compile multimonNG
+cd ~/alertrecv/
+git clone https://github.com/EliasOenal/multimonNG.git
+cd multimonNG
+mkdir build
+cd build
+qmake ../multimon-ng.pro
+make
+sudo make install
+
+
+*** if using the C solution, edit the pocsag.c file:
+# copy the send()-function from local pocsag.c file to ~/alertrecv/multimon-ng/pocsag.c
+# then compile again:
+cd ~/alertrecv/multimon-ng/build
+make
+sudo make install
+# run with: 
+rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin >> /dev/stdout
+
+*** better: using socat/nc to forward the decoded string over network
+# for udp-broadcast:
+rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin | socat - udp-datagram:192.168.1.255:50000,broadcast
+# for a well known client:
+rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin | nc -u 192.168.1.xxx 50000
+# for output to bash:
+rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin >> /dev/stdout
+

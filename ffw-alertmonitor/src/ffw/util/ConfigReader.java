@@ -1,4 +1,4 @@
-package ffw.alertsystem;
+package ffw.util;
 
 import java.io.BufferedReader;
 import java.io.File;

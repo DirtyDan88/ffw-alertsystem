@@ -1,4 +1,4 @@
-package ffw.alertsystem;
+package ffw.alertmonitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,12 +9,11 @@ import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ffw.alertsystem.listener.AlertListener;
-import ffw.alertsystem.message.Message;
-import ffw.alertsystem.message.MessageLogger;
-import ffw.alertsystem.message.MessageLogger.LogEvent;
+import ffw.util.ConfigReader;
+import ffw.util.MessageLogger;
+import ffw.util.MessageLogger.LogEvent;
 
-public class AlertSystem implements Runnable {
+public class AlertMonitor implements Runnable {
     
     private Queue<Message> messageQueue = null;
     
@@ -23,7 +22,7 @@ public class AlertSystem implements Runnable {
     
     
     
-    public AlertSystem(Queue<Message> messageQueue) {
+    public AlertMonitor(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
     }
     
@@ -134,10 +133,10 @@ public class AlertSystem implements Runnable {
     
     public static void main(String[] args) {
         Queue<Message> messageStack  = new ConcurrentLinkedQueue<Message>();
-        AlertSystem    alertSystem   = new AlertSystem(messageStack);
+        AlertMonitor   alertMonitor  = new AlertMonitor(messageStack);
         AlertListener  alertListener = new AlertListener(messageStack);
         
-        Thread alertSystemThread   = new Thread(alertSystem);
+        Thread alertSystemThread   = new Thread(alertMonitor);
         Thread alertListenerThread = new Thread(alertListener);
         
         alertSystemThread.start();
@@ -155,6 +154,6 @@ public class AlertSystem implements Runnable {
         }
         
         alertListener.stop();
-        alertSystem.stop();
+        alertMonitor.stop();
     }
 }

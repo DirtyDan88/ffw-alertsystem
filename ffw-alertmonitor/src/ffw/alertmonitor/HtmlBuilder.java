@@ -1,4 +1,4 @@
-package ffw.alertsystem;
+package ffw.alertmonitor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,8 +11,6 @@ import java.util.Date;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import ffw.alertsystem.message.Message;
 
 public class HtmlBuilder {
     

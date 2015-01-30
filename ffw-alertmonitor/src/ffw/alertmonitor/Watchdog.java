@@ -1,4 +1,4 @@
-package ffw.alertsystem;
+package ffw.alertmonitor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,6 +7,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import ffw.util.ConfigReader;
 
 public class Watchdog {
     

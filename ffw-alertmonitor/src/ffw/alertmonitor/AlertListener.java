@@ -1,4 +1,4 @@
-package ffw.alertsystem.listener;
+package ffw.alertmonitor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,8 +7,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Queue;
 
-import ffw.alertsystem.ConfigReader;
-import ffw.alertsystem.message.Message;
+import ffw.util.ConfigReader;
 
 
 

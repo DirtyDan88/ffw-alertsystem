@@ -15,7 +15,7 @@ IF not exist log (
 )
 
 echo ">> compiling source files"
-javac -g:none -d bin/ -cp lib/* src/ffw/alertsystem/listener/*.java src/ffw/alertsystem/message/*.java src/ffw/alertsystem/*.java
+javac -g:none -d bin/ -cp lib/* src/ffw/alertmonitor/util/*.java src/ffw/alertmonitor/*.java
 
 echo ">> let ant do the building work ..."
 ant 
