@@ -16,8 +16,8 @@ fi
 echo ">> compiling source files ..."
 javac -g:none \
       -d bin/ \
-      -cp lib/* \
-      src/ffw/alertmonitor/util/*.java \
+      -cp "lib/*" \
+      src/ffw/util/*.java \
       src/ffw/alertmonitor/*.java
 
 echo ">> let ant do the building work ..."
