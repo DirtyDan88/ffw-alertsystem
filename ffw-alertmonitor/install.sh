@@ -19,6 +19,5 @@ javac -g:none \
       -cp "lib/*" \
       src/ffw/util/*.java \
       src/ffw/alertmonitor/*.java
-
 echo ">> let ant do the building work ..."
 ant 
