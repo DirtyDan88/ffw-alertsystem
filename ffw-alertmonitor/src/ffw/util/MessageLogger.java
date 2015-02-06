@@ -13,17 +13,19 @@ public class MessageLogger {
         WATCHDOG, 
         ALERT;
         
+        public String test() {
+            return "asdasd";
+        }
+        
         @Override
         public String toString() {
-          switch(this) {
-            case WATCHDOG: return "WATCHDOG-RESET";
-            case ALERT:    return "ALERT-TRIGGER ";
-            default: throw new IllegalArgumentException();
-          }
+            switch(this) {
+                case WATCHDOG: return "WATCHDOG-RESET";
+                case ALERT:    return "ALERT-TRIGGER ";
+                default: throw new IllegalArgumentException();
+            }
         }
     }
-    
-    private MessageLogger() {}
     
     public static void log(String pocsag1200Str, LogEvent event) {
         BufferedWriter bufWriter = null;

@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ffw.alertmonitor.TVController.TVAction;
 import ffw.util.ConfigReader;
 import ffw.util.MessageLogger;
 import ffw.util.MessageLogger.LogEvent;
@@ -81,6 +82,10 @@ public class AlertMonitor implements Runnable {
         
         if (msg.hasCoordinates()) {
             System.out.println("## alert was triggered");
+            
+            /* try to switch on TV */
+            TVController.send(TVAction.SWITCH_ON);
+            
             
             HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
             String fileName = htmlBuilder.writeTemplate("html/alerts/");
