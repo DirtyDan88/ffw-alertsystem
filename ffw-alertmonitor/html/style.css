@@ -9,6 +9,8 @@ html, body {
     width: 100%;
 }
 
+
+
 .wrapper {
     height: 100%;
     width: 100%;
@@ -16,14 +18,13 @@ html, body {
 }
 .leftWrapper {
     height: 100%;
-    width: 35%;
+    width: 40%;
 }
 .rightWrapper {
     height: 100%;
-    width: 65%;
+    width: 60%;
     padding-left:20px;
 }
-
 div.left {
     height: 100%;
     width: 100%;
@@ -36,24 +37,48 @@ div.right {
 }
 
 
-div.leftContainer {
-    
-}
+
 div#alertTime {
     font-size: 200%;
     margin-bottom: 20px;
 }
 div#timeSinceAlert {
     font-size: 700%;
-    border-bottom: 1px dashed black;
     margin-bottom: 40px;
 }
-
-.alertKeyword {
-
-    border: 1px dashed black;
+div.alertKeyword {
+    padding: 20px;
+    border: 2px dashed red;
     margin-bottom: 40px;
 }
+div.alertKeyword table { 
+    width: 100%;
+}
+div#shortKeywordDesc,
+div#alertLevelDesc {
+    font-size: 300%;
+}
+div#keywordImage {
+    float: right;
+}
+div#keywordImage img {
+    height: 100px;
+    width: auto;
+}
+div#furtherKeywords {
+    padding-top: 20px;
+    margin-bottom: 40px;
+}
+div#furtherKeywords ul {
+    font-size: 200%;
+    padding-top: 10px;
+    padding-left: 10%;
+    list-style-type: square;
+}
+div#furtherKeywords ul li {
+    padding-top: 10px;
+}
+
 
 
 div.mapContainer {
@@ -68,12 +93,20 @@ div#mapInfo {
     position:absolute;
     bottom: 5%;
     right: 3%; 
-    
     height: 10%;
-    width: 20%;
-    
+    width: 22%;
     background: grey;
-    opacity: 0.5;
+    opacity: 0.75;
     border: 1px dashed black;
     border-radius: 5px;
+}
+div#mapInfo table {
+    font-size: 200%;
+    color: white;
+    font-weight: bold;
+    
+    padding: 10px;
+    
+    width: 100%;
+    height: 100%;
 }

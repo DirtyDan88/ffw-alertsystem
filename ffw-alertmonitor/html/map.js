@@ -10,13 +10,9 @@ function loadMap() {
     var map = new google.maps.Map(document.getElementById("map"), mapOptions);
     directionsDisplay.setMap(map);
     
-    
-    
-    
     var lat  = $("#latitude").text();
     var lng  = $("#longitude").text();
     var dest = new google.maps.LatLng(lat, lng);
-    
     var request = {
         origin: ffwMoe,
         destination: dest,
@@ -27,22 +23,18 @@ function loadMap() {
     var directionsService = new google.maps.DirectionsService();
     directionsService.route(request, function(result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-            
-            
             directionsDisplay.setDirections(result);
-            
             
             var totalDistance = 0;
             var totalDuration = 0;
             var legs = result.routes[0].legs;
             for(var i=0; i<legs.length; ++i) {
-                totalDistance += legs[i].distance.value;
-                totalDuration += legs[i].duration.value;
+                totalDistance += legs[i].distance.text;
+                totalDuration += legs[i].duration.text;
             }
             
-            $("#distance").text("Distanz: " + totalDistance);
-            $("#duration").text("Dauer:   " + totalDuration);
-            
+            $("#distance").text(" " + totalDistance);
+            $("#duration").text("~" + totalDuration);
         }
     });
 }

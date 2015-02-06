@@ -11,7 +11,6 @@
         <script type="text/javascript" src="../alert.js"></script>
         <script type="text/javascript" src="../map.js"></script>
         
-        
         <script type="text/javascript">
         $(document).ready(function() {
                 updateTimer();
@@ -33,43 +32,32 @@
             <tr>
                 <td class="leftWrapper">
                     <div class="left">
-                        <div class="leftContainer">
-                            
-                            <div>
-                                <div>Alarmierung am: </div>
-                                <div id="alertTime"></div>
-                                <div>Zeit seit Alarmierung: </div>
-                                <div id="timeSinceAlert"></div>
-                                
-                                <div class="alertKeyword">
-                                    <table>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Einsatzstichwort: </td>
-                                            <td><div id="shortKeywordDesc"></div></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Alarmstufe:</td>
-                                            <td><div id="alertLevelDesc"></div></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                
-                                <div>Weitere Einsatzstichwörter: </div>
-                                <div id="keyword1"></div>
-                                <div id="keyword2"></div>
-                                <div id="keyword3"></div>
-                                <div id="keyword4"></div>
-                                <div id="keyword5"></div>
-                                <div id="keyword6"></div>
-                                <div id="keyword7"></div>
-                                <div id="keyword8"></div>
-                                <div id="keyword9"></div>
-                                <div id="keyword10"></div>
+                        
+                        <div>
+                            <div>Alarmierung am: </div>
+                            <div id="alertTime"></div>
+                            <div>Zeit seit Alarmierung: </div>
+                            <div id="timeSinceAlert"></div>
+                            <div class="alertKeyword">
+                                <table>
+                                    <tr>
+                                        <td>Einsatzstichwort: </td>
+                                        <td><div id="shortKeywordDesc"></div></td>
+                                        <td rowspan="2">
+                                            <div id="keywordImage"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alarmstufe:</td>
+                                        <td><div id="alertLevelDesc"></div></td>
+                                    </tr>
+                                </table>
                             </div>
+                            <div id="furtherKeywords">
+                                <div>Weitere Einsatzstichwörter: </div>
+                                <ul></ul>
+                            </div>
+                            
                         </div>
                         
                     </div>
@@ -79,8 +67,16 @@
                         <div class="mapContainer">
                             <div id="map"></div>
                             <div id="mapInfo">
-                                <div id="distance"></div>
-                                <div id="duration"></div>
+                                <table>
+                                    <tr>
+                                        <td>Entfernung:</td>
+                                        <td style="text-align: right;"><div id="distance"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fahrtzeit:</td>
+                                        <td style="text-align: right;"><div id="duration"></div></td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
