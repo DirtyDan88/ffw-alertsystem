@@ -127,6 +127,12 @@ public class Message {
         return newAlphaStr;
     }
     
+    
+    
+    /**
+     * Getter-Methods
+     */
+    
     public String getPocsag1200Str() {
         return this.pocsag1200Str;
     }

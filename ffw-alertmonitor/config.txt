@@ -1,16 +1,27 @@
-# 
-port=50000
+### ALERTMONITOR SETTINGS ###
+
+# port the POCSAG messages comes from
+pocsag-port=50000
 
 # the RICs which will trigger an alert
 # seperated by ",", add "*" to list for all rigs
 alert-rics=158973
 
 
-# determines the RICs which resets the watchdog
+### TV SETTINGS ###
+serial-port=/dev/ttyAMA0
+
+
+### WATCHDOG SETTINGS ###
+
+# RICs which triggers a watchdog-reset
 watchdog-rics=174896,157601
-# watchdog message will be sent to: 
+
+# watchdog message will be sent to:
 watchdog-addr=192.168.1.255
+
 # port which the watchdog process listens on
 watchdog-port=50001
+
 # watchdog timeout in minutes:
 watchdog-timeout=10

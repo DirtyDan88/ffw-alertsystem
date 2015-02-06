@@ -28,7 +28,7 @@ public class AlertListener implements Runnable {
         this.messageQueue = messageQueue;
         this.buffer = new StringBuilder();
         
-        this.port = Integer.parseInt(ConfigReader.getConfigVar("port"));
+        this.port = Integer.parseInt(ConfigReader.getConfigVar("pocsag-port"));
         
         try {
             this.socket = new DatagramSocket(this.port);

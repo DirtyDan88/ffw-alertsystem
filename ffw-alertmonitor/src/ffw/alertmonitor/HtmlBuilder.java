@@ -23,11 +23,10 @@ public class HtmlBuilder {
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
         this.setElement("#timestamp", timestamp);
         
-        this.setElement("#latitude", msg.getLatitude());
-        this.setElement("#longitude", msg.getLongitude());
-        
+        this.setElement("#latitude",     msg.getLatitude());
+        this.setElement("#longitude",    msg.getLongitude());
         this.setElement("#shortKeyword", msg.getShortKeyword());
-        this.setElement("#alertLevel", msg.getAlertLevel());
+        this.setElement("#alertLevel",   msg.getAlertLevel());
         
         /* max. 10 keywords */
         for (int i=0; i<msg.getKeywords().size() && i<10; i++) {
