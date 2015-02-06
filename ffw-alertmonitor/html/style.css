@@ -18,11 +18,11 @@ html, body {
 }
 .leftWrapper {
     height: 100%;
-    width: 40%;
+    width: 43%;
 }
 .rightWrapper {
     height: 100%;
-    width: 60%;
+    width: 57%;
     padding-left:20px;
 }
 div.left {
@@ -94,7 +94,7 @@ div#mapInfo {
     bottom: 5%;
     right: 3%; 
     height: 10%;
-    width: 22%;
+    width: 25%;
     background: grey;
     opacity: 0.75;
     border: 1px dashed black;

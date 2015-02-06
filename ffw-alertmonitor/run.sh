@@ -11,4 +11,4 @@ then
 fi
 
 export DISPLAY=":0" # chromium needs this
-java $JAVA_OPT -jar $1
+java $JAVA_OPT -jar ffw-alertmonitor.jar
