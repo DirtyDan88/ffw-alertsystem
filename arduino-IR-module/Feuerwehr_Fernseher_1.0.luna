@@ -1,0 +1,243 @@
+'******************************************************************************
+' Author      : David Ruckes
+' Title       : Feuerwehr Fernseher Platine
+' Version     : 1.0
+' Last updated: 07.02.2014
+'******************************************************************************
+' Compiler    : LunaAVR 2014.r2.4
+'*******************************************************************************
+
+#library "Library/Wdt.interface"
+
+'******************************************************************************
+avr.device = atmega328p
+avr.clock = 16000000
+avr.stack = 64
+
+'*******************************************************************************
+uart.baud = 9600
+uart.Recv.enable
+uart.Send.enable
+
+uart.recv.fifo = 8						'8 Bytes für Empfangsbuffer
+
+'*******************************************************************************
+'Eingang des Optokopplers für die Stromerkennung des Fernsehers
+#define USB_Power as PortB.2
+USB_Power.mode=input,pullup
+'LED zur USB_Stromerkennung, dient der Erkennung ob der Fernseher angeschlatet ist
+#define USB_LED as PortB.5
+USB_LED.mode=output,low
+'Ausgang für die IR-LED an PWM-Port A1 16Bit
+#define IR_LED as PortB.1
+IR_LED.mode=input
+
+'*******************************************************************************
+'Timer0 für den Kürzesten Zeitintervall eines Impulses
+dim prescaletimer0 as byte
+prescaletimer0 = 0xcc
+Timer0.isr   = ServiceRoutine
+Timer0.clock = 256
+Timer0.value = prescaletimer0
+Timer0.disable
+
+'*******************************************************************************
+'Timer1 für die 36Khz modellierung der IR-LED
+Timer1.pwm.mode = 4
+Timer1.clock = 1
+Timer1.CmpA.Mode = toggle
+AVR.OCR1A = 221
+
+'*******************************************************************************
+'Timer2 für die Globale Systemzeit in Millisekunden
+dim prescaletimer2 as byte
+prescaletimer2 = 0x64
+Timer2.isr   = zehnmilli
+Timer2.clock = 1024
+Timer2.value = prescaletimer2
+Timer2.enable
+
+'*******************************************************************************
+
+' WDT -- wdr command
+wdt.Reset()
+
+' WDT abschalten
+wdt.mode = halt
+
+' WDT Zykluszeit einstellen
+wdt.clock = 250ms
+
+' WDT Mode Reset -- springt den RESET-Vector (0x0000) an.
+wdt.mode = reset
+
+
+dim Durchlauf, Bitstelle, Delay, sekunde, soll, zaehler as byte
+dim Bitwert(14), Teilbit, USB_Power_vorher as boolean
+dim Eingabe as string
+dim Buffer, zeit as word
+
+
+'*******************************************************************************
+Avr.Interrupts.Enable
+'*******************************************************************************
+
+
+soll = 3
+'wait 1
+uart.flush
+
+USB_Power_vorher = USB_Power
+if USB_Power = 0 then
+USB_LED = 1
+else
+USB_LED = 0
+endif
+
+do
+
+wdt.Reset()
+
+if USB_Power_vorher <> USB_Power then
+USB_Power_vorher = USB_Power
+soll = 3
+if USB_Power = 0 then
+USB_LED = 1
+else
+USB_LED = 0
+endif
+endif
+
+Eingabe = Datenverarbeitung()
+
+select case Eingabe
+case "#AN"
+uart.print "AN"
+soll = 1
+if USB_LED = 0 then
+Anschalten()
+endif
+case "#AU"
+uart.print "AU"
+soll = 0
+if USB_LED = 1 then
+Anschalten()
+endif
+case "#ST"
+if USB_LED = 1 then
+uart.print "AN"
+else
+uart.print "AU"
+endif
+case "-"
+uart.flush
+caseelse
+uart.print "ER"
+uart.flush
+endSelect
+
+if sekunde > 5 and soll = 0 and USB_LED = 1 then
+sekunde = 0
+incr zaehler
+if zaehler > 2 then
+zaehler = 0
+soll = 3
+endif
+Anschalten()
+elseif sekunde > 5 and soll = 1 and USB_LED = 0 then
+sekunde = 0
+Anschalten()
+endif
+
+loop
+
+end
+
+
+'*******************************************************************************
+Isr ServiceRoutine
+Timer0.value = prescaletimer0
+if Bitstelle < 14 then
+if Bitwert(Bitstelle) = 0 then
+if Teilbit = 0 then
+Teilbit = 1
+IR_LED.mode=output
+else
+IR_LED.mode=input
+Teilbit = 0
+incr Bitstelle
+endif
+else
+if Teilbit = 0 then
+Teilbit = 1
+IR_LED.mode=input
+else
+IR_LED.mode=output
+Teilbit = 0
+incr Bitstelle
+endif
+endif
+else
+IR_LED.mode=input
+if Durchlauf > 8 then
+Timer0.Disable
+else
+incr Delay
+if Delay > 103 then
+Delay = 0
+Bitstelle = 0
+incr Durchlauf
+endif
+endif
+endif
+EndIsr
+
+'*******************************************************************************
+Isr zehnmilli
+Timer2.value = prescaletimer2
+incr zeit
+if Zeit > 100 then
+zeit = 0
+incr sekunde
+endif
+
+EndIsr
+
+'*******************************************************************************
+function Datenverarbeitung()as string
+dim Daten as string
+if uart.byteAvailable = True then
+Daten = uart.inpStr()
+return Daten
+uart.flush
+else
+return "-"
+endif
+
+endfunc
+
+'*******************************************************************************
+procedure Anschalten()
+
+if zeit < 50 then
+Buffer = Datacode.wordvalue(0)
+else
+Buffer = Datacode.wordvalue(2)
+endif
+
+For Bitstelle=0 to 13
+Bitwert(Bitstelle) = Buffer.(15-Bitstelle)
+next
+
+Bitstelle = 0
+Durchlauf = 0
+sekunde = 0
+Timer0.enable
+endProc
+
+'*******************************************************************************
+data Datacode
+.dw 0b1100000000110000	'An/Aus Taste
+.dw 0b1110000000110000
+enddata
+'*******************************************************************************
