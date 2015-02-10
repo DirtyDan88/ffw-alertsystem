@@ -1,4 +1,4 @@
-# Alarmmonitor_Feuerwehr
+# Arduino IR-Modul
 Einschaltroutine, für den Fernseher in der Fahrzeughalle
 
 Dieses kleine Programm ermöglicht das Einschalten und Steuern eines Fernsehers, mittels Serialverbindung. Verwendet wurde ein "Arduino Mini Pro", an dem eine IR-LED angeschlossen ist.
