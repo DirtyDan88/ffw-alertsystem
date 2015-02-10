@@ -13,6 +13,6 @@ Linux / Windows:
    
 The RXTX library (for COM port communication) brings platform dependent libs:
 * Linux: 
-    *'sudo apt-get install librxtx-java' for installation (needs 32-bit JVM?)
+    * 'sudo apt-get install librxtx-java' for installation (needs 32-bit JVM?)
     * use run.sh to execute alertmonitor.jar (which sets some path vars for the JVM)
-* Windows: not tested yet
+* Windows: not yet tested 
