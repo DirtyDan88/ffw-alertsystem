@@ -8,8 +8,15 @@ pocsag-port=50000
 alert-rics=158973
 
 
+
+
 ### TV SETTINGS ###
+
+# disable/enable tv module
+tv-module=enable
 serial-port=/dev/ttyAMA0
+
+
 
 
 ### WATCHDOG SETTINGS ###

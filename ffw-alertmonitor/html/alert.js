@@ -21,6 +21,6 @@ function setAlertKeywordAndLevel() {
                              "TH klein", "TH mittel", "TH groß", "Gefahrgut");
     $("#alertLevelDesc").text(levels[alertLevel - 1]);
     
-    
+    // TODO: get some more pictures
     $("#keywordImage").prepend('<img src="../images/F.png" />')
 }

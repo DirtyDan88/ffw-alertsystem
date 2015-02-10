@@ -13,7 +13,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class HtmlBuilder {
-    
     private String html = "";
     private Document doc;
     
@@ -21,7 +20,7 @@ public class HtmlBuilder {
         this.loadTemplate("html/template.html");
         
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
-        this.setElement("#timestamp", timestamp);
+        this.setElement("#timestamp",    timestamp);
         this.setElement("#latitude",     msg.getLatitude());
         this.setElement("#longitude",    msg.getLongitude());
         this.setElement("#shortKeyword", msg.getShortKeyword());
@@ -90,5 +89,4 @@ public class HtmlBuilder {
         Element tag = this.doc.select(cssSelector).first();
         tag.html(content);
     }
-    
 }

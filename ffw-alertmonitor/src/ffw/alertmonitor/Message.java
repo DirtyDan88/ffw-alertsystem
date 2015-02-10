@@ -2,33 +2,24 @@ package ffw.alertmonitor;
 
 import java.util.Vector;
 
-/**
- * represents a POCSAG1200 message
- * @author max
- *
- */
 public class Message {
-    
     private String pocsag1200Str;
-    
-    private String address = null;
+    private String address  = null;
     private String function = null;
-    private String alpha = null;
+    private String alpha    = null;
     
     private boolean isComplete     = false;
     private boolean hasCoordinates = false;
     
-    private String latitude;
-    private String longitude;
-    private String shortKeyword;
-    private String alertLevel;
+    private String         latitude;
+    private String         longitude;
+    private String         shortKeyword;
+    private String         alertLevel;
     private Vector<String> keywords = new Vector<String>();
     
     public Message(String pocsag1200Str) {
         this.pocsag1200Str = pocsag1200Str;
     }
-    
-    
     
     public void evaluateMessageHead() {
         //pocsag1200Str.startsWith("POCSAG1200:")
@@ -63,13 +54,12 @@ public class Message {
         if (this.getAlpha() != null) {
             String[] alphaStr = this.cleanAlphaString().split("#");
             
-            
             if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
                 /* alert with latitude and longitude */
                 this.latitude  = alphaStr[0];
                 this.longitude = alphaStr[1];
                 
-                // TODO: alphaStr[2] ???
+                // TODO: alphaStr[2] := laufende Einsatznummer
                 
                 if (this.isShortKeyword(alphaStr[3])) {
                     this.shortKeyword = alphaStr[3].substring(0, 1);
@@ -86,15 +76,8 @@ public class Message {
                 this.hasCoordinates = true;
                 
             } else {
-                /* alert without geo coordinates */
-                /*
-                for (int i = 0; i < alphaStr.length; i++) {
-                    this.keywords.add(alphaStr[i]);
-                }
-                */
+                /* TODO: alert without geo coordinates */
             }
-            
-            
         }
     }
     
@@ -118,11 +101,6 @@ public class Message {
                 newAlphaStr = newAlphaStr.concat(alphaStr[i] + "#");
             }
         }
-        
-        //newAlphaStr = newAlphaStr.replace("�", "ae");
-        //newAlphaStr = newAlphaStr.replace("�", "oe");
-        //newAlphaStr = newAlphaStr.replace("�", "ue");
-        //newAlphaStr = newAlphaStr.replace("�", "ss");
         
         return newAlphaStr;
     }

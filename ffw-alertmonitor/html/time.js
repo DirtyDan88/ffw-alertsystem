@@ -49,6 +49,5 @@ function setAlertTime() {
                         mins. substr(mins.length-2) + ':' + 
                         secs. substr(secs.length-2) + " Uhr";
     
-    
     $("#alertTime").text(formattedTime);
 }

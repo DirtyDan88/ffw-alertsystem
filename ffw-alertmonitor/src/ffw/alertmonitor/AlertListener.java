@@ -9,20 +9,13 @@ import java.util.Queue;
 
 import ffw.util.ConfigReader;
 
-
-
 public class AlertListener implements Runnable {
-    
-    private Queue<Message> messageQueue = null;
-    
     private boolean stopped = false;
     
-    private int port;
+    private int            port;
     private DatagramSocket socket;
-    
-    private StringBuilder buffer;
-    
-    
+    private StringBuilder  buffer;
+    private Queue<Message> messageQueue = null;
     
     public AlertListener(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
@@ -60,8 +53,6 @@ public class AlertListener implements Runnable {
             String      recvStr = new String(data, 0, length);
             recvStr = recvStr.replaceAll("[\n\r]", "#");
             
-            
-            
             this.buffer.append(recvStr);
             System.out.println(">> received data, buffer is:       '" + buffer + "'");
             
@@ -76,7 +67,6 @@ public class AlertListener implements Runnable {
         while (buffer.indexOf("#") != -1) {
             int start = buffer.indexOf("POCSAG1200:");
             int end = buffer.indexOf("#");
-            
             
             if (start == -1) {
                 buffer.setLength(0);

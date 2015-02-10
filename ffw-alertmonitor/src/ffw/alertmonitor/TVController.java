@@ -3,10 +3,10 @@ package ffw.alertmonitor;
 import java.io.IOException;
 import java.io.OutputStream;
 import gnu.io.*;
+
 import ffw.util.ConfigReader;
 
 public class TVController implements Runnable {
-    
     public enum TVAction {
         SWITCH_ON, 
         TURN_OFF, 
@@ -28,7 +28,6 @@ public class TVController implements Runnable {
             }
         }
     }
-    
     TVAction action;
     
     public TVController(TVAction action) {

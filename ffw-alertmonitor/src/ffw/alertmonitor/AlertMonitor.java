@@ -15,13 +15,9 @@ import ffw.util.MessageLogger;
 import ffw.util.MessageLogger.LogEvent;
 
 public class AlertMonitor implements Runnable {
-    
-    private Queue<Message> messageQueue = null;
-    
     private boolean stopped = false;
     
-    
-    
+    private Queue<Message> messageQueue = null;
     
     public AlertMonitor(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
@@ -82,10 +78,8 @@ public class AlertMonitor implements Runnable {
         
         if (msg.hasCoordinates()) {
             System.out.println("## alert was triggered");
-            
             /* try to switch on TV */
             TVController.send(TVAction.SWITCH_ON);
-            
             
             HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
             String fileName = htmlBuilder.writeTemplate("html/alerts/");
@@ -96,10 +90,7 @@ public class AlertMonitor implements Runnable {
                     Runtime.getRuntime().exec("script/alert.bat " + fileName);
                 } else {
                     Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
-                } 
-                
-                
-                
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -133,6 +124,8 @@ public class AlertMonitor implements Runnable {
     public synchronized void stop() {
         this.stopped = true;
     }
+    
+    
     
     
     
