@@ -7,7 +7,7 @@
 '*******************************************************************************
 
 
-#define Debug as 1
+#define Debug as 0
 
 
 #library "Library/Wdt.interface"
@@ -64,19 +64,16 @@ Timer2.enable
 
 ' WDT -- wdr command
 wdt.Reset()
-
 ' WDT abschalten
 wdt.mode = halt
-
 ' WDT Zykluszeit einstellen
-wdt.clock = 250ms
-
+wdt.clock = 1s
 ' WDT Mode Reset -- springt den RESET-Vector (0x0000) an.
 wdt.mode = reset
 
 
-dim Durchlauf_ist, Durchlauf_soll, Bitstelle, Delay, sekunde, Zustand_soll, zaehler, Lautstaerke_ist, Lautstaerke_soll as byte
-dim Bitwert(14), Teilbit as boolean
+dim Durchlauf_ist, Durchlauf_soll, Bitstelle, Delay, sekunde, Zustand_soll, zaehler, Lautstaerke_ist, Lautstaerke_soll, Lautstaerke_diff, warteschlange as byte
+dim Bitwert(14), Teilbit, Busy as boolean
 dim Eingabe as string
 dim Buffer, zeit as word
 
@@ -85,46 +82,73 @@ dim Buffer, zeit as word
 Avr.Interrupts.Enable
 '*******************************************************************************
 
-
-'wait 1
+waitms 100
 uart.flush
 
-USB_Power = NOT USB_LED
-Zustand_soll = USB_LED
+if USB_Power = 1 then
+USB_LED = 0
+else
+USB_LED = 1
+endif
+
+Zustand_soll = 2
+Busy = False
+Warteschlange = 0
 
 #if Debug
-uart.print "USB_Power: " + str(USB_Power)
-uart.print "USB_LED und Zustand_soll" +
+uart.print "Starte uC"
+uart.print
+'uart.print "USB_Power: " + str(USB_Power)
+'uart.print "USB_LED: " + str(USB_LED)
+'uart.print "Zustand_soll: " + str(Zustand_soll)
 #endif
+
 do
 
 wdt.Reset()
 
-USB_Power = NOT USB_LED
-
-Eingabe = Datenverarbeitung()
-
-#if Debug
-if Eingabe = "-" then
-uart.print "Keine Eingabe vorhanden"
+if USB_Power = 1 then
+USB_LED = 0
 else
-uart.print "Eingabe: " + Eingabe
-uart.print "Eingabenlänge: " + str(Len(Eingabe))
+USB_LED = 1
 endif
-#endif
+
+if uart.byteAvailable = True then
+
+Eingabe = uart.inpStr()
+'uart.flush
+
+'#if Debug
+	'uart.print "Eingabe: " + Eingabe
+	'uart.print "Eingabenlänge: " + str(Len(Eingabe))
+'#endif
 
 select case Eingabe
 case "#AN"
 uart.print "AN"
 Zustand_soll = 1
 if USB_LED = 0 then
+if Busy = True then
+warteschlange.0 = 1
+#if Debug
+uart.print "Warteschlange AN"
+#endif
+else
 Anschalten()
+endif
 endif
 case "#AU"
 uart.print "AU"
 Zustand_soll = 0
 if USB_LED = 1 then
+if Busy = True then
+warteschlange.1 = 1
+#if Debug
+uart.print "Warteschlange AU"
+#endif
+else
 Anschalten()
+endif
 endif
 case "#ST"
 if USB_LED = 1 then
@@ -132,38 +156,96 @@ uart.print "AN"
 else
 uart.print "AU"
 endif
+case "#LSRE"
+if USB_LED = 0 then
+uart.print "AU"
+else
+uart.print "LSRE"
+if Busy = True then
+warteschlange.2 = 1
+#if Debug
+uart.print "Warteschlange LSRE"
+#endif
+else
+Lautstaerke_reset()
+endif
+endif
 case "-"
 uart.flush
 caseelse
 if left(Eingabe,3) = "#LS" then
+if USB_LED = 0 then
+uart.print "AU"
+else
 Lautstaerke_soll = Val(right(Eingabe,(Len(Eingabe)-3)))
 uart.print str(Lautstaerke_soll)
-Lautstaerke_einstellen(Lautstaerke_soll)
+if Busy = True then
+warteschlange.3 = 1
+#if Debug
+uart.print "Warteschlange LS XXX"
+#endif
+else
+Lautstaerke_einstellen()
+endif
+endif
 else
 uart.print "ER"
 uart.flush
 endif
+
 endSelect
+endif
 
 if sekunde > 5 and Zustand_soll = 0 and USB_LED = 1 then
 #if Debug
-uart.print "5 Sekunden überschritten, wiedereinschalten versuchen"
+uart.print "5 Sekunden überschritten, wiederausschalten versuchen"
 #endif
 sekunde = 0
-incr zaehler
-if zaehler > 2 then
-zaehler = 0
-soll = 3
-endif
+Zustand_soll = 2
 Anschalten()
-elseif sekunde > 5 and Zustand_soll = 1 and USB_LED = 0 then
+
+elseif sekunde > 2 and Zustand_soll = 1 and USB_LED = 0 then
 #if Debug
-	uart.print "5 Sekunden überschritten, wiederausschalten versuchen"
+	uart.print "2 Sekunden überschritten, wiedereinschalten versuchen"
 #endif
 sekunde = 0
+Zustand_soll = 2
 Anschalten()
+
 elseif sekunde > 5 then
 sekunde = 0
+endif
+
+if Busy = False AND warteschlange <> 0 then
+if Warteschlange.0 = 1 then
+if warteschlange.1 = 1 then
+warteschlange.0 = 0
+warteschlange.1 = 0
+else
+warteschlange.0 = 0
+if USB_LED = 0 then
+Anschalten()
+endif
+endif
+elseif Warteschlange.1 = 1 then
+warteschlange.1 = 0
+if USB_LED = 1 then
+Anschalten()
+endif
+
+Anschalten()
+elseif warteschlange.2 = 1 then
+warteschlange.2 = 0
+warteschlange.3 = 0
+if USB_LED = 1 then
+Lautstaerke_reset()
+endif
+elseif warteschlange.3 = 1 then
+warteschlange.3 = 0
+if USB_LED = 1 then
+Lautstaerke_einstellen()
+endif
+endif
 endif
 
 loop
@@ -204,10 +286,13 @@ incr Durchlauf_ist
 endif
 
 if Durchlauf_ist > Durchlauf_soll then
+Busy = False
 Timer0.Disable
+endif
 endif
 
 EndIsr
+
 '*******************************************************************************
 Isr zehnmilli
 Timer2.value = prescaletimer2
@@ -218,19 +303,11 @@ incr sekunde
 endif
 
 EndIsr
-'*******************************************************************************
-function Datenverarbeitung()as string
-dim Daten as string
-if uart.byteAvailable = True then
-Daten = uart.inpStr()
-uart.flush
-return Daten
-else
-return "-"
-endif
-endfunc
+
 '*******************************************************************************
 procedure Anschalten()
+
+Busy = True
 
 if zeit < 50 then
 Buffer = Datacode.wordvalue(0)
@@ -248,9 +325,11 @@ Durchlauf_soll = 7
 sekunde = 0
 Timer0.enable
 endProc
-'*******************************************************************************
-procedure Lautsaerke_einstellen()
 
+'*******************************************************************************
+procedure Lautstaerke_einstellen()
+
+Busy = True
 
 if Lautstaerke_soll < Lautstaerke_ist then
 if zeit < 50 then
@@ -268,6 +347,8 @@ endif
 Lautstaerke_diff = Lautstaerke_soll-Lautstaerke_ist
 endif
 
+Lautstaerke_ist = Lautstaerke_soll
+
 For Bitstelle=0 to 13
 Bitwert(Bitstelle) = Buffer.(15-Bitstelle)
 next
@@ -281,6 +362,8 @@ endproc
 
 '*******************************************************************************
 procedure Lautstaerke_reset()
+
+Busy = True
 
 if zeit < 50 then
 Buffer = Datacode.wordvalue(4)
