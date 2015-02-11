@@ -11,4 +11,15 @@ then
 fi
 
 export DISPLAY=":0" # chromium needs this
-java $JAVA_OPT -jar ffw-alertmonitor.jar
+
+case "$1" in
+    bg)
+    echo "execution in background"
+    # run application in background, input = null and output to alertmonitor.log
+    nohup java $JAVA_OPT -jar ffw-alertmonitor.jar < /dev/null >> log/alertmonitor.log &
+    ;;
+    
+    *)
+    java $JAVA_OPT -jar ffw-alertmonitor.jar
+    ;;
+esac

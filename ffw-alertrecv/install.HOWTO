@@ -78,3 +78,16 @@ rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a 
 # for output to bash:
 rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin >> /dev/stdout
 
+
+
+
+*** ALL TOGETHER: create script && set up script on system startup
+# create init script: http://jankarres.de/2014/07/raspberry-pi-autostart-von-programmen-einrichten/
+copy alertrecv_init.sh into /etc/init.d/
+sudo chmod +x /etc/init.d/alertrecv_init.sh
+sudo update-rc.d alertrecv_init.sh defaults
+
+# create the actual script which does the work 
+sudo apt-get install gawk
+copy alertrecv.sh into ~/alertrecv
+

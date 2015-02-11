@@ -13,6 +13,10 @@ case "$1" in
         echo "Testing alert message with geo coordinates ..."
         MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.324291/08.808761/26/F1 undefiniertes Kleinfeuer//vorm Kindergarten/Industriestraße /Meckesheim// //brennende Mülleimer/"
         ;;
+    alert3)
+	echo "Testing with real pocsag string ..."
+	MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.31765/08.80954/329/F2 Kellerbrand///Zeppelinstr. 29 /Meckesheim// //Trocknerbrand/"
+	;;
     --help)
         echo "Usage: $0 {watchdog | alert1 | alert2 | <message>}"
         exit 1 
