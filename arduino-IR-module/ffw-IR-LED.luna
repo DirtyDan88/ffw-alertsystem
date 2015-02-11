@@ -1,11 +1,14 @@
 '******************************************************************************
-' Author      : David Ruckes
-' Title       : Feuerwehr Fernseher Platine
+' Author      : David R
 ' Version     : 1.0
 ' Last updated: 07.02.2014
 '******************************************************************************
 ' Compiler    : LunaAVR 2014.r2.4
 '*******************************************************************************
+
+
+#define Debug as 1
+
 
 #library "Library/Wdt.interface"
 
@@ -72,8 +75,8 @@ wdt.clock = 250ms
 wdt.mode = reset
 
 
-dim Durchlauf, Bitstelle, Delay, sekunde, soll, zaehler as byte
-dim Bitwert(14), Teilbit, USB_Power_vorher as boolean
+dim Durchlauf_ist, Durchlauf_soll, Bitstelle, Delay, sekunde, Zustand_soll, zaehler, Lautstaerke_ist, Lautstaerke_soll as byte
+dim Bitwert(14), Teilbit as boolean
 dim Eingabe as string
 dim Buffer, zeit as word
 
@@ -83,43 +86,43 @@ Avr.Interrupts.Enable
 '*******************************************************************************
 
 
-soll = 3
 'wait 1
 uart.flush
 
-USB_Power_vorher = USB_Power
-if USB_Power = 0 then
-USB_LED = 1
-else
-USB_LED = 0
-endif
+USB_Power = NOT USB_LED
+Zustand_soll = USB_LED
 
+#if Debug
+uart.print "USB_Power: " + str(USB_Power)
+uart.print "USB_LED und Zustand_soll" +
+#endif
 do
 
 wdt.Reset()
 
-if USB_Power_vorher <> USB_Power then
-USB_Power_vorher = USB_Power
-soll = 3
-if USB_Power = 0 then
-USB_LED = 1
-else
-USB_LED = 0
-endif
-endif
+USB_Power = NOT USB_LED
 
 Eingabe = Datenverarbeitung()
+
+#if Debug
+if Eingabe = "-" then
+uart.print "Keine Eingabe vorhanden"
+else
+uart.print "Eingabe: " + Eingabe
+uart.print "Eingabenlänge: " + str(Len(Eingabe))
+endif
+#endif
 
 select case Eingabe
 case "#AN"
 uart.print "AN"
-soll = 1
+Zustand_soll = 1
 if USB_LED = 0 then
 Anschalten()
 endif
 case "#AU"
 uart.print "AU"
-soll = 0
+Zustand_soll = 0
 if USB_LED = 1 then
 Anschalten()
 endif
@@ -132,11 +135,20 @@ endif
 case "-"
 uart.flush
 caseelse
+if left(Eingabe,3) = "#LS" then
+Lautstaerke_soll = Val(right(Eingabe,(Len(Eingabe)-3)))
+uart.print str(Lautstaerke_soll)
+Lautstaerke_einstellen(Lautstaerke_soll)
+else
 uart.print "ER"
 uart.flush
+endif
 endSelect
 
-if sekunde > 5 and soll = 0 and USB_LED = 1 then
+if sekunde > 5 and Zustand_soll = 0 and USB_LED = 1 then
+#if Debug
+uart.print "5 Sekunden überschritten, wiedereinschalten versuchen"
+#endif
 sekunde = 0
 incr zaehler
 if zaehler > 2 then
@@ -144,15 +156,19 @@ zaehler = 0
 soll = 3
 endif
 Anschalten()
-elseif sekunde > 5 and soll = 1 and USB_LED = 0 then
+elseif sekunde > 5 and Zustand_soll = 1 and USB_LED = 0 then
+#if Debug
+	uart.print "5 Sekunden überschritten, wiederausschalten versuchen"
+#endif
 sekunde = 0
 Anschalten()
+elseif sekunde > 5 then
+sekunde = 0
 endif
 
 loop
 
 end
-
 
 '*******************************************************************************
 Isr ServiceRoutine
@@ -179,19 +195,19 @@ endif
 endif
 else
 IR_LED.mode=input
-if Durchlauf > 8 then
-Timer0.Disable
-else
+
 incr Delay
 if Delay > 103 then
 Delay = 0
 Bitstelle = 0
-incr Durchlauf
+incr Durchlauf_ist
 endif
-endif
-endif
-EndIsr
 
+if Durchlauf_ist > Durchlauf_soll then
+Timer0.Disable
+endif
+
+EndIsr
 '*******************************************************************************
 Isr zehnmilli
 Timer2.value = prescaletimer2
@@ -202,20 +218,17 @@ incr sekunde
 endif
 
 EndIsr
-
 '*******************************************************************************
 function Datenverarbeitung()as string
 dim Daten as string
 if uart.byteAvailable = True then
 Daten = uart.inpStr()
-return Daten
 uart.flush
+return Daten
 else
 return "-"
 endif
-
 endfunc
-
 '*******************************************************************************
 procedure Anschalten()
 
@@ -230,14 +243,68 @@ Bitwert(Bitstelle) = Buffer.(15-Bitstelle)
 next
 
 Bitstelle = 0
-Durchlauf = 0
+Durchlauf_ist = 0
+Durchlauf_soll = 7
 sekunde = 0
 Timer0.enable
 endProc
+'*******************************************************************************
+procedure Lautsaerke_einstellen()
 
+
+if Lautstaerke_soll < Lautstaerke_ist then
+if zeit < 50 then
+Buffer = Datacode.wordvalue(4)
+else
+Buffer = Datacode.wordvalue(6)
+endif
+Lautstaerke_diff = Lautstaerke_ist-Lautstaerke_soll
+else
+if zeit < 50 then
+Buffer = Datacode.wordvalue(8)
+else
+Buffer = Datacode.wordvalue(10)
+endif
+Lautstaerke_diff = Lautstaerke_soll-Lautstaerke_ist
+endif
+
+For Bitstelle=0 to 13
+Bitwert(Bitstelle) = Buffer.(15-Bitstelle)
+next
+
+Bitstelle = 0
+Durchlauf_ist = 0
+Durchlauf_soll = Lautstaerke_diff
+sekunde = 0
+Timer0.enable
+endproc
+
+'*******************************************************************************
+procedure Lautstaerke_reset()
+
+if zeit < 50 then
+Buffer = Datacode.wordvalue(4)
+else
+Buffer = Datacode.wordvalue(6)
+endif
+
+For Bitstelle=0 to 13
+Bitwert(Bitstelle) = Buffer.(15-Bitstelle)
+next
+
+Bitstelle = 0
+Durchlauf_ist = 0
+Durchlauf_soll = 50
+sekunde = 0
+Timer0.enable
+endproc
 '*******************************************************************************
 data Datacode
 .dw 0b1100000000110000	'An/Aus Taste
 .dw 0b1110000000110000
+.dw 0b1100000001110000	'Lautstärke erhöhen
+.dw 0b1110000001110000
+.dw 0b1100000001010000	'Lautstärke veringern
+.dw 0b1110000001010000
 enddata
 '*******************************************************************************
