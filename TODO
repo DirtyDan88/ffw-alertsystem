@@ -1,3 +1,13 @@
 * Oberflaeche zur Eingabe von Testalarmierungen
 * Screensaver-Modi verhindern
 * gpio serial boot: http://blog.oscarliang.net/raspberry-pi-and-arduino-connected-serial-gpio/
+
+* Aufbau einer Möglichkeit zur "Text to Speech" Sprachausgabe über HDMI
+    - Straße Hausnummer
+    - Ort
+    - Einsatzstichwort
+* Auslesen der Straße und Hausnummer aus "Pocsag 1200"
+    - Möglichkeit zur Fehlerabwägung durch Abgleich der Straße mit Straßendatenbank von Me und Mö
+      ^^ Diese Arbeit könnte jemand der Kameraden übernehmen ;)
+
+  
