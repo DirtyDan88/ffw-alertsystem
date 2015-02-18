@@ -6,11 +6,45 @@
     - Straße Hausnummer
     - Ort
     - Einsatzstichwort
+    
 * Auslesen der Straße und Hausnummer aus "Pocsag 1200"
-    - Möglichkeit zur Fehlerabwägung durch Abgleich der Straße mit Straßendatenbank von Me und Mö
-      ^^ Diese Arbeit könnte jemand der Kameraden übernehmen ;)
+    - laut Rene, Dennis und Armin befindet sich diese immer an der selben Stelle
 
 * Option zum Ausschalten des Alarmmonitors
     - Manuell
     - Zeit
   
+* Desktopshortcut zum Ausschalten des Alarmmonitors
+    - Option zur Verwenung eines GPIO (Taster zum Triggern)
+    - Schließen aller laufenden Prozesse die nicht benötigt werden und Ausschalten des Fernsehers
+    (Serialport muss nach verwendung immer geschlossen werden, eine mehrfache verwendung ist nicht möglich)
+    
+* User "pi" in den Rechten weiter beschränken um Anwederfehler zu vermeiden
+
+* Einen .pdf Viewer installieren der einen Präsentationsmodus ermöglicht
+
+
+****************************************************************************************************************
+Ab hier nur noch Ideen für die Zukunft
+
+* Möglichkeit zur Anzeige des Einsatzstichwortes auf weiterem Pi
+    - Hintergrund ist hier ein 19" Monitor im Eingangsbereich
+    (Ich würde mich wieder um die Hardware kümmern: Monitor ein und Auschalten und der Bewegungsmelder)
+    Bei Alarmierung:
+        Triggerung bei Eingehen einer Alarmierung
+        Monitor anschalten
+        Einsatzstichwort anzeigen (gut zu wissen ob eher Überhosen oder Schutzbrillen gebraucht werden)
+        nach 15min Automatischer wechsel in "Normalmodus"
+    Im Normalfall:
+        Triggerung über angeschlossenen Bewegungsmelder vor dem Monitor
+        Monitor Anschalten
+        Anzeigen von: Herzlich willkommen - Freiwillige Feuerwehr Meckesheim / Abteilung Mönchzell mit Logo und aktueller Uhrzeit in groß
+        Weitere Ideen: Anzeige der nächsten Übungen
+        nach 5min ohne Trigger Ausschalten
+        
+    - Eventuelles Einrichten einer Service Seite die vom Funkraum-PC aufgerufen werden kann
+        Upload einer Bilderpräsentation oder des Kalenders mit den Terminen
+        Manuelles Unterdrücken des Monitors (Sleepstate)
+
+
+        
