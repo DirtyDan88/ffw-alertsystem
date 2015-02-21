@@ -45,6 +45,19 @@ Ab hier nur noch Ideen für die Zukunft
     - Eventuelles Einrichten einer Service Seite die vom Funkraum-PC aufgerufen werden kann
         Upload einer Bilderpräsentation oder des Kalenders mit den Terminen
         Manuelles Unterdrücken des Monitors (Sleepstate)
+        
+* Navigation für das LF (Tabletsuche)
+    - Funktionalitäten:
+        GPS / Wlan / 7"-10" Touch Display (Toll wäre eine Induktive Lademöglichkeit, die Spule könnte im LF fest verbaut werden, vielleicht mit einer Hülle möglich)
+    - Zu prüfen:
+        Startskripte und Einschränkungen der Benutzoberfläche um die Navigation im Vollbild laufen zu lassen ohne durch versehentliches Berühren die Navigation zu beenden
+        Lauffähigkeit von Navit auf Android 4.1-4.4 mit der Übergabe der Einsatzorte per sbus (Für Navit GPS-Funktionalität wird "gpsd" "gpsd-clients" und "python-gps" benötigt)
+        Hintergrundskript das mittels WLAN einen Einsatzort empfängt und an Navit übergibt
+        Einbinden von Hydranten in Navit aus der Openfiremap (GeoJSON, GPX, KML) (overpass-turbo.eu -> Wizard "hydrant")
+        Beenden der Navigation bei erreichen der Gerätehauses mit anschließendem Reset aller Einstellungen
+        Eventuelle Anpassung der Benutzeroberfläche von Navit um die Bedienung auf unsere bedürfnisse anzupassen
+        
+    
 
 
         
