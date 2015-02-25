@@ -17,6 +17,11 @@ case "$1" in
 	echo "Testing with real pocsag string ..."
 	MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.31765/08.80954/329/F2 Kellerbrand///Zeppelinstr. 29 /Meckesheim// //Trocknerbrand/"
 	;;
+    alert4)
+	echo "Test with "
+	MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.33422/08.85146/518/F1 Feuer klein//FW Meckesheim-Mönchz/Mühlstr. 12/Meckesheim-Mönchzell// //Test Test/<NUL><NUL>"
+	;;
+	
     --help)
         echo "Usage: $0 {watchdog | alert1 | alert2 | <message>}"
         exit 1 
@@ -27,4 +32,4 @@ case "$1" in
         ;;
 esac
 
-echo $MESSAGE | socat - udp-datagram:192.168.1.255:50000,broadcast
+echo $MESSAGE | socat - udp-datagram:255.255.255.255:50000,broadcast

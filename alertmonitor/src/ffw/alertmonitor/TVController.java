@@ -2,9 +2,10 @@ package ffw.alertmonitor;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import gnu.io.*;
 
+import gnu.io.*;
 import ffw.util.ConfigReader;
+import ffw.util.DateAndTime;
 
 public class TVController implements Runnable {
     public enum TVAction {
@@ -54,7 +55,8 @@ public class TVController implements Runnable {
         }
         
         if (serialPort != null) {
-            System.out.println("$$ serial connection is good, try to send command");
+            System.out.println("[" + DateAndTime.get() + "] $$ serial connection "
+                             + "is good, try to send command");
             
             /* try it several times, in case of some unexpected error */
             for (int i=0; i<5; i++) {

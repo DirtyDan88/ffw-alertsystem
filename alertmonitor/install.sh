@@ -18,6 +18,8 @@ javac -g:none \
       -d bin/ \
       -cp "lib/*" \
       src/ffw/util/*.java \
-      src/ffw/alertmonitor/*.java
+      src/ffw/alertmonitor/*.java \
+      src/ffw/watchdog/*.java
+
 echo ">> let ant do the building work ..."
-ant 
+ant

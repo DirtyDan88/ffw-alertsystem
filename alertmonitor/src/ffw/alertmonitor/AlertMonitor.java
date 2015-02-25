@@ -11,12 +11,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ffw.alertmonitor.TVController.TVAction;
 import ffw.util.ConfigReader;
+import ffw.util.DateAndTime;
 import ffw.util.MessageLogger;
 import ffw.util.MessageLogger.LogEvent;
 
 public class AlertMonitor implements Runnable {
     private boolean stopped = false;
-    
     private Queue<Message> messageQueue = null;
     
     public AlertMonitor(Queue<Message> messageQueue) {
@@ -25,13 +25,13 @@ public class AlertMonitor implements Runnable {
     
     @Override
     public void run() {
-        System.out.println("## start alertsystem");
+        System.out.println("[" + DateAndTime.get() + "] ## monitor is waiting "
+                         + "for messages");
         
         while (!this.stopped) {
             /* check if there are new messages */
             Message msg = this.messageQueue.poll();
             if (msg != null) {
-                System.out.println("## got the message");
                 this.handleMessage(msg);
                 
             } else {
@@ -44,7 +44,7 @@ public class AlertMonitor implements Runnable {
             }
         }
         
-        System.out.println("## stop alertsystem");
+        System.out.println("[" + DateAndTime.get() + "] ## monitor stopped");
     }
     
     private void handleMessage(Message msg) {
@@ -58,6 +58,7 @@ public class AlertMonitor implements Runnable {
             for (String curRIC : watchdogRICs) {
                 if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
                     MessageLogger.log(msg.getPocsag1200Str(), LogEvent.WATCHDOG);
+                    // TODO: reset watchdog for each incoming message? 
                     this.resetWatchdog();
                     break;
                 }
@@ -77,7 +78,6 @@ public class AlertMonitor implements Runnable {
         msg.evaluateAlphaString();
         
         if (msg.hasCoordinates()) {
-            System.out.println("## alert was triggered");
             /* try to switch on TV */
             TVController.send(TVAction.SWITCH_ON);
             
@@ -95,9 +95,12 @@ public class AlertMonitor implements Runnable {
                 e.printStackTrace();
             }
             
+            System.out.println("[" + DateAndTime.get() + "] ## alert was triggered");
             
         } else {
-            System.out.println("## alert was triggered, but no geo coordinates are given");
+            // TODO: show template without map?
+            System.out.println("[" + DateAndTime.get() + "] ## alert was triggered, "
+                             + "but no geo coordinates are given");
         }
     }
     
@@ -106,13 +109,17 @@ public class AlertMonitor implements Runnable {
         String addressStr = ConfigReader.getConfigVar("watchdog-addr");
         byte[] buf        = "I am alive!".getBytes();
         
-        System.out.println("## reset watchdog on: " + addressStr + ":" + port);
+        System.out.println("[" + DateAndTime.get() + "] ## reset watchdog on: " 
+                           + addressStr + ":" + port);
         
         try {
             InetAddress address   = InetAddress.getByName(addressStr);
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
             DatagramSocket socket = new DatagramSocket();
             
+            if (addressStr.equals("255.255.255.255")) {
+                socket.setBroadcast(true);
+            }
             socket.send(packet);
             socket.close();
             
@@ -127,21 +134,19 @@ public class AlertMonitor implements Runnable {
     
     
     
-    
-    
     public static void main(String[] args) {
+        System.out.println("[" + DateAndTime.get() + "] ffw-alertsystem started");
+        
         Queue<Message> messageStack  = new ConcurrentLinkedQueue<Message>();
         AlertMonitor   alertMonitor  = new AlertMonitor(messageStack);
         AlertListener  alertListener = new AlertListener(messageStack);
         
         Thread alertSystemThread   = new Thread(alertMonitor);
         Thread alertListenerThread = new Thread(alertListener);
-        
         alertSystemThread.start();
         alertListenerThread.start();
         
-        BufferedReader console = new BufferedReader(
-                                     new InputStreamReader(System.in));
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
         try {
             boolean quit = false;
             while (!quit) {
@@ -151,6 +156,7 @@ public class AlertMonitor implements Runnable {
             e.printStackTrace();
         }
         
+        System.out.println("[" + DateAndTime.get() + "] ffw-alertsystem stopped");
         alertListener.stop();
         alertMonitor.stop();
     }

@@ -8,6 +8,7 @@ import java.net.SocketTimeoutException;
 import java.util.Queue;
 
 import ffw.util.ConfigReader;
+import ffw.util.DateAndTime;
 
 public class AlertListener implements Runnable {
     private boolean stopped = false;
@@ -19,7 +20,7 @@ public class AlertListener implements Runnable {
     
     public AlertListener(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
-        this.buffer = new StringBuilder();
+        this.buffer       = new StringBuilder();
         
         this.port = Integer.parseInt(ConfigReader.getConfigVar("pocsag-port"));
         
@@ -34,7 +35,8 @@ public class AlertListener implements Runnable {
     
     @Override
     public void run() {
-        System.out.println(">> start listening on port " + port);
+        System.out.println("[" + DateAndTime.get() + "] >> listener is "
+                         + "listening (port: " + port + ")");
         
         while (!this.stopped) {
             /* listen for alerts */
@@ -54,19 +56,19 @@ public class AlertListener implements Runnable {
             recvStr = recvStr.replaceAll("[\n\r]", "#");
             
             this.buffer.append(recvStr);
-            System.out.println(">> received data, buffer is:       '" + buffer + "'");
-            
+            System.out.println("[" + DateAndTime.get() + "] >> received data, "
+                             + "buffer is:    '" + buffer + "'");
             this.checkMessageComplete();
         }
         
         this.socket.close();
-        System.out.println(">> stop listening on port " + port);
+        System.out.println("[" + DateAndTime.get() + "] >> listener stopped (port: " + port + ")");
     }
     
     private void checkMessageComplete() {
         while (buffer.indexOf("#") != -1) {
             int start = buffer.indexOf("POCSAG1200:");
-            int end = buffer.indexOf("#");
+            int end   = buffer.indexOf("#");
             
             if (start == -1) {
                 buffer.setLength(0);
@@ -79,7 +81,8 @@ public class AlertListener implements Runnable {
                 this.messageQueue.offer(new Message(pocsag1200Str));
                 
                 buffer.delete(0, end+1);
-                System.out.println(">> message complete, buffer is:    '" + buffer + "'");
+                System.out.println("                        >> message complete, "
+                                 + "buffer is: '" + buffer + "'");
             }
         }
     }

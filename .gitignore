@@ -1,7 +1,7 @@
-ffw-alertmonitor/bin/
-ffw-alertmonitor/html/alerts/
-ffw-alertmonitor/log/
-ffw-alertmonitor/*.jar
+alertmonitor/bin/
+alertmonitor/html/alerts/
+alertmonitor/log/
+alertmonitor/*.jar
 .classpath
 .project
 .settings
