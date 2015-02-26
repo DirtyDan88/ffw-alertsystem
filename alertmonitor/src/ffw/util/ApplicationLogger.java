@@ -16,7 +16,7 @@ public class ApplicationLogger {
         public String toString() {
             switch(this) {
                 case ALERTMONITOR: return "alertmonitor";
-                case WATCHDOG:     return "watchdog ";
+                case WATCHDOG:     return "watchdog";
                 default: throw new IllegalArgumentException();
             }
         }
