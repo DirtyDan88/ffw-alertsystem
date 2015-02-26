@@ -27,7 +27,7 @@ case "$1" in
                     echo "alertmonitor is already running"
                 else
                     # run app in background; input and output = null and log into file
-	             java $JAVA_OPT -jar $JARFILE -logInFile < /dev/null >> /dev/null &
+	            nohup java $JAVA_OPT -jar $JARFILE -logInFile < /dev/null >> /dev/null &
                     # write process id to lock-file
                     PROCESSID="PROCESS-ID: "$!
                     echo $PROCESSID > $LOCKFILE
