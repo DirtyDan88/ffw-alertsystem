@@ -17,6 +17,7 @@
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/javax.mail.jar"/>
         </jar>
     </target>
 </project>
