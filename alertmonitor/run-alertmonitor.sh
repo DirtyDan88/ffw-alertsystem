@@ -20,25 +20,25 @@ case "$1" in
     -bg)
         case "$2" in
             start)
-                if [ -n "$(netstat -a | grep $ALERTMONITOR_PORT)" ] ; then
+                if [ -e ".alertmonitor.lock" ] ; then
+#                if [ -n "$(netstat -a | grep $ALERTMONITOR_PORT)" ] ; then
                     echo "alertmonitor is already running"
                 else
-                    # run app in background; input = null and output to log file
-                    DATE=`date +%d-%m-%Y`
-                    LOGFILE="log/log-"$DATE"-alertmonitor.txt"
-                    nohup java $JAVA_OPT -jar ffw-alertmonitor.jar < /dev/null >> $LOGFILE &
-                    # write process id to logfile
+                    # run app in background; input and output = null and log into file
+                    nohup java $JAVA_OPT -jar ffw-alertmonitor.jar -logInFile < /dev/null >> /dev/null &
+                    # write process id to lock-file
                     PROCESSID="PROCESS-ID: "$!
-                    echo $PROCESSID >> $LOGFILE
+                    echo $PROCESSID > ".alertmonitor.lock"
                 fi
                 ;;
             stop)
-                # loop over all process id's and select the last one
-                for ID in $(cat log/*-alertmonitor.txt | grep PROCESS-ID) ; do
-                    PROCESSID=$ID
+                # get the process id from the lock-file
+                for PID in $(cat .alertmonitor.lock | grep PROCESS-ID) ; do
+                    PROCESSID=$PID
                 done
                 echo "kill alertmonitor process: "$PROCESSID
                 kill $PROCESSID
+                rm .alertmonitor.lock
                 ;;
             *)
                 echo "Usage: $0 {-bg start | -bg stop}"

@@ -6,8 +6,10 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
+import ffw.util.ApplicationLogger.Application;
 
 public class Watchdog {
     private DatagramSocket socket;
@@ -21,11 +23,12 @@ public class Watchdog {
             this.socket.setSoTimeout(1000 * 60 * timeout);
             
         } catch (SocketException e) {
-            e.printStackTrace();
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.WATCHDOG);
         }
         
-        System.out.println("[" + DateAndTime.get() +"] watchdog started (timeout: " 
-                         + timeout + " min)");
+        ApplicationLogger.log("watchdog started (timeout: " + timeout + " min)", 
+                              Application.WATCHDOG);
         
         while (true) {
             DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
@@ -36,16 +39,17 @@ public class Watchdog {
                 
                 int    length = packet.getLength();
                 byte[] data   = packet.getData();
-                System.out.println("[" + DateAndTime.get() +"] watchdog says: " 
-                                 + new String(data, 0, length));
+                ApplicationLogger.log("watchdog says: " + new String(data, 0, length), 
+                                      Application.WATCHDOG);
                 
             } catch (SocketTimeoutException e) {
-                System.out.println("[" + DateAndTime.get() +"] watchdog says: "
-                                 + "oh nooo!");
+                ApplicationLogger.log("watchdog says: oh nooo!", 
+                                      Application.WATCHDOG);
                 this.sendMail();
                 
             } catch (IOException e) {
-                e.printStackTrace();
+                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                      Application.WATCHDOG);
             }
         }
     }
@@ -58,12 +62,19 @@ public class Watchdog {
         String text       = "Watchdog timeout at " + DateAndTime.get() + "\n";
         
         Mail.send(userName, passWord, recipients, subject, text);
-        System.out.println("** send mail to: " + recipients);
+        ApplicationLogger.log("send mail to: " + recipients, 
+                              Application.WATCHDOG, false);
     }
     
     
     
     public static void main(String[] args) {
+        if (args.length > 0) {
+            if (args[0].equals("-logInFile")) {
+                ApplicationLogger.inFile = true;
+            }
+        }
+        
         new Watchdog().run();
     }
 }

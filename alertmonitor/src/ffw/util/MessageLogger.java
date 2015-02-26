@@ -8,12 +8,7 @@ import java.io.IOException;
 public class MessageLogger {
     
     public enum LogEvent {
-        WATCHDOG, 
-        ALERT;
-        
-        public String test() {
-            return "asdasd";
-        }
+        WATCHDOG, ALERT;
         
         @Override
         public String toString() {

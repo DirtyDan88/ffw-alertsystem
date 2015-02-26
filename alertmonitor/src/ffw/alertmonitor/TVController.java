@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import gnu.io.*;
+import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.DateAndTime;
+import ffw.util.ApplicationLogger.Application;
 
 public class TVController implements Runnable {
     public enum TVAction {
@@ -51,12 +52,13 @@ public class TVController implements Runnable {
         } catch (IOException | NoSuchPortException | 
                  UnsupportedCommOperationException | 
                  PortInUseException e) {
-            e.printStackTrace();
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
         }
         
         if (serialPort != null) {
-            System.out.println("[" + DateAndTime.get() + "] $$ serial connection "
-                             + "is good, try to send command");
+            ApplicationLogger.log("$$ serial connection is good, try to send command", 
+                                  Application.ALERTMONITOR);
             
             /* try it several times, in case of some unexpected error */
             for (int i=0; i<5; i++) {
@@ -65,12 +67,14 @@ public class TVController implements Runnable {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                          Application.ALERTMONITOR);
                 }
             }
             
             serialPort.close();
-            System.out.println("$$ serial connection closed");
+            ApplicationLogger.log("$$ serial connection closed", 
+                                  Application.ALERTMONITOR);
         }
     }
     
@@ -104,7 +108,6 @@ public class TVController implements Runnable {
         
         public void write(String message) {
             try {
-                
                 byte[] msg  = message.getBytes();
                 byte[] cr   = new byte[]{0x0D}; //CR
                 byte[] data = new byte[msg.length + cr.length];
@@ -117,7 +120,8 @@ public class TVController implements Runnable {
                 this.outStream.flush();
                 
             } catch (IOException e) {
-                e.printStackTrace();
+                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                      Application.ALERTMONITOR);
             }
         }
     }

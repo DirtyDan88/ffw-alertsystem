@@ -11,21 +11,21 @@ case "$1" in
                     echo "watchdog is already running"
                 else
                     # run app in background; output to log file
-                    DATE=`date +%d-%m-%Y`
-                    LOGFILE="log/log-"$DATE"-watchdog.txt"
-                    nohup java -jar ffw-alertsystem-watchdog.jar >> $LOGFILE &
-                    # write process id to logfile
+                    nohup java -jar ffw-alertsystem-watchdog.jar -logInFile >> /dev/null &
+                    # write process id to lock-file
                     PROCESSID="PROCESS-ID: "$!
-                    echo $PROCESSID >> $LOGFILE
+                    echo $PROCESSID > ".watchdog.lock"
                 fi
                 ;;
             stop)
-                # loop over all process id's and select the last one
-                for ID in $(cat log/*-watchdog.txt | grep PROCESS-ID) ; do
-                    PROCESSID=$ID
+                # get the process id from the lock-file
+                for PID in $(cat .watchdog.lock | grep PROCESS-ID) ; do
+                    PROCESSID=$PID
                 done
                 echo "kill watchdog process: "$PROCESSID
                 kill $PROCESSID
+                rm .watchdog.lock
+                
                 ;;
             *)
                 echo "Usage: $0 {-bg start | -bg stop}"

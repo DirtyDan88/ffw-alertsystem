@@ -7,8 +7,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Queue;
 
+import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.DateAndTime;
+import ffw.util.ApplicationLogger.Application;
 
 public class AlertListener implements Runnable {
     private boolean stopped = false;
@@ -29,14 +30,15 @@ public class AlertListener implements Runnable {
             this.socket.setSoTimeout(10);
             
         } catch (SocketException e) {
-            System.err.println("error during socket creation: " + e.getMessage());
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
         }
     }
     
     @Override
     public void run() {
-        System.out.println("[" + DateAndTime.get() + "] >> listener is "
-                         + "listening (port: " + port + ")");
+        ApplicationLogger.log(">> listener is listening (port: " + port + ")", 
+                              Application.ALERTMONITOR);
         
         while (!this.stopped) {
             /* listen for alerts */
@@ -46,7 +48,8 @@ public class AlertListener implements Runnable {
             } catch (SocketTimeoutException e) {
                 continue;
             } catch (IOException e) {
-                e.printStackTrace();
+                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                      Application.ALERTMONITOR);
             }
             
             /* create new message from recieved string */
@@ -56,13 +59,15 @@ public class AlertListener implements Runnable {
             recvStr = recvStr.replaceAll("[\n\r]", "#");
             
             this.buffer.append(recvStr);
-            System.out.println("[" + DateAndTime.get() + "] >> received data, "
-                             + "buffer is:    '" + buffer + "'");
+            ApplicationLogger.log(">> received data, buffer is:    '" + buffer + "'", 
+                                  Application.ALERTMONITOR);
+            
             this.checkMessageComplete();
         }
         
         this.socket.close();
-        System.out.println("[" + DateAndTime.get() + "] >> listener stopped (port: " + port + ")");
+        ApplicationLogger.log(">> listener stopped (port: " + port + ")",
+                              Application.ALERTMONITOR);
     }
     
     private void checkMessageComplete() {
@@ -81,8 +86,9 @@ public class AlertListener implements Runnable {
                 this.messageQueue.offer(new Message(pocsag1200Str));
                 
                 buffer.delete(0, end+1);
-                System.out.println("                        >> message complete, "
-                                 + "buffer is: '" + buffer + "'");
+                ApplicationLogger.log(">> message complete, "
+                                    + "buffer is: '" + buffer + "'", 
+                                      Application.ALERTMONITOR, false);
             }
         }
     }

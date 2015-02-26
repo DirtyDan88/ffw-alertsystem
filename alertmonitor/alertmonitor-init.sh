@@ -12,6 +12,7 @@
 
 case "$1" in
     start)
+#        su pi -c "rm /home/pi/ffw-alertsystem/alertmonitor/.alertmonitor.lock"
         su pi -c "/home/pi/ffw-alertsystem/alertmonitor/run-alertmonitor.sh -bg start"
         ;;
     stop)

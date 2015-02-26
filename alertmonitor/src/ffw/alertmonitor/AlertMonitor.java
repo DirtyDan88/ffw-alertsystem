@@ -10,9 +10,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ffw.alertmonitor.TVController.TVAction;
+import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.DateAndTime;
 import ffw.util.MessageLogger;
+import ffw.util.ApplicationLogger.Application;
 import ffw.util.MessageLogger.LogEvent;
 
 public class AlertMonitor implements Runnable {
@@ -25,8 +26,8 @@ public class AlertMonitor implements Runnable {
     
     @Override
     public void run() {
-        System.out.println("[" + DateAndTime.get() + "] ## monitor is waiting "
-                         + "for messages");
+        ApplicationLogger.log("## monitor is waiting for messages", 
+                              Application.ALERTMONITOR);
         
         while (!this.stopped) {
             /* check if there are new messages */
@@ -39,12 +40,14 @@ public class AlertMonitor implements Runnable {
                 try {
                     Thread.sleep(10);
                 } catch (Exception e) {
-                    System.out.println(e);
+                    ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                          Application.ALERTMONITOR);
                 }
             }
         }
         
-        System.out.println("[" + DateAndTime.get() + "] ## monitor stopped");
+        ApplicationLogger.log("## monitor stopped", 
+                              Application.ALERTMONITOR);
     }
     
     private void handleMessage(Message msg) {
@@ -93,14 +96,18 @@ public class AlertMonitor implements Runnable {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                      Application.ALERTMONITOR);
             }
             
-            System.out.println("[" + DateAndTime.get() + "] ## alert was triggered");
+            ApplicationLogger.log("## alert was triggered", 
+                                  Application.ALERTMONITOR);
             
         } else {
             // TODO: show template without map?
-            System.out.println("[" + DateAndTime.get() + "] ## alert was triggered, "
-                             + "but no geo coordinates are given");
+            ApplicationLogger.log("## alert was triggered, but no geo "
+                                + "coordinates are given", 
+                                Application.ALERTMONITOR);
         }
     }
     
@@ -109,8 +116,8 @@ public class AlertMonitor implements Runnable {
         String addressStr = ConfigReader.getConfigVar("watchdog-addr");
         byte[] buf        = "I am alive!".getBytes();
         
-        System.out.println("[" + DateAndTime.get() + "] ## reset watchdog on: " 
-                           + addressStr + ":" + port);
+        ApplicationLogger.log("## reset watchdog on: " + addressStr + 
+                              ":" + port, Application.ALERTMONITOR);
         
         try {
             InetAddress address   = InetAddress.getByName(addressStr);
@@ -125,6 +132,8 @@ public class AlertMonitor implements Runnable {
             
         } catch (IOException e) {
             e.printStackTrace();
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
         }
     }
     
@@ -135,7 +144,13 @@ public class AlertMonitor implements Runnable {
     
     
     public static void main(String[] args) {
-        System.out.println("[" + DateAndTime.get() + "] ffw-alertsystem started");
+        if (args.length > 0) {
+            if (args[0].equals("-logInFile")) {
+                ApplicationLogger.inFile = true;
+            }
+        }
+        
+        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
         
         Queue<Message> messageStack  = new ConcurrentLinkedQueue<Message>();
         AlertMonitor   alertMonitor  = new AlertMonitor(messageStack);
@@ -153,10 +168,12 @@ public class AlertMonitor implements Runnable {
                 if (console.read() == 'q') quit = true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            ApplicationLogger.log("ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
         }
         
-        System.out.println("[" + DateAndTime.get() + "] ffw-alertsystem stopped");
+        ApplicationLogger.log("ffw-alertsystem stopped", Application.ALERTMONITOR);
+        
         alertListener.stop();
         alertMonitor.stop();
     }
