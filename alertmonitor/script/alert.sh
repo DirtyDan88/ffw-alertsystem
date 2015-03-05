@@ -1,5 +1,12 @@
-echo "starting chrome..."
-locationOfScript=$(dirname "$(readlink -e "$0")")
+# first, force chromium to quit
+while true; do
+    killall chromium-browser
+    if [ -z "$(ps -e | grep chromium-browse)" ]; then
+        break;
+    fi
+done
 
 # start chrome in fullscreen mode with --kiosk
-chromium-browser --kiosk file://$locationOfScript/../$1 
+# disable chrome session restore functionality with --incognito
+locationOfScript=$(dirname "$(readlink -e "$0")")
+chromium-browser --kiosk --incognito file://$locationOfScript/../$1 

@@ -19,7 +19,7 @@ export DISPLAY=":0"
 case "$1" in
     -bg)
         LOCATION=$(dirname "$(readlink -e "$0")")
-	LOCKFILE=$LOCATION"/.alertmonitor.lock"
+	    LOCKFILE=$LOCATION"/.alertmonitor.lock"
         JARFILE=$LOCATION"/ffw-alertmonitor.jar"
         case "$2" in
             start)
@@ -27,7 +27,7 @@ case "$1" in
                     echo "alertmonitor is already running"
                 else
                     # run app in background; input and output = null and log into file
-	            nohup java $JAVA_OPT -jar $JARFILE -logInFile < /dev/null >> /dev/null &
+	                nohup java $JAVA_OPT -jar $JARFILE -logInFile < /dev/null >> /dev/null &
                     # write process id to lock-file
                     PROCESSID="PROCESS-ID: "$!
                     echo $PROCESSID > $LOCKFILE
@@ -36,10 +36,10 @@ case "$1" in
             stop)
                 # get the process id from the lock-file
                 for PID in $(cat $LOCKFILE | grep PROCESS-ID) ; do
-	            PROCESSID=$PID
-        	done
+	                PROCESSID=$PID
+        	    done
                 echo "kill alertmonitor process: "$PROCESSID
-	        kill $PROCESSID
+	            kill $PROCESSID
                 rm $LOCKFILE
                 ;;
             *)

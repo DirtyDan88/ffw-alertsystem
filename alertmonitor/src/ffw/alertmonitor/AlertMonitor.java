@@ -61,7 +61,6 @@ public class AlertMonitor implements Runnable {
             for (String curRIC : watchdogRICs) {
                 if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
                     MessageLogger.log(msg.getPocsag1200Str(), LogEvent.WATCHDOG);
-                    // TODO: reset watchdog for each incoming message? 
                     this.resetWatchdog();
                     break;
                 }
@@ -80,9 +79,19 @@ public class AlertMonitor implements Runnable {
     private void triggerAlert(Message msg) {
         msg.evaluateAlphaString();
         
+        // TODO: list with actions after alert was triggered 
+        // e.g: - switch on tv (tv-module)
+        //      - start chrome with specific template
+        //      - send email with alert-infos
+        //      - etc.
+        // This should be configurated via the config.txt
+        
         if (msg.hasCoordinates()) {
             /* try to switch on TV */
-            TVController.send(TVAction.SWITCH_ON);
+            String tvModule = ConfigReader.getConfigVar("tv-module");
+            if (tvModule.equals("enable")) {
+                TVController.send(TVAction.SWITCH_ON);
+            }
             
             HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
             String fileName = htmlBuilder.writeTemplate("html/alerts/");
