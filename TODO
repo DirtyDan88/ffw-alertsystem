@@ -1,5 +1,12 @@
 * Oberflaeche zur Eingabe von Testalarmierungen
+    - Ort
+    - Einsatzart
+    - Zeitverzägerung / Auslösezeit festlegen
+    (Hierauf achten das gestartet Alarmierungen kenntlich gemacht werden und wieder beendet werden können,
+    bei Änderungen an der Eingabemaske reicht ein Überschreiben der Alarmierungsangaben)
+    
 * Screensaver-Modi verhindern
+
 * gpio serial boot: http://blog.oscarliang.net/raspberry-pi-and-arduino-connected-serial-gpio/
 
 * Aufbau einer Möglichkeit zur "Text to Speech" Sprachausgabe über HDMI
@@ -18,10 +25,15 @@
     - Option zur Verwenung eines GPIO (Taster zum Triggern)
     - Schließen aller laufenden Prozesse die nicht benötigt werden und Ausschalten des Fernsehers
     (Serialport muss nach verwendung immer geschlossen werden, eine mehrfache verwendung ist nicht möglich)
+    - Loggen aller manuell gestarteten Prozesse um das Beenden zu vereinfachen/ermöglichen
     
 * User "pi" in den Rechten weiter beschränken um Anwederfehler zu vermeiden
 
 * Einen .pdf Viewer installieren der einen Präsentationsmodus ermöglicht
+
+* Airmouse aussuchen, bestellen, testen, verbauen
+
+* Chrome Sitzungen vor dem Start des Alarmmonitors beeenden um den Vollbildmodus zu erzwingen
 
 
 ****************************************************************************************************************
