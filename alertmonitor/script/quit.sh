@@ -9,7 +9,7 @@
 # Chromium
 while true; do
     killall chromium-browser
-    if [ -z "$(ps -e | grep chromium-browse)" ]; then
+    if [ -z "$(ps -e | grep chromium)" ]; then
         break;
     fi
 done

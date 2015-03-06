@@ -18,8 +18,10 @@ public class Watchdog {
     private DatagramSocket socket;
     
     private void run() {
-        int port    = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));
-        int timeout = Integer.parseInt(ConfigReader.getConfigVar("watchdog-timeout"));
+        int port    = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port", 
+                                       Application.WATCHDOG));
+        int timeout = Integer.parseInt(ConfigReader.getConfigVar("watchdog-timeout", 
+                                       Application.WATCHDOG));
         
         try {
             this.socket = new DatagramSocket(port);
@@ -60,7 +62,8 @@ public class Watchdog {
     private void sendMail() {
         String userName   = "ffw-moe-geraetehaus@web.de";
         String passWord   = "R8A825Tm";
-        String recipients = ConfigReader.getConfigVar("watchdog-recipients");
+        String recipients = ConfigReader.getConfigVar("watchdog-recipients", 
+                                                      Application.WATCHDOG);
         String subject    = "[ffw-alertsystem] !! watchdog timeout !!";
         String text       = "Watchdog timeout at " + DateAndTime.get() + "\n";
         try {
@@ -70,7 +73,8 @@ public class Watchdog {
                                   Application.WATCHDOG);
         }
         
-        Mail.send(userName, passWord, recipients, subject, text);
+        Mail.send(userName, passWord, recipients, subject, text, 
+                  Application.WATCHDOG);
         ApplicationLogger.log("send mail to: " + recipients, 
                               Application.WATCHDOG, false);
     }

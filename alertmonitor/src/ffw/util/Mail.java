@@ -11,25 +11,29 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import ffw.util.ApplicationLogger.Application;
+
 public class Mail implements Runnable {
     private String userName;
     private String passWord;
     private String recipients;
     private String subject;
     private String text;
+    private Application app;
     
     public Mail(String userName, String passWord, String recipients, 
-                String subject, String text) {
+                String subject, String text, Application app) {
         this.userName   = userName;
         this.passWord   = passWord;
         this.recipients = recipients;
         this.subject    = subject;
         this.text       = text;
+        this.app        = app;
     }
     
     public static void send(String userName, String passWord, String recipients, 
-                            String subject, String text) {
-        new Thread(new Mail(userName, passWord, recipients, subject, text)).start();
+                            String subject, String text, Application app) {
+        new Thread(new Mail(userName, passWord, recipients, subject, text, app)).start();
     }
     
     @Override
@@ -56,7 +60,7 @@ public class Mail implements Runnable {
             Transport.send(msg);
         }
         catch (Exception e) {
-            e.printStackTrace( );
+            ApplicationLogger.log("ERROR: " + e.getMessage(), app);
         }
     }
     

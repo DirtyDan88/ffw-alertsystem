@@ -5,11 +5,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import ffw.util.ApplicationLogger.Application;
+
 public class ConfigReader {
     
     private ConfigReader() {}
     
     public static String getConfigVar(String varName) {
+        return getConfigVar(varName, Application.ALERTMONITOR);
+    }
+    
+    public static String getConfigVar(String varName, Application app) {
         BufferedReader bufReader = null;
         String varValue = "";
         String line = null;
@@ -33,13 +39,14 @@ public class ConfigReader {
             }
             
         } catch(IOException e) {
-            e.printStackTrace();
+            ApplicationLogger.log("ERROR: " + e.getMessage() + "\n" +
+                                  "varName: " + varName, app);
         } finally {
             if(bufReader != null) {
                 try {
                     bufReader.close();
                 } catch(IOException e) {
-                    e.printStackTrace();
+                    ApplicationLogger.log("ERROR: " + e.getMessage(), app);
                 }
             }
         }

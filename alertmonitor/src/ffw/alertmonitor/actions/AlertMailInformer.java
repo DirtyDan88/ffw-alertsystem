@@ -23,7 +23,8 @@ public class AlertMailInformer {
             text += message.getKeywords().get(i) + "\n";
         }
         
-        Mail.send(userName, passWord, recipients, subject, text);
+        Mail.send(userName, passWord, recipients, subject, text, 
+                  Application.WATCHDOG);
         ApplicationLogger.log("## send alert mail to: " + recipients, 
                               Application.ALERTMONITOR, false);
     }
