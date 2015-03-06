@@ -9,20 +9,25 @@ alert-rics=158973
 
 
 
-### TV SETTINGS ###
+### ALERT ACTIONS ###
 
 # disable/enable tv module
-tv-module=enable
+tv-module=disable
 # name of the serial port
 serial-port=/dev/ttyAMA0
 
+browser-module=enable
+html-template=standard
+speech-module=enable
+email-module=enable
+alert-recipients=Max.Stark88@web.de
 
 
 
 ### WATCHDOG SETTINGS ###
 
 # RICs which triggers a watchdog-reset
-watchdog-rics=174896,157601
+watchdog-rics=174896,157601,*
 # watchdog message will be sent to:
 watchdog-addr=255.255.255.255
 # port which the watchdog process listens on
@@ -31,4 +36,4 @@ watchdog-port=50001
 watchdog-timeout=10
 # mail address to inform, in case of watchdog was
 # triggert, seperated by ','
-watchdog-recipients=Max.Stark88@web.de,Max.Stark88@gmail.com,David-ruckes@web.de
+watchdog-recipients=Max.Stark88@web.de,David-ruckes@web.de
