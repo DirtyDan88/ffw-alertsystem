@@ -12,7 +12,7 @@ alert-rics=158973
 ### ALERT ACTIONS ###
 
 # disable/enable tv module
-tv-module=disable
+tv-module=enable
 # name of the serial port
 serial-port=/dev/ttyAMA0
 

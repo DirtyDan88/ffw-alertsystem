@@ -10,6 +10,7 @@
             <fileset dir="bin"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/jsoup-1.7.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/RXTXcomm.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/javax.mail.jar"/>
         </jar>
         <jar destfile="ffw-alertsystem-watchdog.jar" filesetmanifest="mergewithoutmain">
             <manifest>
