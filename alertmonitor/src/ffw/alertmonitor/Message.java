@@ -59,7 +59,7 @@ public class Message {
                 this.latitude  = alphaStr[0];
                 this.longitude = alphaStr[1];
                 
-                // TODO: alphaStr[2] := laufende Einsatznummer
+                // alphaStr[2] := laufende Einsatznummer
                 
                 if (this.isShortKeyword(alphaStr[3])) {
                     this.shortKeyword = alphaStr[3].substring(0, 1);
@@ -68,6 +68,8 @@ public class Message {
                     this.shortKeyword = "-";
                     this.alertLevel   = "-";
                 }
+                
+                // TODO: alphaStr[4] := Adresse?
                 
                 for (int i = 4; i < alphaStr.length; i++) {
                     this.keywords.add(alphaStr[i]);

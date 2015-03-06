@@ -3,12 +3,15 @@ package ffw.watchdog;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
+import ffw.util.Mail;
 import ffw.util.ApplicationLogger.Application;
 
 public class Watchdog {
@@ -60,6 +63,12 @@ public class Watchdog {
         String recipients = ConfigReader.getConfigVar("watchdog-recipients");
         String subject    = "[ffw-alertsystem] !! watchdog timeout !!";
         String text       = "Watchdog timeout at " + DateAndTime.get() + "\n";
+        try {
+            text += "Watchdog on host: " + InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.WATCHDOG);
+        }
         
         Mail.send(userName, passWord, recipients, subject, text);
         ApplicationLogger.log("send mail to: " + recipients, 

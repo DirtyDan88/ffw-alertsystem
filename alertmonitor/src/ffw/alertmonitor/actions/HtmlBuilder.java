@@ -1,4 +1,4 @@
-package ffw.alertmonitor;
+package ffw.alertmonitor.actions;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,27 +12,41 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import ffw.alertmonitor.Message;
+
 public class HtmlBuilder {
+    private Message message;
+    private String templateName;
     private String html = "";
     private Document doc;
     
-    public HtmlBuilder(Message msg) {
-        this.loadTemplate("html/template.html");
+    
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+    
+    public void setTemplate(String templateName) {
+        this.templateName = templateName;
+    }
+    
+    public void build() {
+        this.loadTemplate("html/templates/" + this.templateName + ".html");
         
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
         this.setElement("#timestamp",    timestamp);
-        this.setElement("#latitude",     msg.getLatitude());
-        this.setElement("#longitude",    msg.getLongitude());
-        this.setElement("#shortKeyword", msg.getShortKeyword());
-        this.setElement("#alertLevel",   msg.getAlertLevel());
+        this.setElement("#latitude",     this.message.getLatitude());
+        this.setElement("#longitude",    this.message.getLongitude());
+        this.setElement("#shortKeyword", this.message.getShortKeyword());
+        this.setElement("#alertLevel",   this.message.getAlertLevel());
         
-        for (int i=0; i<msg.getKeywords().size(); i++) {
+        for (int i=0; i<this.message.getKeywords().size(); i++) {
             Element tag = this.doc.select("#furtherKeywords ul").first();
-            tag.append("<li>" + msg.getKeywords().get(i) + "</li>");
+            tag.append("<li>" + this.message.getKeywords().get(i) + "</li>");
         }
     }
     
-    public String writeTemplate(String path) {
+    public String writeHTML(String path) {
         Date now = new java.util.Date();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy-HH.mm.ss");
         String dateAndTime = sdf.format(now);
@@ -86,7 +100,9 @@ public class HtmlBuilder {
     }
     
     private void setElement(String cssSelector, String content) {
-        Element tag = this.doc.select(cssSelector).first();
-        tag.html(content);
+        if (content != null) {
+            Element tag = this.doc.select(cssSelector).first();
+            tag.html(content);
+        }
     }
 }

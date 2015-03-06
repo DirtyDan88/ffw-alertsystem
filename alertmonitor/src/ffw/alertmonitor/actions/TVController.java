@@ -1,4 +1,4 @@
-package ffw.alertmonitor;
+package ffw.alertmonitor.actions;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -9,7 +9,10 @@ import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ffw.alertmonitor.TVController.TVAction;
+import ffw.alertmonitor.actions.AlertMailInformer;
+import ffw.alertmonitor.actions.HtmlBuilder;
+import ffw.alertmonitor.actions.TVController;
+import ffw.alertmonitor.actions.TVController.TVAction;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.MessageLogger;
@@ -31,9 +34,9 @@ public class AlertMonitor implements Runnable {
         
         while (!this.stopped) {
             /* check if there are new messages */
-            Message msg = this.messageQueue.poll();
-            if (msg != null) {
-                this.handleMessage(msg);
+            Message message = this.messageQueue.poll();
+            if (message != null) {
+                this.handleMessage(message);
                 
             } else {
                 /* wait a little bit */
@@ -50,17 +53,17 @@ public class AlertMonitor implements Runnable {
                               Application.ALERTMONITOR);
     }
     
-    private void handleMessage(Message msg) {
+    private void handleMessage(Message message) {
         String[] watchdogRICs = ConfigReader.getConfigVar("watchdog-rics").split(",");
         String[] alertRICs    = ConfigReader.getConfigVar("alert-rics").split(",");
         
-        msg.evaluateMessageHead();
-        String msgRIC = msg.getAddress();
+        message.evaluateMessageHead();
+        String msgRIC = message.getAddress();
         
         if (msgRIC != null) {
             for (String curRIC : watchdogRICs) {
                 if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
-                    MessageLogger.log(msg.getPocsag1200Str(), LogEvent.WATCHDOG);
+                    MessageLogger.log(message.getPocsag1200Str(), LogEvent.WATCHDOG);
                     this.resetWatchdog();
                     break;
                 }
@@ -68,16 +71,16 @@ public class AlertMonitor implements Runnable {
             
             for (String curRIC : alertRICs) {
                 if (msgRIC.equals(curRIC) || curRIC.equals("*")) {
-                    MessageLogger.log(msg.getPocsag1200Str(), LogEvent.ALERT);
-                    this.triggerAlert(msg);
+                    MessageLogger.log(message.getPocsag1200Str(), LogEvent.ALERT);
+                    this.executeAlertActions(message);
                     break;
                 }
             }
         }
     }
     
-    private void triggerAlert(Message msg) {
-        msg.evaluateAlphaString();
+    private void executeAlertActions(Message message) {
+        message.evaluateAlphaString();
         
         // TODO: list with actions after alert was triggered 
         // e.g: - switch on tv (tv-module)
@@ -85,16 +88,28 @@ public class AlertMonitor implements Runnable {
         //      - send email with alert-infos
         //      - etc.
         // This should be configurated via the config.txt
+        StringBuilder actions = new StringBuilder();
+        String tvModule      = ConfigReader.getConfigVar("tv-module");
+        String browserModule = ConfigReader.getConfigVar("browser-module");
+        String speechModule  = ConfigReader.getConfigVar("speech-module");
+        String emailModule   = ConfigReader.getConfigVar("email-module");
         
-        if (msg.hasCoordinates()) {
-            /* try to switch on TV */
-            String tvModule = ConfigReader.getConfigVar("tv-module");
-            if (tvModule.equals("enable")) {
-                TVController.send(TVAction.SWITCH_ON);
+        /* switch on TV */
+        if (tvModule.equals("enable")) {
+            TVController.send(TVAction.SWITCH_ON);
+            actions.append("tv-module ");
+        }
+        
+        /* open browser and show alert infos */
+        if (browserModule.equals("enable")) {
+            HtmlBuilder htmlBuilder = new HtmlBuilder();
+            htmlBuilder.setMessage(message);
+            htmlBuilder.setTemplate(ConfigReader.getConfigVar("html-template"));
+            if (!message.hasCoordinates()) {
+                // TODO: change template?
             }
-            
-            HtmlBuilder htmlBuilder = new HtmlBuilder(msg);
-            String fileName = htmlBuilder.writeTemplate("html/alerts/");
+            htmlBuilder.build();
+            String fileName = htmlBuilder.writeHTML("html/alerts/");
             
             try {
                 String osName = System.getProperty("os.name");
@@ -109,15 +124,23 @@ public class AlertMonitor implements Runnable {
                                       Application.ALERTMONITOR);
             }
             
-            ApplicationLogger.log("## alert was triggered", 
-                                  Application.ALERTMONITOR);
-            
-        } else {
-            // TODO: show template without map?
-            ApplicationLogger.log("## alert was triggered, but no geo "
-                                + "coordinates are given", 
-                                Application.ALERTMONITOR);
+            actions.append("browser-module ");
         }
+        
+        /* start audio ouput */
+        if (speechModule.equals("enable")) {
+            actions.append("speech-module ");
+        }
+        
+        /* send alert infos via email */
+        if (emailModule.equals("enable")) {
+            AlertMailInformer.send(message);
+            actions.append("email-module ");
+        }
+        
+        ApplicationLogger.log("## alert was triggered, following actions were "
+                            + "executed: " + actions, 
+                              Application.ALERTMONITOR);
     }
     
     private void resetWatchdog() {
