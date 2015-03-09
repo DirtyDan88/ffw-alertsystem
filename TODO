@@ -1,3 +1,8 @@
+* start at system startup of raspi-alertmonitor:
+    - alertmonitor
+    - marytts-server
+    - watchdog
+
 * Oberflaeche zur Eingabe von Testalarmierungen
     - Ort
     - Einsatzart
