@@ -5,3 +5,5 @@ alertmonitor/*.jar
 .classpath
 .project
 .settings
+.alertmonitor.lock
+.watchdog.lock

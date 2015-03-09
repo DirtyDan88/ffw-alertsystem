@@ -1,6 +1,7 @@
 # first, force chromium to quit
 while true; do
     killall chromium
+    killall chromium-browse
     if [ -z "$(ps -e | grep chromium)" ]; then
         break;
     fi

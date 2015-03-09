@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ffw.alertmonitor.actions.AlertMailInformer;
+import ffw.alertmonitor.actions.AlertSpeaker;
 import ffw.alertmonitor.actions.HtmlBuilder;
 import ffw.alertmonitor.actions.TVController;
 import ffw.alertmonitor.actions.TVController.TVAction;
@@ -82,12 +83,6 @@ public class AlertMonitor implements Runnable {
     private void executeAlertActions(Message message) {
         message.evaluateAlphaString();
         
-        // TODO: list with actions after alert was triggered 
-        // e.g: - switch on tv (tv-module)
-        //      - start chrome with specific template
-        //      - send email with alert-infos
-        //      - etc.
-        // This should be configurated via the config.txt
         StringBuilder actions = new StringBuilder();
         String tvModule      = ConfigReader.getConfigVar("tv-module");
         String browserModule = ConfigReader.getConfigVar("browser-module");
@@ -102,33 +97,13 @@ public class AlertMonitor implements Runnable {
         
         /* open browser and show alert infos */
         if (browserModule.equals("enable")) {
-            HtmlBuilder htmlBuilder = new HtmlBuilder();
-            htmlBuilder.setMessage(message);
-            htmlBuilder.setTemplate(ConfigReader.getConfigVar("html-template"));
-            if (!message.hasCoordinates()) {
-                // TODO: change template?
-            }
-            htmlBuilder.build();
-            String fileName = htmlBuilder.writeHTML("html/alerts/");
-            
-            try {
-                String osName = System.getProperty("os.name");
-                if (osName.contains("Windows")) {
-                    Runtime.getRuntime().exec("script/alert.bat " + fileName);
-                } else {
-                    Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                      Application.ALERTMONITOR);
-            }
-            
+            HtmlBuilder.build(message);
             actions.append("browser-module ");
         }
         
         /* start audio ouput */
         if (speechModule.equals("enable")) {
+            AlertSpeaker.play(message);
             actions.append("speech-module ");
         }
         
@@ -139,8 +114,7 @@ public class AlertMonitor implements Runnable {
         }
         
         ApplicationLogger.log("## alert was triggered, following actions were "
-                            + "executed: " + actions, 
-                              Application.ALERTMONITOR);
+                            + "executed: " + actions, Application.ALERTMONITOR);
     }
     
     private void resetWatchdog() {
@@ -163,7 +137,6 @@ public class AlertMonitor implements Runnable {
             socket.close();
             
         } catch (IOException e) {
-            e.printStackTrace();
             ApplicationLogger.log("## ERROR: " + e.getMessage(), 
                                   Application.ALERTMONITOR);
         }
@@ -188,9 +161,9 @@ public class AlertMonitor implements Runnable {
         AlertMonitor   alertMonitor  = new AlertMonitor(messageStack);
         AlertListener  alertListener = new AlertListener(messageStack);
         
-        Thread alertSystemThread   = new Thread(alertMonitor);
+        Thread alertMonitorThread  = new Thread(alertMonitor);
         Thread alertListenerThread = new Thread(alertListener);
-        alertSystemThread.start();
+        alertMonitorThread.start();
         alertListenerThread.start();
         
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -208,5 +181,13 @@ public class AlertMonitor implements Runnable {
         
         alertListener.stop();
         alertMonitor.stop();
+        
+        try {
+            alertMonitorThread.join();
+            alertListenerThread.join();
+        } catch (InterruptedException e) {
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
+        }
     }
 }

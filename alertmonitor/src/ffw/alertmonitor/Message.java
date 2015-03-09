@@ -64,6 +64,10 @@ public class Message {
                 if (this.isShortKeyword(alphaStr[3])) {
                     this.shortKeyword = alphaStr[3].substring(0, 1);
                     this.alertLevel   = alphaStr[3].substring(1, 2);
+                    if (alphaStr[3].length() > 3) {
+                        this.keywords.add(alphaStr[3].substring(3));
+                    }
+                    
                 } else {
                     this.shortKeyword = "-";
                     this.alertLevel   = "-";

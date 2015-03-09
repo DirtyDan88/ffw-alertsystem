@@ -13,6 +13,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import ffw.alertmonitor.Message;
+import ffw.util.ApplicationLogger;
+import ffw.util.ConfigReader;
+import ffw.util.ApplicationLogger.Application;
 
 public class HtmlBuilder {
     private Message message;
@@ -20,8 +23,30 @@ public class HtmlBuilder {
     private String html = "";
     private Document doc;
     
+    public static void build(Message message) {
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        htmlBuilder.setMessage(message);
+        htmlBuilder.setTemplate(ConfigReader.getConfigVar("html-template"));
+        if (!message.hasCoordinates()) {
+            // TODO: change template?
+        }
+        htmlBuilder.build();
+        String fileName = htmlBuilder.writeHTML("html/alerts/");
+        
+        try {
+            String osName = System.getProperty("os.name");
+            if (osName.contains("Windows")) {
+                Runtime.getRuntime().exec("script/alert.bat " + fileName);
+            } else {
+                Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
+        }
+    }
     
-
     public void setMessage(Message message) {
         this.message = message;
     }

@@ -8,17 +8,28 @@ alert-rics=158973
 
 
 
-
 ### ALERT ACTIONS ###
 
-# disable/enable tv module
+# enable/disable tv module
 tv-module=enable
 # name of the serial port
 serial-port=/dev/ttyAMA0
 
+# enable/disable browser module
 browser-module=enable
 html-template=standard
+
+# enable/disable speech module
 speech-module=enable
+# marytts settings:
+marytts-server=localhost
+marytts-port=59125
+marytts-voice=bits3-hsmm
+marytts-effect=Stadium
+marytts-repeat=30
+marytts-pause=10
+
+# enable/disable email module
 email-module=enable
 alert-recipients=Max.Stark88@web.de
 
