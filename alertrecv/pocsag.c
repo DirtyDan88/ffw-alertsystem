@@ -1,4 +1,4 @@
-rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin >> /dev/stdout
+//rtl_fm -M nfm -s 22050 -f 173.255.000M -A fast -g 49.60 | multimon-ng -t raw -a POCSAG1200 -f alpha /dev/stdin >> /dev/stdout
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
