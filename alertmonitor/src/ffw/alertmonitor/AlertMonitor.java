@@ -148,6 +148,12 @@ public class AlertMonitor implements Runnable {
     
     
     
+    private static Queue<Message> messageStack;
+    private static AlertMonitor   alertMonitor;
+    private static AlertListener  alertListener;
+    private static Thread         alertMonitorThread;
+    private static Thread         alertListenerThread;
+    
     public static void main(String[] args) {
         if (args.length > 0) {
             if (args[0].equals("-logInFile")) {
@@ -155,30 +161,48 @@ public class AlertMonitor implements Runnable {
             }
         }
         
-        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
+        startApplication();
         
-        Queue<Message> messageStack  = new ConcurrentLinkedQueue<Message>();
-        AlertMonitor   alertMonitor  = new AlertMonitor(messageStack);
-        AlertListener  alertListener = new AlertListener(messageStack);
+        /* application is either terminated via signal or user */
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                ApplicationLogger.log("received SIGTERM", Application.ALERTMONITOR);
+                stopApplication();
+            }
+        });
         
-        Thread alertMonitorThread  = new Thread(alertMonitor);
-        Thread alertListenerThread = new Thread(alertListener);
-        alertMonitorThread.start();
-        alertListenerThread.start();
-        
-        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader console = new BufferedReader(
+                                 new InputStreamReader(System.in));
         try {
             boolean quit = false;
             while (!quit) {
                 if (console.read() == 'q') quit = true;
+                Thread.sleep(100);
             }
-        } catch (IOException e) {
+            ApplicationLogger.log("stopped by user", Application.ALERTMONITOR);
+            stopApplication();
+            
+        } catch (IOException | InterruptedException e) {
             ApplicationLogger.log("ERROR: " + e.getMessage(), 
                                   Application.ALERTMONITOR);
         }
+    }
+    
+    private static void startApplication() {
+        messageStack  = new ConcurrentLinkedQueue<Message>();
+        alertMonitor  = new AlertMonitor(messageStack);
+        alertListener = new AlertListener(messageStack);
         
-        ApplicationLogger.log("ffw-alertsystem stopped", Application.ALERTMONITOR);
+        alertMonitorThread  = new Thread(alertMonitor);
+        alertListenerThread = new Thread(alertListener);
+        alertMonitorThread.start();
+        alertListenerThread.start();
         
+        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
+    }
+    
+    private static void stopApplication() {
         alertListener.stop();
         alertMonitor.stop();
         
@@ -189,5 +213,7 @@ public class AlertMonitor implements Runnable {
             ApplicationLogger.log("## ERROR: " + e.getMessage(), 
                                   Application.ALERTMONITOR);
         }
+        
+        ApplicationLogger.log("ffw-alertsystem stopped", Application.ALERTMONITOR);
     }
 }
