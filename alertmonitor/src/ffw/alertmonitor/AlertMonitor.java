@@ -209,6 +209,8 @@ public class AlertMonitor implements Runnable {
     }
     
     private static void startApplication() {
+        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
+        
         messageStack  = new ConcurrentLinkedQueue<Message>();
         alertMonitor  = new AlertMonitor(messageStack);
         alertListener = new AlertListener(messageStack);
@@ -217,8 +219,6 @@ public class AlertMonitor implements Runnable {
         alertListenerThread = new Thread(alertListener);
         alertMonitorThread.start();
         alertListenerThread.start();
-        
-        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
     }
     
     private static void stopApplication() {

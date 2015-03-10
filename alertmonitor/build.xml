@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
 <!-- 
     Copyright (c) 2015, Max Stark <max.stark88@web.de> 
         All rights reserved.
@@ -17,7 +19,6 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="Create Runnable Jars for Project ffw-alertsystem">
     <!--ANT 1.7 is required -->
     <target name="create_run_jar">

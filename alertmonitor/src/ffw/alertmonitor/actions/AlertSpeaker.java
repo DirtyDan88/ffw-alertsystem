@@ -126,6 +126,11 @@ public class AlertSpeaker implements Runnable {
             keyword = keyword.replace("str.", "straße");
         }
         
+        /* workaround: known issues of marytts 5.1.2 */
+        if (keyword.contains("brennende ")) {
+            keyword = keyword.replace("brennende ", "brennender ");
+        }
+        
         return keyword;
     }
 }
