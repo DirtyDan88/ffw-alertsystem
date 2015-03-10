@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# if they are runnning, stop the applications 
+# if the applications are runnning, stop them
 LOCATION=$(dirname "$(readlink -e "$0")")
 AE_LOCKFILE=$LOCATION"/.alertmonitor.lock"
 WD_LOCKFILE=$LOCATION"/.watchdog.lock"

@@ -14,10 +14,12 @@ import ffw.util.DateAndTime;
 import ffw.util.Mail;
 import ffw.util.ApplicationLogger.Application;
 
-public class Watchdog {
+public class Watchdog implements Runnable {
+    private boolean stopped = false;
     private DatagramSocket socket;
     
-    private void run() {
+    @Override
+    public void run() {
         int port    = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port", 
                                        Application.WATCHDOG));
         int timeout = Integer.parseInt(ConfigReader.getConfigVar("watchdog-timeout", 
@@ -35,12 +37,13 @@ public class Watchdog {
         ApplicationLogger.log("watchdog started (timeout: " + timeout + " min)", 
                               Application.WATCHDOG);
         
-        while (true) {
+        while (!this.stopped) {
             DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
             
             try {
                 /* wait for watchdog-reset */
                 this.socket.receive(packet);
+                
                 
                 int    length = packet.getLength();
                 byte[] data   = packet.getData();
@@ -53,8 +56,7 @@ public class Watchdog {
                 this.sendMail();
                 
             } catch (IOException e) {
-                ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                      Application.WATCHDOG);
+                ApplicationLogger.log(e.getMessage(), Application.WATCHDOG);
             }
         }
     }
@@ -79,6 +81,11 @@ public class Watchdog {
                               Application.WATCHDOG, false);
     }
     
+    public synchronized void stop() {
+        this.socket.close();
+        this.stopped = true;
+    }
+    
     
     
     public static void main(String[] args) {
@@ -88,6 +95,24 @@ public class Watchdog {
             }
         }
         
-        new Watchdog().run();
+        Watchdog watchdog     = new Watchdog();
+        Thread watchdogThread = Thread.currentThread();
+        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                watchdog.stop();
+                try {
+                    watchdogThread.join();
+                } catch (InterruptedException e) {
+                    ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                          Application.WATCHDOG);
+                }
+                
+                ApplicationLogger.log("watchdog stopped", Application.WATCHDOG);
+            }
+        });
+        
+        watchdog.run();
     }
 }
