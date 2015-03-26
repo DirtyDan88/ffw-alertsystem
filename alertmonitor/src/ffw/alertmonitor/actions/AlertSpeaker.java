@@ -32,24 +32,20 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import marytts.client.MaryClient;
 import marytts.util.data.audio.AudioPlayer;
 import marytts.util.http.Address;
-import ffw.alertmonitor.Message;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.ApplicationLogger.Application;
 
-public class AlertSpeaker implements Runnable {
-    private Message message;
+public class AlertSpeaker extends AlertAction {
     
-    public AlertSpeaker(Message message) {
-        this.message = message;
-    }
-    
-    public static void play(Message message) {
-        new Thread(new AlertSpeaker(message)).start();
+    @Override
+    public String getDescription() {
+        return "speech-module";
     }
     
     @Override
     public void run() {
+        // TODO: start marytts server?
         String server = ConfigReader.getConfigVar("marytts-server", Application.ALERTMONITOR);
         String voice  = ConfigReader.getConfigVar("marytts-voice",  Application.ALERTMONITOR);
         String effect = ConfigReader.getConfigVar("marytts-effect", Application.ALERTMONITOR);
@@ -111,7 +107,7 @@ public class AlertSpeaker implements Runnable {
         }
         text.append(". ");
         
-        for (int i=0; i<this.message.getKeywords().size(); i++) {
+        for (int i = 0; i < this.message.getKeywords().size(); i++) {
             String keyword = cleanKeyword(this.message.getKeywords().get(i));
             text.append(keyword);
             text.append(", ");

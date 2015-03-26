@@ -19,27 +19,32 @@
 
 package ffw.alertmonitor.actions;
 
-import ffw.alertmonitor.Message;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
 import ffw.util.Mail;
 import ffw.util.ApplicationLogger.Application;
 
-public class AlertMailInformer {
-
-    public static void send(Message message) {
+public class AlertMailInformer extends AlertAction {
+    
+    @Override
+    public String getDescription() {
+        return "mail-module";
+    }
+    
+    @Override
+    public void run() {
         String userName   = "ffw-moe-geraetehaus@web.de";
         String passWord   = "R8A825Tm";
         String recipients = ConfigReader.getConfigVar("alert-recipients");
         
         String subject    = "[ffw-alertsystem] !! ALARM !! ";
         String text       = "Alarm eingegangen am " + DateAndTime.get() + "\n"
-                          + "Kurzstichwort: " + message.getShortKeyword() 
-                                              + message.getAlertLevel() + "\n\n"
+                          + "Kurzstichwort: " + this.message.getShortKeyword() 
+                                              + this.message.getAlertLevel() + "\n\n"
                           + "Weitere Einsatzstichwoerter: \n";
-        for (int i=0; i<message.getKeywords().size(); i++) {
-            text += message.getKeywords().get(i) + "\n";
+        for (int i = 0; i < this.message.getKeywords().size(); i++) {
+            text += this.message.getKeywords().get(i) + "\n";
         }
         
         Mail.send(userName, passWord, recipients, subject, text, 

@@ -17,17 +17,15 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertmonitor.actions;
+package ffw.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import gnu.io.*;
-import ffw.util.ApplicationLogger;
-import ffw.util.ConfigReader;
 import ffw.util.ApplicationLogger.Application;
+import gnu.io.*;
 
-public class TVController implements Runnable {
+public class TVController {
     public enum TVAction {
         SWITCH_ON, 
         TURN_OFF, 
@@ -49,24 +47,19 @@ public class TVController implements Runnable {
             }
         }
     }
-    TVAction action;
     
-    public TVController(TVAction action) {
-        this.action = action;
-    }
     
-    public static void send(TVAction action) {
-        new Thread(new TVController(action)).start();
-    }
-    
-    @Override
-    public void run() {
+    public static void sendCommand(TVAction action) {
         SerialPort serialPort = null;
         SerialWriter writer   = null;
         try {
             serialPort = connect(ConfigReader.getConfigVar("serial-port"));
-            writer = new SerialWriter(serialPort.getOutputStream());
             serialPort.notifyOnDataAvailable(true);
+            
+            writer = new SerialWriter(serialPort.getOutputStream());
+            
+            
+            
             
         } catch (IOException | NoSuchPortException | 
                  UnsupportedCommOperationException | 
@@ -81,7 +74,7 @@ public class TVController implements Runnable {
             
             /* try it several times, in case of some unexpected error */
             for (int i=0; i<5; i++) {
-                writer.write(this.action.getCommandString());
+                writer.write(action.getCommandString());
                 
                 try {
                     Thread.sleep(3000);
@@ -118,7 +111,7 @@ public class TVController implements Runnable {
         return null;
     }
     
-    private class SerialWriter {
+    private static class SerialWriter {
         private OutputStream outStream;
         
         public SerialWriter(OutputStream outStream) {

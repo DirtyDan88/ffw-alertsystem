@@ -19,20 +19,12 @@
 
 package ffw.alertmonitor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ffw.alertmonitor.actions.AlertMailInformer;
-import ffw.alertmonitor.actions.AlertSpeaker;
-import ffw.alertmonitor.actions.HtmlBuilder;
-import ffw.alertmonitor.actions.TVController;
-import ffw.alertmonitor.actions.TVController.TVAction;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.MessageLogger;
@@ -101,40 +93,42 @@ public class AlertMonitor implements Runnable {
     
     private void executeAlertActions(Message message) {
         message.evaluateAlphaString();
-        
+        AlertActionManager.executeActions(message);
+    }
+    
+        /*
         StringBuilder actions = new StringBuilder();
-        String tvModule      = ConfigReader.getConfigVar("tv-module");
-        String browserModule = ConfigReader.getConfigVar("browser-module");
-        String speechModule  = ConfigReader.getConfigVar("speech-module");
-        String emailModule   = ConfigReader.getConfigVar("email-module");
+        String tvModule       = ConfigReader.getConfigVar("tv-module");
+        String browserModule  = ConfigReader.getConfigVar("browser-module");
+        String speechModule   = ConfigReader.getConfigVar("speech-module");
+        String emailModule    = ConfigReader.getConfigVar("email-module");
+        */
         
-        /* switch on TV */
+        /*
+        /* switch on TV 
         if (tvModule.equals("enable")) {
             TVController.send(TVAction.SWITCH_ON);
             actions.append("tv-module ");
         }
         
-        /* open browser and show alert infos */
+        /* open browser and show alert infos 
         if (browserModule.equals("enable")) {
             HtmlBuilder.build(message);
             actions.append("browser-module ");
         }
         
-        /* start audio ouput */
+        /* start audio ouput 
         if (speechModule.equals("enable")) {
             AlertSpeaker.play(message);
             actions.append("speech-module ");
         }
         
-        /* send alert infos via email */
+        /* send alert infos via email 
         if (emailModule.equals("enable")) {
             AlertMailInformer.send(message);
             actions.append("email-module ");
         }
-        
-        ApplicationLogger.log("## alert was triggered, following actions were "
-                            + "executed: " + actions, Application.ALERTMONITOR);
-    }
+        */
     
     private void resetWatchdog() {
         int port          = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));
@@ -163,76 +157,5 @@ public class AlertMonitor implements Runnable {
     
     public synchronized void stop() {
         this.stopped = true;
-    }
-    
-    
-    
-    private static Queue<Message> messageStack;
-    private static AlertMonitor   alertMonitor;
-    private static AlertListener  alertListener;
-    private static Thread         alertMonitorThread;
-    private static Thread         alertListenerThread;
-    
-    public static void main(String[] args) {
-        if (args.length > 0) {
-            if (args[0].equals("-logInFile")) {
-                ApplicationLogger.inFile = true;
-            }
-        }
-        
-        startApplication();
-        
-        /* application is either terminated via signal or user */
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                ApplicationLogger.log("received SIGTERM", Application.ALERTMONITOR);
-                stopApplication();
-            }
-        });
-        
-        BufferedReader console = new BufferedReader(
-                                 new InputStreamReader(System.in));
-        try {
-            boolean quit = false;
-            while (!quit) {
-                if (console.read() == 'q') quit = true;
-                Thread.sleep(100);
-            }
-            ApplicationLogger.log("stopped by user", Application.ALERTMONITOR);
-            stopApplication();
-            
-        } catch (IOException | InterruptedException e) {
-            ApplicationLogger.log("ERROR: " + e.getMessage(), 
-                                  Application.ALERTMONITOR);
-        }
-    }
-    
-    private static void startApplication() {
-        ApplicationLogger.log("ffw-alertsystem started", Application.ALERTMONITOR);
-        
-        messageStack  = new ConcurrentLinkedQueue<Message>();
-        alertMonitor  = new AlertMonitor(messageStack);
-        alertListener = new AlertListener(messageStack);
-        
-        alertMonitorThread  = new Thread(alertMonitor);
-        alertListenerThread = new Thread(alertListener);
-        alertMonitorThread.start();
-        alertListenerThread.start();
-    }
-    
-    private static void stopApplication() {
-        alertListener.stop();
-        alertMonitor.stop();
-        
-        try {
-            alertMonitorThread.join();
-            alertListenerThread.join();
-        } catch (InterruptedException e) {
-            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                  Application.ALERTMONITOR);
-        }
-        
-        ApplicationLogger.log("ffw-alertsystem stopped", Application.ALERTMONITOR);
     }
 }

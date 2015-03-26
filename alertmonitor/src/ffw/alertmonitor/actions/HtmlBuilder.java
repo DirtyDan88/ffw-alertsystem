@@ -31,26 +31,28 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import ffw.alertmonitor.Message;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.ApplicationLogger.Application;
 
-public class HtmlBuilder {
-    private Message message;
+public class HtmlBuilder extends AlertAction {
     private String templateName;
     private String html = "";
     private Document doc;
     
-    public static void build(Message message) {
-        HtmlBuilder htmlBuilder = new HtmlBuilder();
-        htmlBuilder.setMessage(message);
-        htmlBuilder.setTemplate(ConfigReader.getConfigVar("html-template"));
-        if (!message.hasCoordinates()) {
+    @Override
+    public String getDescription() {
+        return "browser-module";
+    }
+    
+    @Override
+    public void run() {
+        this.setTemplate(ConfigReader.getConfigVar("html-template"));
+        if (!this.message.hasCoordinates()) {
             // TODO: change template?
         }
-        htmlBuilder.build();
-        String fileName = htmlBuilder.writeHTML("html/alerts/");
+        this.build();
+        String fileName = this.writeHTML("html/alerts/");
         
         try {
             String osName = System.getProperty("os.name");
@@ -64,10 +66,6 @@ public class HtmlBuilder {
             ApplicationLogger.log("## ERROR: " + e.getMessage(), 
                                   Application.ALERTMONITOR);
         }
-    }
-    
-    public void setMessage(Message message) {
-        this.message = message;
     }
     
     public void setTemplate(String templateName) {
