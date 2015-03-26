@@ -1,17 +1,31 @@
 package ffw.alertmonitor.actions;
 
+import ffw.util.ApplicationLogger;
+import ffw.util.ConfigReader;
+import ffw.util.ShellScript;
+import ffw.util.TVController;
+import ffw.util.ApplicationLogger.Application;
 import ffw.util.TVController.TVAction;
 
 public class SystemHibernate extends AlertAction {
 
     @Override
     public String getDescription() {
-        return "switch off TV and close all open applications";
+        return "switches off TV and closes open applications after a given time";
     }
     
     @Override
     public void run() {
-        // TODO: after x min: 
-        //TVController.sendCommand(TVAction.TURN_OFF);
+        int time = Integer.parseInt(ConfigReader.getConfigVar("system-hibernate-time", 
+                                                              Application.ALERTMONITOR));
+        try {
+            Thread.sleep(time * 1000 * 60);
+        } catch (InterruptedException e) {
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
+        }
+        
+        ShellScript.execute("close-applications");
+        TVController.sendCommand(TVAction.TURN_OFF);
     }
 }

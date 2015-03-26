@@ -29,7 +29,7 @@ public class AlertMailInformer extends AlertAction {
     
     @Override
     public String getDescription() {
-        return "mail-module";
+        return "sends an eMail to given recipients";
     }
     
     @Override

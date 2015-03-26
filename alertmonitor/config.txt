@@ -26,17 +26,16 @@ watchdog-recipients=Max.Stark88@web.de,David-ruckes@web.de
 
 ### ALERT ACTIONS ###
 
-# 
-actionClassNames=AlertSpeaker,AlertMailInformer,HtmlBuilder,TVSwitchOn,SystemHibernate,AlertSMSInformer
 
+actionClassNames=AlertSpeaker,AlertMailInformer,HtmlBuilder,TVSwitchOn,SystemHibernate,AlertSMSInformer
 
 # name of the serial port
 serial-port=/dev/ttyAMA0
 
-
 html-template=standard
 
 # marytts settings:
+marytts-start-delay=10
 marytts-server=localhost
 marytts-port=59125
 marytts-voice=bits3-hsmm
@@ -46,4 +45,5 @@ marytts-pause=10
 
 alert-recipients=Max.Stark88@web.de
 
+system-hibernate-time=1
 

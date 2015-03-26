@@ -16,6 +16,7 @@
 #    along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 # first, force chromium to quit
+# TODO: call close-application-script
 while true; do
   killall chromium
   killall chromium-browse

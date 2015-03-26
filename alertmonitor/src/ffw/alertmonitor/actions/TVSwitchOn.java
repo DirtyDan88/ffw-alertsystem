@@ -7,7 +7,7 @@ public class TVSwitchOn extends AlertAction {
     
     @Override
     public String getDescription() {
-        return "switch on the TV";
+        return "switches on the TV";
     }
     
     @Override

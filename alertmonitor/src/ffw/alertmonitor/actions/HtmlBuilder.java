@@ -31,9 +31,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.ShellScript;
 
 public class HtmlBuilder extends AlertAction {
     private String templateName;
@@ -42,7 +41,7 @@ public class HtmlBuilder extends AlertAction {
     
     @Override
     public String getDescription() {
-        return "browser-module";
+        return "shows the alert information as HTML-page in browser";
     }
     
     @Override
@@ -51,21 +50,11 @@ public class HtmlBuilder extends AlertAction {
         if (!this.message.hasCoordinates()) {
             // TODO: change template?
         }
-        this.build();
-        String fileName = this.writeHTML("html/alerts/");
         
-        try {
-            String osName = System.getProperty("os.name");
-            if (osName.contains("Windows")) {
-                Runtime.getRuntime().exec("script/alert.bat " + fileName);
-            } else {
-                Runtime.getRuntime().exec("sh script/alert.sh " + fileName);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                  Application.ALERTMONITOR);
-        }
+        this.build();
+        
+        String fileName = this.writeHTML("html/alerts/");
+        ShellScript.execute("open-browser", fileName);
     }
     
     public void setTemplate(String templateName) {

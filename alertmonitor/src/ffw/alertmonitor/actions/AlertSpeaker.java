@@ -35,17 +35,29 @@ import marytts.util.http.Address;
 import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.ApplicationLogger.Application;
+import ffw.util.ShellScript;
 
 public class AlertSpeaker extends AlertAction {
     
     @Override
     public String getDescription() {
-        return "speech-module";
+        return "speech output on audio-device";
     }
     
     @Override
     public void run() {
-        // TODO: start marytts server?
+        ShellScript.execute("start-marytts-server");
+        
+        /* wait till the server is started */
+        int time = Integer.parseInt(ConfigReader.getConfigVar("marytts-start-delay", 
+                Application.ALERTMONITOR));
+        try {
+            Thread.sleep(time * 1000);
+        } catch (InterruptedException e) {
+            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                  Application.ALERTMONITOR);
+        }
+        
         String server = ConfigReader.getConfigVar("marytts-server", Application.ALERTMONITOR);
         String voice  = ConfigReader.getConfigVar("marytts-voice",  Application.ALERTMONITOR);
         String effect = ConfigReader.getConfigVar("marytts-effect", Application.ALERTMONITOR);
