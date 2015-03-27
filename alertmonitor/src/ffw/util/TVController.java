@@ -205,7 +205,7 @@ public class TVController {
             String response = null;
             response = this.getMessage();
             
-            while (response != null) {
+            while (response == null) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
