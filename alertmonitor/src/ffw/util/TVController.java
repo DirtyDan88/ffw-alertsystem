@@ -43,8 +43,8 @@ public class TVController {
         }
         public String getStatusString() {
             switch(this) {
-                case SWITCH_ON:  return "AN";
-                case TURN_OFF:   return "AU";
+                case SWITCH_ON:  return "#AN";
+                case TURN_OFF:   return "#AU";
                 default: throw new IllegalArgumentException();
             }
         }
@@ -184,9 +184,6 @@ public class TVController {
                 byte[] buf = new byte[1024];
                 
                 if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-                    ApplicationLogger.log("$$ received response", 
-                                          Application.ALERTMONITOR);
-                    
                     try {
                         while (this.inStream.available() > 0) {
                             this.inStream.read(buf);
@@ -195,6 +192,8 @@ public class TVController {
                         
                     } catch (IOException e) {
                         e.printStackTrace();
+                        ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                Application.ALERTMONITOR);
                     }
                 }
             }
