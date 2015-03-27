@@ -81,6 +81,8 @@ public class TVController {
                 writer.write(action.getCommandString());
                 String response = reader.getResponse();
                 
+                response = response.substring(0, 2);
+                
                 ApplicationLogger.log("$$ sended   '" + action.getCommandString() + "'", Application.ALERTMONITOR);
                 ApplicationLogger.log("$$ received '" + response + "'", Application.ALERTMONITOR, false);
                 ApplicationLogger.log("$$ expected '" + action.getStatusString() + "'", Application.ALERTMONITOR, false);
