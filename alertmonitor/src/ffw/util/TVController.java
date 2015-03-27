@@ -20,6 +20,7 @@
 package ffw.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import ffw.util.ApplicationLogger.Application;
@@ -52,14 +53,14 @@ public class TVController {
     public static void sendCommand(TVAction action) {
         SerialPort serialPort = null;
         SerialWriter writer   = null;
+        SerialReader reader   = null;
+        
         try {
             serialPort = connect(ConfigReader.getConfigVar("serial-port"));
             serialPort.notifyOnDataAvailable(true);
             
             writer = new SerialWriter(serialPort.getOutputStream());
-            
-            
-            
+            reader = SerialReader.createInstance(serialPort.getInputStream());
             
         } catch (IOException | NoSuchPortException | 
                  UnsupportedCommOperationException | 
@@ -73,18 +74,26 @@ public class TVController {
                                   Application.ALERTMONITOR);
             
             /* try it several times, in case of some unexpected error */
-            for (int i=0; i<5; i++) {
+            boolean received = false;
+            for (int i = 0; (i < 10 && !received); i++) {
                 writer.write(action.getCommandString());
+                String response = reader.getResponse();
                 
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                          Application.ALERTMONITOR);
+                if (response.equals(action.getStatusString())) {
+                    received = true;
+                } else {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                              Application.ALERTMONITOR);
+                    }
                 }
             }
             
+            reader.stop();
             serialPort.close();
+            
             ApplicationLogger.log("$$ serial connection closed", 
                                   Application.ALERTMONITOR);
         }
@@ -138,15 +147,20 @@ public class TVController {
         }
     }
     
-    /*
-    private class SerialReader implements Runnable, SerialPortEventListener {
+    private static class SerialReader implements Runnable, SerialPortEventListener {
         private boolean stopped = false;
         private InputStream inStream;
-        private volatile String message;
+        private volatile String message = null;
         
-        public SerialReader(InputStream inStream) {
-            this.inStream = inStream;
+        public static SerialReader createInstance(InputStream inStream) {
+            SerialReader instance = new SerialReader(inStream);
+            new Thread(instance).start();
             
+            return instance;
+        }
+        
+        private SerialReader(InputStream inStream) {
+            this.inStream = inStream;
         }
         
         public void run() {
@@ -180,13 +194,31 @@ public class TVController {
             this.message = message;
         }
         
-        public synchronized String getMessage() {
+        private synchronized String getMessage() {
             return this.message;
+        }
+        
+        public String getResponse() {
+            String response = null;
+            response = this.getMessage();
+            
+            while (response != null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                                          Application.ALERTMONITOR);
+                }
+                
+                response = this.getMessage();
+            }
+            
+            this.setMessage(null);
+            return response;
         }
         
         public synchronized void stop() {
             this.stopped = true;
         }
     }
-    */
 }
