@@ -22,6 +22,7 @@ package ffw.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.TooManyListenersException;
 
 import ffw.util.ApplicationLogger.Application;
 import gnu.io.*;
@@ -61,10 +62,11 @@ public class TVController {
             
             writer = new SerialWriter(serialPort.getOutputStream());
             reader = SerialReader.createInstance(serialPort.getInputStream());
+            serialPort.addEventListener(reader);
             
         } catch (IOException | NoSuchPortException | 
                  UnsupportedCommOperationException | 
-                 PortInUseException e) {
+                 PortInUseException | TooManyListenersException e) {
             ApplicationLogger.log("## ERROR: " + e.getMessage(), 
                                   Application.ALERTMONITOR);
         }
@@ -181,14 +183,19 @@ public class TVController {
             if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
                 byte[] buf = new byte[1024];
                 
-                try {
-                    while (this.inStream.available() > 0) {
-                        this.inStream.read(buf);
-                    }
-                    this.setMessage(new String(buf));
+                if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+                    ApplicationLogger.log("$$ received response", 
+                                          Application.ALERTMONITOR);
                     
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        while (this.inStream.available() > 0) {
+                            this.inStream.read(buf);
+                        }
+                        this.setMessage(new String(buf));
+                        
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
