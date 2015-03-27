@@ -24,7 +24,7 @@
     <target name="create_run_jar">
         <jar destfile="ffw-alertmonitor.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="ffw.alertmonitor.AlertMonitor"/>
+                <attribute name="Main-Class" value="ffw.alertmonitor.Application"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="bin"/>
@@ -32,6 +32,7 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/RXTXcomm.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/javax.mail.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/marytts-client-5.1.2.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/twilio-java-sdk-3.7.2-jar-with-dependencies.jar"/>
         </jar>
         <jar destfile="ffw-alertsystem-watchdog.jar" filesetmanifest="mergewithoutmain">
             <manifest>

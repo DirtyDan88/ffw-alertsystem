@@ -7,3 +7,4 @@ alertmonitor/*.jar
 .settings
 .alertmonitor.lock
 .watchdog.lock
+twilio.txt

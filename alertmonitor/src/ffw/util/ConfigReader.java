@@ -28,7 +28,7 @@ import ffw.util.ApplicationLogger.Application;
 
 public class ConfigReader {
     
-    private ConfigReader() {}
+    public static String fileName = "config.txt";
     
     public static String getConfigVar(String varName) {
         return getConfigVar(varName, Application.ALERTMONITOR);
@@ -41,7 +41,7 @@ public class ConfigReader {
         Boolean found = false;
         
         try {
-            File configFile = new File("config.txt");
+            File configFile = new File(fileName);
             bufReader = new BufferedReader(new FileReader(configFile));
             
             
