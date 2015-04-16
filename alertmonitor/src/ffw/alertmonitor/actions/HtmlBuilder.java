@@ -48,7 +48,7 @@ public class HtmlBuilder extends AlertAction {
     public void run() {
         this.setTemplate(ConfigReader.getConfigVar("html-template"));
         if (!this.message.hasCoordinates()) {
-            // TODO: change template?
+            this.setTemplate("withoutGPS");
         }
         
         this.build();
@@ -66,8 +66,10 @@ public class HtmlBuilder extends AlertAction {
         
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
         this.setElement("#timestamp",    timestamp);
-        this.setElement("#latitude",     this.message.getLatitude());
-        this.setElement("#longitude",    this.message.getLongitude());
+        if (!this.message.hasCoordinates()) {
+            this.setElement("#latitude",     this.message.getLatitude());
+            this.setElement("#longitude",    this.message.getLongitude());
+        }
         this.setElement("#shortKeyword", this.message.getShortKeyword());
         this.setElement("#alertLevel",   this.message.getAlertLevel());
         

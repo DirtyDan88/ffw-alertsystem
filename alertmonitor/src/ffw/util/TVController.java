@@ -79,6 +79,9 @@ public class TVController {
             boolean received = false;
             for (int i = 0; (i < 10 && !received); i++) {
                 writer.write(action.getCommandString());
+                
+                // TODO: bug: thats what we get here is not the response but 
+                //            the echo of the own message, hence its always true
                 String response = reader.getResponse();
                 
                 response = response.substring(0, 3);

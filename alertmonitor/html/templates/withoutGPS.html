@@ -1,0 +1,101 @@
+<!-- 
+    Copyright (c) 2015, Max Stark <max.stark88@web.de> 
+        All rights reserved.
+    
+    This file is part of ffw-alertsystem, which is free software: you 
+    can redistribute it and/or modify it under the terms of the GNU 
+    General Public License as published by the Free Software Foundation, 
+    either version 2 of the License, or (at your option) any later 
+    version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details. 
+    
+    You should have received a copy of the GNU General Public License 
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../style.css">
+        <title>Alarmsystem - FFW Mönchzell</title>
+        
+        <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script type="text/javascript" src="../time.js"></script>
+        <script type="text/javascript" src="../alert.js"></script>
+        
+        <script type="text/javascript">
+        $(document).ready(function() {
+                updateTimer();
+                setAlertTime();
+                setAlertKeywordAndLevel();
+            });
+        </script>
+    </head>
+    
+    <body>
+        <div id="timestamp" style="display: none;"></div>
+        <div id="shortKeyword" style="display: none;"></div>
+        <div id="alertLevel" style="display: none;"></div>
+        
+        <table class="wrapper">
+            <tr>
+                <td class="leftWrapper">
+                    <div class="left">
+                        
+                        <div>
+                            <div>Alarmierung am: </div>
+                            <div id="alertTime"></div>
+                            <div>Zeit seit Alarmierung: </div>
+                            <div id="timeSinceAlert"></div>
+                            <div class="alertKeyword">
+                                <table>
+                                    <tr>
+                                        <td>Einsatzstichwort: </td>
+                                        <td><div id="shortKeywordDesc"></div></td>
+                                        <td rowspan="2">
+                                            <div id="keywordImage"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alarmstufe:</td>
+                                        <td><div id="alertLevelDesc"></div></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="furtherKeywords">
+                                <div>Weitere Einsatzstichwörter: </div>
+                                <ul></ul>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                </td>
+                <td class="rightWrapper">
+                    <div class="right">
+                        <div class="mapContainer">
+                            <div id="map"></div>
+                            <div id="mapInfo">
+                                <table>
+                                    <tr>
+                                        <td>Entfernung:</td>
+                                        <td style="text-align: right;"><div id="distance"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fahrtzeit:</td>
+                                        <td style="text-align: right;"><div id="duration"></div></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

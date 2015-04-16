@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import ffw.util.ApplicationLogger;
@@ -34,9 +36,11 @@ import ffw.util.MessageLogger.LogEvent;
 public class AlertMonitor implements Runnable {
     private boolean stopped = false;
     private Queue<Message> messageQueue = null;
+    private List<String>   alertNumbers = null;
     
     public AlertMonitor(Queue<Message> messageQueue) {
         this.messageQueue = messageQueue;
+        this.alertNumbers = new ArrayList<String>();
     }
     
     @Override
@@ -93,42 +97,18 @@ public class AlertMonitor implements Runnable {
     
     private void executeAlertActions(Message message) {
         message.evaluateAlphaString();
-        AlertActionManager.executeActions(message);
+        
+        /* prevent multiple alerting by checking the alertnumber */
+        if (this.alertNumbers.contains(message.getAlertNumber())) {
+            ApplicationLogger.log("## multiple alerting detected, no actions "
+                    + "will be executed", Application.ALERTMONITOR);
+        } else {
+            this.alertNumbers.add(message.getAlertNumber());
+            AlertActionManager.executeActions(message);
+        }
+        
+        //TODO: Write alertnumber + message in file for statistical evaluation
     }
-    
-        /*
-        StringBuilder actions = new StringBuilder();
-        String tvModule       = ConfigReader.getConfigVar("tv-module");
-        String browserModule  = ConfigReader.getConfigVar("browser-module");
-        String speechModule   = ConfigReader.getConfigVar("speech-module");
-        String emailModule    = ConfigReader.getConfigVar("email-module");
-        */
-        
-        /*
-        /* switch on TV 
-        if (tvModule.equals("enable")) {
-            TVController.send(TVAction.SWITCH_ON);
-            actions.append("tv-module ");
-        }
-        
-        /* open browser and show alert infos 
-        if (browserModule.equals("enable")) {
-            HtmlBuilder.build(message);
-            actions.append("browser-module ");
-        }
-        
-        /* start audio ouput 
-        if (speechModule.equals("enable")) {
-            AlertSpeaker.play(message);
-            actions.append("speech-module ");
-        }
-        
-        /* send alert infos via email 
-        if (emailModule.equals("enable")) {
-            AlertMailInformer.send(message);
-            actions.append("email-module ");
-        }
-        */
     
     private void resetWatchdog() {
         int port          = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));

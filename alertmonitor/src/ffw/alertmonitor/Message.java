@@ -32,6 +32,7 @@ public class Message {
     
     private String         latitude;
     private String         longitude;
+    private String         alertNumber;
     private String         shortKeyword;
     private String         alertLevel;
     private Vector<String> keywords = new Vector<String>();
@@ -72,36 +73,36 @@ public class Message {
     public void evaluateAlphaString() {
         if (this.getAlpha() != null) {
             String[] alphaStr = this.cleanAlphaString().split("#");
+            int index = 0;
             
             if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
                 /* alert with latitude and longitude */
-                this.latitude  = alphaStr[0];
-                this.longitude = alphaStr[1];
-                
-                // alphaStr[2] := laufende Einsatznummer
-                
-                if (this.isShortKeyword(alphaStr[3])) {
-                    this.shortKeyword = alphaStr[3].substring(0, 1);
-                    this.alertLevel   = alphaStr[3].substring(1, 2);
-                    if (alphaStr[3].length() > 3) {
-                        this.keywords.add(alphaStr[3].substring(3));
-                    }
-                    
-                } else {
-                    this.shortKeyword = "-";
-                    this.alertLevel   = "-";
-                }
-                
-                // TODO: alphaStr[4] := Adresse?
-                
-                for (int i = 4; i < alphaStr.length; i++) {
-                    this.keywords.add(alphaStr[i]);
-                }
-                
+                this.latitude  = alphaStr[index++];
+                this.longitude = alphaStr[index++];
                 this.hasCoordinates = true;
                 
+            } /* else {
+                alert without gps coordinates 
+            } */
+            
+            this.alertNumber = alphaStr[index++];
+            
+            if (this.isShortKeyword(alphaStr[index])) {
+                this.shortKeyword = alphaStr[index].substring(0, 1);
+                this.alertLevel   = alphaStr[index].substring(1, 2);
+                if (alphaStr[index].length() > 3) {
+                    this.keywords.add(alphaStr[index].substring(3));
+                }
+                index++;
             } else {
-                /* TODO: alert without geo coordinates */
+                this.shortKeyword = "-";
+                this.alertLevel   = "-";
+            }
+            
+            // TODO: alphaStr[4] := Adresse?
+            
+            for (int i = index; i < alphaStr.length; i++) {
+                this.keywords.add(alphaStr[i]);
             }
         }
     }
@@ -166,6 +167,10 @@ public class Message {
     
     public String getLongitude() {
         return this.longitude;
+    }
+    
+    public String getAlertNumber() {
+        return this.alertNumber;
     }
     
     public String getShortKeyword() {

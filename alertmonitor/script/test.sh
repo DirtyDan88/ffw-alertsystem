@@ -38,7 +38,11 @@ case "$1" in
     echo "Testing with real pocsag string ..."
     MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   49.33422/08.85146/518/F1 Feuer klein//FW Meckesheim-Mönchz/Mühlstr. 12/Meckesheim-Mönchzell// //Test Test/<NUL><NUL>"
     ;;
-	
+  alert5)
+    echo "Alert string from 14/04/2015"
+    MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   //1202/F2 LKW/Bus//Ortsausgang/Eschelbronner Str. /Meckesheim// //Maisernter/"
+    ;;
+    
   --help)
     echo "Usage: $0 {watchdog|alert[1-4]|<message>}"
     exit 1 
