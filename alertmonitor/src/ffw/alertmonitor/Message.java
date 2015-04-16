@@ -99,7 +99,7 @@ public class Message {
                 this.alertLevel   = "-";
             }
             
-            // TODO: alphaStr[4] := Adresse?
+            // TODO: alphaStr[index++] := adress on index == 4?
             
             for (int i = index; i < alphaStr.length; i++) {
                 this.keywords.add(alphaStr[i]);
