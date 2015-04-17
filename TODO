@@ -3,6 +3,12 @@
     - marytts-server
     - watchdog
 
+* add to system startup of raspi-reciever:
+    - watchdogtimer with delay, to wait for JVM
+    
+* add to watchdogtimer raspi-reciever:
+    -selfcheck for watchdog timeout, to reboot System in case of WLAN malfunction
+    
 * Oberflaeche zur Eingabe von Testalarmierungen
     - Ort
     - Einsatzart
@@ -14,12 +20,9 @@
     - Straße Hausnummer
     - Ort
     - Einsatzstichwort
-    
-* Auslesen der Straße und Hausnummer aus "Pocsag 1200"
-    - laut Rene, Dennis und Armin befindet sich diese immer an der selben Stelle
-
+ 
 * Option zum Ausschalten des Alarmmonitors
-    - Manuell
+    - Manuell (Sondertasten auf der Airmaus verwenden)
     - Zeit
   
 * Desktopshortcut zum Ausschalten des Alarmmonitors
