@@ -1,3 +1,7 @@
+* implement automated test-system with former pocsag strings
+    - supersede manuel testing 
+    - debug- or test-flag for executable
+
 * start at system startup of raspi-alertmonitor:
     - alertmonitor
     - marytts-server
