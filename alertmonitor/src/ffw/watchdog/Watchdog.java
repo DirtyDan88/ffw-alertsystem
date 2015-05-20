@@ -32,6 +32,7 @@ import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
 import ffw.util.Mail;
 import ffw.util.ApplicationLogger.Application;
+import ffw.util.ShellScript;
 
 public class Watchdog implements Runnable {
     private boolean stopped = false;
@@ -74,6 +75,13 @@ public class Watchdog implements Runnable {
                                       Application.WATCHDOG);
                 this.sendMail();
                 
+                boolean reboot = Boolean.getBoolean(ConfigReader.getConfigVar(
+                                    "watchdog-reboot", Application.WATCHDOG));
+                if (reboot) {
+                    ApplicationLogger.log("reboot", Application.WATCHDOG);
+                    ShellScript.execute("reboot");
+                }
+                
             } catch (IOException e) {
                 ApplicationLogger.log(e.getMessage(), Application.WATCHDOG);
             }
@@ -104,6 +112,7 @@ public class Watchdog implements Runnable {
         this.socket.close();
         this.stopped = true;
     }
+    
     
     
     

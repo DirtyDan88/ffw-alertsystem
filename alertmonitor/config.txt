@@ -17,11 +17,12 @@ watchdog-addr=255.255.255.255
 # port which the watchdog process listens on
 watchdog-port=50001
 # watchdog timeout in minutes:
-watchdog-timeout=10
+watchdog-timeout=1
 # mail address to inform, in case of watchdog was
 # triggert, seperated by ','
-watchdog-recipients=Max.Stark88@web.de,David-ruckes@web.de
-
+watchdog-recipients=Max.Stark88@web.de
+# reboot after watchdog was triggered
+watchdog-reboot=true
 
 
 ### ALERT ACTIONS ###
