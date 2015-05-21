@@ -15,7 +15,6 @@
 #    You should have received a copy of the GNU General Public License 
 #    along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-# shutdown 
-shutdown -r now
+# you have to exec 'sudo chmod u+s /sbin/shutdown' to allow shutdown without pw
 #shutdown -r -t 10 1
-
+shutdown -r now
