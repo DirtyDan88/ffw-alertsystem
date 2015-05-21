@@ -73,9 +73,15 @@ public class Watchdog implements Runnable {
             } catch (SocketTimeoutException e) {
                 ApplicationLogger.log("watchdog says: oh nooo!", 
                                       Application.WATCHDOG);
-                this.sendMail();
                 
-                boolean reboot = Boolean.getBoolean(ConfigReader.getConfigVar(
+                String recipients = ConfigReader.getConfigVar("watchdog-recipients", 
+                                                              Application.WATCHDOG);
+                if (!recipients.isEmpty()) {
+                    ApplicationLogger.log("send mail", Application.WATCHDOG);
+                    this.sendMail(recipients);
+                }
+                
+                boolean reboot = Boolean.valueOf(ConfigReader.getConfigVar(
                                     "watchdog-reboot", Application.WATCHDOG));
                 if (reboot) {
                     ApplicationLogger.log("reboot", Application.WATCHDOG);
@@ -88,11 +94,9 @@ public class Watchdog implements Runnable {
         }
     }
     
-    private void sendMail() {
+    private void sendMail(String recipients) {
         String userName   = "ffw-moe-geraetehaus@web.de";
         String passWord   = "R8A825Tm";
-        String recipients = ConfigReader.getConfigVar("watchdog-recipients", 
-                                                      Application.WATCHDOG);
         String subject    = "[ffw-alertsystem] !! watchdog timeout !!";
         String text       = "Watchdog timeout at " + DateAndTime.get() + "\n";
         try {

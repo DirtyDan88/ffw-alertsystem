@@ -16,4 +16,6 @@
 #    along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 # shutdown 
-shutdown -r -t 10 1
+shutdown -r now
+#shutdown -r -t 10 1
+

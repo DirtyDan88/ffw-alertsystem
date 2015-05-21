@@ -44,11 +44,17 @@ public class ConfigReader {
             File configFile = new File(fileName);
             bufReader = new BufferedReader(new FileReader(configFile));
             
-            
             while((line = bufReader.readLine()) != null) {
                 if (!line.startsWith("#") && line.startsWith(varName)) {
-                    varValue = line.split("=")[1];
-                    found = true; 
+                    found = true;
+                    
+                    String s[] = line.split("=");
+                    if (s.length > 1) {
+                        varValue = s[1];
+                    } else {
+                        varValue = "";
+                    }
+                    
                     break;
                 }
             }
