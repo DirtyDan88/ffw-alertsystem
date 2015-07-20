@@ -24,11 +24,6 @@
     - Zeitverzägerung / Auslösezeit festlegen
     (Hierauf achten das gestartet Alarmierungen kenntlich gemacht werden und wieder beendet werden können,
     bei Änderungen an der Eingabemaske reicht ein Überschreiben der Alarmierungsangaben)
-    
-* Aufbau einer Möglichkeit zur "Text to Speech" Sprachausgabe über HDMI
-    - Straße Hausnummer
-    - Ort
-    - Einsatzstichwort
  
 * Option zum Ausschalten des Alarmmonitors
     - Manuell (Sondertasten auf der Airmaus verwenden)
@@ -41,8 +36,6 @@
     - Loggen aller manuell gestarteten Prozesse um das Beenden zu vereinfachen/ermöglichen
     
 * User "pi" in den Rechten weiter beschränken um Anwederfehler zu vermeiden
-
-* Einen .pdf Viewer installieren der einen Präsentationsmodus ermöglicht
 
 * Airmouse aussuchen, bestellen, testen, verbauen
 
