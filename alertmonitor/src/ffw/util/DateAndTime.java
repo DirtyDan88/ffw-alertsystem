@@ -23,27 +23,54 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateAndTime {
-    public static String get() {
-        Date now = new java.util.Date();
-        SimpleDateFormat sdfDateAndTime = new SimpleDateFormat("dd-MM-yyyy # HH:mm:ss");
-        String dateAndTime = sdfDateAndTime.format(now);
-        
-        return dateAndTime;
-    }
+  
+  /* So we always get the english month names, independent of system locale */
+  private static String[] monthNames = { 
+    "January", 
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  };
+  
+  public static String get() {
+    Date now = new java.util.Date();
+    SimpleDateFormat sdfDateAndTime = new SimpleDateFormat("dd-MM-yyyy # HH:mm:ss");
+    String dateAndTime = sdfDateAndTime.format(now);
     
-    public static String getDate() {
-        Date now = new java.util.Date();
-        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy");
-        String date = sdfDate.format(now);
-        
-        return date;
-    }
+    return dateAndTime;
+  }
+  
+  public static String getDate() {
+    Date now = new java.util.Date();
+    SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy");
+    String date = sdfDate.format(now);
     
-    public static String getTime() {
-        Date now = new java.util.Date();
-        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-        String time = sdfTime.format(now);
-        
-        return time;
-    }
+    return date;
+  }
+  
+  public static String getTime() {
+    Date now = new java.util.Date();
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+    String time = sdfTime.format(now);
+    
+    return time;
+  }
+  
+  public static String getYearAndMonthName() {
+    Date now = new java.util.Date();
+    SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+    SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
+    String yearAndMonthName = sdfYear.format(now) + "-" + 
+                              monthNames[Integer.parseInt(sdfMonth.format(now)) - 1];
+    
+    return yearAndMonthName;
+  }
 }
