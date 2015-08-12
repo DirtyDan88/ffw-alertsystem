@@ -24,7 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 import gnu.io.*;
 
 public class TVController {

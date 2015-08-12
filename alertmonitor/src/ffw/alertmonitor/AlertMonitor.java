@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.MessageLogger;
-import ffw.util.ApplicationLogger.Application;
-import ffw.util.MessageLogger.LogEvent;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.MessageLogger;
+import ffw.util.logging.ApplicationLogger.Application;
+import ffw.util.logging.MessageLogger.LogEvent;
 
 public class AlertMonitor implements Runnable {
     private boolean stopped = false;

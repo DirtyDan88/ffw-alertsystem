@@ -26,9 +26,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Queue;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 public class AlertListener implements Runnable {
     private boolean stopped = false;

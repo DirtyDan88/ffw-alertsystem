@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ffw.alertmonitor.actions.AlertAction;
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 public class AlertActionManager {
     

@@ -1,11 +1,11 @@
 package ffw.alertmonitor.actions;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.ShellScript;
 import ffw.util.TVController;
-import ffw.util.ApplicationLogger.Application;
 import ffw.util.TVController.TVAction;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 public class SystemHibernate extends AlertAction {
 

@@ -23,10 +23,10 @@ import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;

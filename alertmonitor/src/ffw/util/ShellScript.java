@@ -21,7 +21,8 @@ package ffw.util;
 
 import java.io.IOException;
 
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 public class ShellScript {
     

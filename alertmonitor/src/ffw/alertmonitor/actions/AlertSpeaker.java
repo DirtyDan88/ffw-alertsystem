@@ -32,9 +32,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import marytts.client.MaryClient;
 import marytts.util.data.audio.AudioPlayer;
 import marytts.util.http.Address;
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 import ffw.util.ShellScript;
 
 public class AlertSpeaker extends AlertAction {

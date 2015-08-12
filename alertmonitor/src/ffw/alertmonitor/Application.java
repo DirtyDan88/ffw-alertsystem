@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ffw.util.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger;
 
 
 public class Application {

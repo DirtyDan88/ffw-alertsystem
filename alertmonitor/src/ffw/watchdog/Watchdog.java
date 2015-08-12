@@ -27,11 +27,11 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import ffw.util.ApplicationLogger;
 import ffw.util.ConfigReader;
 import ffw.util.DateAndTime;
 import ffw.util.Mail;
-import ffw.util.ApplicationLogger.Application;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 import ffw.util.ShellScript;
 
 public class Watchdog implements Runnable {
@@ -95,28 +95,28 @@ public class Watchdog implements Runnable {
     }
     
     private void sendMail(String recipients) {
-        String userName   = "ffw-moe-geraetehaus@web.de";
-        String passWord   = "R8A825Tm";
-        String subject    = "[ffw-alertsystem] !! watchdog timeout !!";
-        String text       = "Watchdog timeout at " + DateAndTime.get() + "\n";
-        try {
-            text += "Watchdog on host: " + InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                                  Application.WATCHDOG);
-        }
-        
-        Mail.send(userName, passWord, recipients, subject, text, 
-                  Application.WATCHDOG);
-        ApplicationLogger.log("send mail to: " + recipients, 
-                              Application.WATCHDOG, false);
+      String userName = ConfigReader.getConfigVar("email-address");
+      String passWord = ConfigReader.getConfigVar("email-password");
+      
+      String subject  = "[ffw-alertsystem] !! watchdog timeout !!";
+      String text     = "Watchdog timeout at " + DateAndTime.get() + "\n";
+      try {
+        text += "Watchdog on host: " + InetAddress.getLocalHost();
+      } catch (UnknownHostException e) {
+        ApplicationLogger.log("## ERROR: " + e.getMessage(), 
+                              Application.WATCHDOG);
+      }
+      
+      Mail.send(userName, passWord, recipients, subject, text, 
+                Application.WATCHDOG);
+      ApplicationLogger.log("send mail to: " + recipients, 
+                            Application.WATCHDOG, false);
     }
     
     public synchronized void stop() {
         this.socket.close();
         this.stopped = true;
     }
-    
     
     
     
