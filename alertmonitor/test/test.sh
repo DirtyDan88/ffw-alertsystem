@@ -42,7 +42,10 @@ case "$1" in
     echo "Alert string from 14/04/2015"
     MESSAGE="POCSAG1200: Address:  158973  Function: 0  Alpha:   //1202/F2 LKW/Bus//Ortsausgang/Eschelbronner Str. /Meckesheim// //Maisernter/"
     ;;
-    
+  alert6)
+    echo "Alert Meckesheimerhof, May 21st 2015"
+    MESSAGE="POCSAG1200: Address:  158934  Function: 0  Alpha:   1640/F1 Fahrzeugbrand///Meckesheimerhof /Meckesheim// //Traktor in Scheune brennt/#"
+    ;;
   --help)
     echo "Usage: $0 {watchdog|alert[1-4]|<message>}"
     exit 1 
