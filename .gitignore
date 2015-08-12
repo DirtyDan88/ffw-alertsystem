@@ -8,4 +8,4 @@ alertmonitor/*.jar
 .alertmonitor.lock
 .watchdog.lock
 twilio.txt
-config.txt
+alertmonitor/config.txt

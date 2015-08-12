@@ -57,7 +57,7 @@ sudo ldconfig
 # driver, the SDR programs can't access it. 
 sudo nano /etc/modprobe.d/rtl2832u-blacklist.conf 
 # content: 
-blacklist dvb_usb_rtl2832u
+blacklist dvb_usb_rtl28xxu
 blacklist rtl2832
 
 *** receiver is ready, test with: 

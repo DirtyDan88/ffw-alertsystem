@@ -1,3 +1,6 @@
+
+* save mobile numbers for twilio in sqlite-file
+
 * recognize if receiver send only bullshit like:
 [18-05-2015 # 00:00:53] >> received data, buffer is:    'POCSAG1200: Address:  161038  Function: 0  Alpha:   %M<ETX>Rb4y!oD5cRgK<CR>,<HT>!42!;Ür'i1=F'öac<CR>4&Ü<DC4>r2I@<ETX>pfÖ3<RS>Ld<US>"h<DC3>C<HT>2E<DC2>g&W<SOH><STX>7ÄmÄI<CAN>ße<DLE>Pg<US> <ACK><ESC>M`<DC4>L<SI><GS>`<DC3>R(B(Xa<EOT><HT><DC3>nBelioH4@V<DC3>.>a<<CAN>)<FS>4"iMJ#Z9<RS>f=E<SUB><DC3>bPö<NAK>jVv`Üx<NAK>IB<FS>S8QOI<NUL><NUL>3#'
                         >> message complete, buffer is: 'Z9<RS>f=E<SUB><DC3>bPö<NAK>jVv`Üx<NAK>IB<FS>S8QOI<NUL><NUL>3#'
@@ -24,11 +27,6 @@
     - Zeitverzägerung / Auslösezeit festlegen
     (Hierauf achten das gestartet Alarmierungen kenntlich gemacht werden und wieder beendet werden können,
     bei Änderungen an der Eingabemaske reicht ein Überschreiben der Alarmierungsangaben)
-    
-* Aufbau einer Möglichkeit zur "Text to Speech" Sprachausgabe über HDMI
-    - Straße Hausnummer
-    - Ort
-    - Einsatzstichwort
  
 * Option zum Ausschalten des Alarmmonitors
     - Manuell (Sondertasten auf der Airmaus verwenden)
@@ -41,8 +39,6 @@
     - Loggen aller manuell gestarteten Prozesse um das Beenden zu vereinfachen/ermöglichen
     
 * User "pi" in den Rechten weiter beschränken um Anwederfehler zu vermeiden
-
-* Einen .pdf Viewer installieren der einen Präsentationsmodus ermöglicht
 
 * Airmouse aussuchen, bestellen, testen, verbauen
 
