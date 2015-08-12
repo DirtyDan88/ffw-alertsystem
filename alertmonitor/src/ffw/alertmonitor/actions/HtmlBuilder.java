@@ -66,7 +66,7 @@ public class HtmlBuilder extends AlertAction {
         
         String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
         this.setElement("#timestamp",    timestamp);
-        if (!this.message.hasCoordinates()) {
+        if (this.message.hasCoordinates()) {
             this.setElement("#latitude",     this.message.getLatitude());
             this.setElement("#longitude",    this.message.getLongitude());
         }
