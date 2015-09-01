@@ -26,18 +26,18 @@ public class DateAndTime {
   
   /* So we always get the english month names, independent of system locale */
   private static String[] monthNames = { 
-    "January", 
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+    "Jan", //"January", 
+    "Feb", //"February",
+    "Mar", //"March",
+    "Apr", //"April",
+    "May", //"May",
+    "June", //"June",
+    "July", //"July",
+    "Aug", //"August",
+    "Sept", //"September",
+    "Oct", //"October",
+    "Nov", //"November",
+    "Dec", //"December"
   };
   
   public static String get() {
@@ -68,8 +68,11 @@ public class DateAndTime {
     Date now = new java.util.Date();
     SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
     SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
+    
+    int monthNumber = Integer.parseInt(sdfMonth.format(now));
     String yearAndMonthName = sdfYear.format(now) + "-" + 
-                              monthNames[Integer.parseInt(sdfMonth.format(now)) - 1];
+                              sdfMonth.format(now) + "-" +
+                              monthNames[monthNumber - 1];
     
     return yearAndMonthName;
   }
