@@ -1,9 +1,13 @@
+.gitignore~
+
 alertmonitor/bin/
 alertmonitor/html/alerts/
 alertmonitor/log/
-alertmonitor/*.jar
-alertmonitor/config.txt
-alertmonitor/twilio.txt
+
+*.jar
+*.txt
+*.txt~
+
 .alertmonitor.lock
 .watchdog.lock
 .classpath
