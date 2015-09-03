@@ -2,10 +2,10 @@ alertmonitor/bin/
 alertmonitor/html/alerts/
 alertmonitor/log/
 alertmonitor/*.jar
+alertmonitor/config.txt
+alertmonitor/twilio.txt
+.alertmonitor.lock
+.watchdog.lock
 .classpath
 .project
 .settings
-.alertmonitor.lock
-.watchdog.lock
-twilio.txt
-alertmonitor/config.txt
