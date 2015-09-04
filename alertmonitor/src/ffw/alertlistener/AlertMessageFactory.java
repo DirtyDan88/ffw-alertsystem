@@ -17,22 +17,29 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertmonitor.actions;
+package ffw.alertlistener;
 
-import ffw.alertlistener.AlertMessage;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 
 
-public abstract class AlertAction implements Runnable {
+public class AlertMessageFactory {
   
-  protected AlertMessage message;
-  
-  public abstract String getDescription();
-  
-  /* to make sure each action is executed in his own thread it is not 
-     allowed to override this method */
-  public final void execute(AlertMessage alertMessage) {
-    this.message = alertMessage;
-    new Thread(this).start();
+  public static AlertMessage create(String messageString) {
+    AlertMessage alertMessage;
+    
+    if (messageString.startsWith("POCSAG")) {
+      alertMessage = new POCSAGMessage(messageString);
+    /* } else if (messageString.startsWith("TETRA")) {
+      alertMessage = new TETRAMessage(messageString); */
+    } else {
+      ApplicationLogger.log("## ERROR: Could not create AlertMessage, " + 
+                            "unknown message type", 
+                            Application.ALERTLISTENER);
+      alertMessage = null;
+    }
+    
+    return alertMessage;
   }
 }

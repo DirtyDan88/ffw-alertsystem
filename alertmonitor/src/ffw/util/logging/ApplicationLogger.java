@@ -1,6 +1,6 @@
 /*
   Copyright (c) 2015, Max Stark <max.stark88@web.de> 
-      All rights reserved.
+    All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you 
   can redistribute it and/or modify it under the terms of the GNU 
@@ -28,13 +28,14 @@ public class ApplicationLogger {
   public static boolean inFile = false;
   
   public enum Application {
-    ALERTMONITOR, WATCHDOG;
+    ALERTLISTENER, ALERTMONITOR, WATCHDOG;
     
     @Override
     public String toString() {
       switch(this) {
-        case ALERTMONITOR: return "alertmonitor";
-        case WATCHDOG:     return "watchdog";
+        case ALERTLISTENER: return "alertlistener";
+        case ALERTMONITOR:  return "alertmonitor";
+        case WATCHDOG:      return "watchdog";
         default: throw new IllegalArgumentException();
       }
     }
