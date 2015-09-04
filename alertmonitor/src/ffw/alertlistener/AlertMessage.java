@@ -24,31 +24,55 @@ import java.util.Vector;
 
 
 public abstract class AlertMessage {
-  protected String messageString;
   
-  protected boolean isComplete = false;
-  protected String  address    = null;
-  protected String  function   = null;
-  protected String  alpha      = null;
+  protected boolean isComplete  = false;
+  protected boolean isEncrypted = false;
+  protected boolean isTestAlert = false;
+  
+  protected String timestamp = null;
+  protected String address   = null;
+  protected String function  = null;
+  protected String alpha     = null;
   
   protected boolean hasCoordinates = false;
   protected String  latitude       = null;
   protected String  longitude      = null;
+  protected String  street         = null;
+  protected String  village        = null;
   protected String  alertNumber    = null;
   protected String  shortKeyword   = null;
   protected String  alertLevel     = null;
+  
+  protected String messageString;
   
   protected Vector<String> keywords = new Vector<String>();
   
   
   
   public AlertMessage(String messageString) {
-      this.messageString = messageString;
+    this.timestamp     = String.valueOf(new java.util.Date().getTime() / 1000);
+    this.messageString = messageString;
   }
   
   public abstract void evaluateMessageHead();
   
-  public abstract void evaluateMessage();
+  public abstract boolean evaluateMessage();
+  
+  @Override
+  public boolean equals(Object o) {
+    AlertMessage other = (AlertMessage) o;
+    
+    if (this.isEncrypted || other.isEncrypted()) {
+      return false;
+    }
+    
+    if (this.address.equals(other.getAddress()) && 
+        this.alertNumber.equals(other.getAlertNumber())) {
+      return true;
+    }
+    
+    return false;
+  }
   
   
   
@@ -62,6 +86,18 @@ public abstract class AlertMessage {
   
   public boolean isComplete() {
     return this.isComplete;
+  }
+  
+  public boolean isEncrypted() {
+    return this.isEncrypted;
+  }
+  
+  public boolean isTestAlert() {
+    return this.isTestAlert;
+  }
+  
+  public String getTimestamp() {
+    return this.timestamp;
   }
   
   public String getAddress() {
@@ -86,6 +122,14 @@ public abstract class AlertMessage {
   
   public String getLongitude() {
     return this.longitude;
+  }
+  
+  public String getStreet() {
+    return this.street;
+  }
+  
+  public String getVillage() {
+    return this.village;
   }
   
   public String getAlertNumber() {

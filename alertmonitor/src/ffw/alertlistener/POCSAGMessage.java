@@ -19,6 +19,12 @@
 
 package ffw.alertlistener;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
+
 
 
 public class POCSAGMessage extends AlertMessage {
@@ -51,11 +57,12 @@ public class POCSAGMessage extends AlertMessage {
       alpha      = messageString.substring(startIndex).trim();
     }
     
-    isComplete = addressExits && functionExits && alphaExits;
+    isEncrypted = checkEncryption();
+    isComplete  = addressExits && functionExits && alphaExits;
   }
   
-  public void evaluateMessage() {
-    if (getAlpha() != null) {
+  public boolean evaluateMessage() {
+    if (!isEncrypted() && getAlpha() != null) {
       String[] alphaStr = cleanAlphaString().split("#");
       int index = 0;
       
@@ -86,24 +93,30 @@ public class POCSAGMessage extends AlertMessage {
         alertLevel   = "-";
       }
       
-      // TODO: implement address detection from message string
-      //       alphaStr[index++] := address on index == 4?
-      
       for (int i = index; i < alphaStr.length; i++) {
         keywords.add(alphaStr[i]);
+        
+        if (isStreet(alphaStr[i])) {
+          street = alphaStr[i];
+        }
+        
+        if (isVillage(alphaStr[i])) {
+          village = alphaStr[i];
+        }
       }
+      
+      return true;
+      
+    } else {
+      ApplicationLogger.log("## Alertmessage is either encrypted or empty", 
+                            Application.ALERTMONITOR, false);
+      return false;
     }
   }
   
+
   
   
-  private Boolean isShortKeyword(String shortKeyword) {
-    return shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]");
-  }
-  
-  private boolean isLatOrLong(String latOrlong) {
-    return latOrlong.matches("\\d{1,2}\\.\\d{5,}");
-  }
   
   private String cleanAlphaString() {
     // TODO: check for double //
@@ -121,4 +134,33 @@ public class POCSAGMessage extends AlertMessage {
     
     return newAlphaStr;
   }
+  
+  private boolean checkEncryption() {
+    // TODO: How to check that more properly?
+    Pattern pattern = Pattern.compile("\\<[a-zA-Z]*\\>[a-zA-Z]*\\<[a-zA-Z]*\\>");
+    Matcher matcher = pattern.matcher(alpha);
+    
+    return matcher.find();
+  }
+  
+  private boolean isShortKeyword(String shortKeyword) {
+    return shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]");
+  }
+  
+  private boolean isLatOrLong(String latOrlong) {
+    return latOrlong.matches("\\d{1,2}\\.\\d{5,}");
+  }
+  
+  private boolean isStreet(String keyword) {
+    // TODO: check if string is a valid street
+    //       use txt file
+    //       check for 'str.' or 'straße'
+    return false;
+  }
+  
+  private boolean isVillage(String keyword) {
+    // TODO: check if string is village name 
+    return false;
+  }
+
 }

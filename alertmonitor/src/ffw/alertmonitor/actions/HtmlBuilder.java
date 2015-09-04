@@ -63,9 +63,8 @@ public class HtmlBuilder extends AlertAction {
   
   public void build() {
     this.loadTemplate("html/templates/" + this.templateName + ".html");
-    
-    String timestamp = String.valueOf(new java.util.Date().getTime() / 1000);
-    this.setElement("#timestamp",    timestamp);
+
+    this.setElement("#timestamp",    this.message.getTimestamp());
     if (this.message.hasCoordinates()) {
       this.setElement("#mapProvider", ConfigReader.getConfigVar("html-map-provider"));
       this.setElement("#latitude",   this.message.getLatitude());

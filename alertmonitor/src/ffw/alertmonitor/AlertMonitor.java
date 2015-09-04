@@ -24,6 +24,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -40,6 +41,7 @@ public class AlertMonitor implements Runnable {
   private boolean stopped = false;
   
   private Queue<AlertMessage> messageQueue = null;
+  private Queue<AlertMessage> prevMessages = null;
   private List<String>        alertNumbers = null;
   
   
@@ -47,6 +49,19 @@ public class AlertMonitor implements Runnable {
   public AlertMonitor(Queue<AlertMessage> messageQueue) {
     this.messageQueue = messageQueue;
     this.alertNumbers = new ArrayList<String>();
+    
+    this.prevMessages = new LinkedList<AlertMessage>() {
+      private static final long serialVersionUID = 1L;
+      
+      @Override
+      public boolean add(AlertMessage alertMessage) {
+        if (this.size() >= 20) {
+          super.removeFirst();
+        }
+        
+        return super.add(alertMessage);
+      }
+    };
   }
   
   @Override
@@ -105,24 +120,10 @@ public class AlertMonitor implements Runnable {
       }
     }
     
-    // TODO: Write alertnumber + message in file for statistical evaluation
+    saveToDB(alertMessage);
   }
-    
-  private void executeAlertActions(AlertMessage alertMessage) {
-    alertMessage.evaluateMessage();
-    
-    /* prevent multiple alerting by checking the alertnumber */
-    if (alertNumbers.contains(alertMessage.getAlertNumber())) {
-      // TODO: check also if message string are equal
-      ApplicationLogger.log("## multiple alerting detected, no actions " + 
-                            "will be executed", 
-                            Application.ALERTMONITOR);
-    } //else {
-      alertNumbers.add(alertMessage.getAlertNumber());
-      AlertActionManager.executeActions(alertMessage);
-    //}
-  }
-    
+  
+  // TODO: move watchdog reset to Listener
   private void resetWatchdog() {
     int port          = Integer.parseInt(ConfigReader.getConfigVar("watchdog-port"));
     String addressStr = ConfigReader.getConfigVar("watchdog-addr");
@@ -144,7 +145,40 @@ public class AlertMonitor implements Runnable {
         
     } catch (IOException e) {
       ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                            Application.ALERTMONITOR);
+                            Application.ALERTMONITOR, false);
+    }
+  }
+  
+  private void executeAlertActions(AlertMessage alertMessage) {
+    if (alertMessage.evaluateMessage()) {
+      /* prevent multiple alerting by checking the alertnumber */
+      if (alertNumbers.contains(alertMessage.getAlertNumber())) {
+        // TODO: check also if message string are equal
+        ApplicationLogger.log("## multiple alerting detected, no actions " + 
+                              "will be executed", 
+                              Application.ALERTMONITOR, false);
+      } else {
+        alertNumbers.add(alertMessage.getAlertNumber());
+        AlertActionManager.executeActions(alertMessage);
+      }
+    }
+  }
+  
+  private void saveToDB(AlertMessage alertMessage) {
+    alertMessage.evaluateMessage();
+    
+    if (!prevMessages.contains(alertMessage)) {
+      prevMessages.add(alertMessage);
+      
+      DatabaseManager.connectToCurrent();
+      DatabaseManager.insertAlertMessage(alertMessage);
+      DatabaseManager.close();
+      
+      ApplicationLogger.log("## saved alert-message to DB", 
+                            Application.ALERTMONITOR, false);
+    } else {
+      ApplicationLogger.log("## alert-message already in DB", 
+                            Application.ALERTMONITOR, false);
     }
   }
 }

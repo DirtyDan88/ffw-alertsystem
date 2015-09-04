@@ -46,6 +46,11 @@ case "$1" in
     echo "Alert Meckesheimerhof, May 21st 2015"
     MESSAGE="POCSAG1200: Address:  158934  Function: 0  Alpha:   1640/F1 Fahrzeugbrand///Meckesheimerhof /Meckesheim// //Traktor in Scheune brennt/#"
     ;;
+  alert7)
+    echo "Encrypted message"
+    MESSAGE="POCSAG1200: Address:  160942  Function: 3  Alpha:   ^p@/<u';3<RS>näw<SUB>O<BEL>l8L'<FF>YÜ>5W<US><DLE><SUB>he&K<SO>Y0Q<EOT>\"N<DC4>öc<VT>yr%ü<NAK>ö&<EM><FS><EOT><SUB>-*<DC2>n,Ea<US>IÜR-<NAK>"
+    ;;
+
   --help)
     echo "Usage: $0 {watchdog|alert[1-4]|<message>}"
     exit 1 

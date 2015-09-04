@@ -6,7 +6,7 @@ alertmonitor/log/
 
 *.jar
 *.txt
-*.txt~
+*.db
 
 .alertmonitor.lock
 .watchdog.lock
