@@ -54,26 +54,38 @@ public class AlertActionManager {
   private static List<AlertAction> loadAlertActions() {
     List<AlertAction> actionList = new ArrayList<AlertAction>();
     
-    String   actionPackageName = "ffw.alertmonitor.actions";
-    String[] actionClassNames  = ConfigReader.getConfigVar("actionClassNames").split(",");
+    String actionPackageName = "ffw.alertmonitor.actions";
+    String actionClassNames  = ConfigReader.getConfigVar("actionClassNames");
     
-    for (String actionClassName : actionClassNames) {
-      try {
-        Class<?> actionClass = Class.forName(actionPackageName + "." + 
-                                             actionClassName);
-        Class<?> superClass  = actionClass.getSuperclass();
-        
-        if (superClass.equals(AlertAction.class)) {
-          actionList.add(
-            (AlertAction) actionClass.newInstance()
-          );
+    if (actionClassNames.isEmpty()) {
+      ApplicationLogger.log("## No actions were specified in config-file",
+                            Application.ALERTMONITOR, false);
+    } else {
+      String[] actionClassNamesArray = actionClassNames.split(",");
+      
+      if (actionClassNamesArray.length == 0) {
+        ApplicationLogger.log("## No actions were specified in config-file",
+                              Application.ALERTMONITOR, false);
+      } else {
+        for (String actionClassName : actionClassNamesArray) {
+          try {
+            Class<?> actionClass = Class.forName(actionPackageName + "." + 
+                                                 actionClassName);
+            Class<?> superClass  = actionClass.getSuperclass();
+            
+            if (superClass.equals(AlertAction.class)) {
+              actionList.add(
+                (AlertAction) actionClass.newInstance()
+              );
+            }
+              
+          } catch (ClassNotFoundException | 
+                   InstantiationException | 
+                   IllegalAccessException e) {
+            ApplicationLogger.log("## ERROR: Could not load action class", 
+                                  Application.ALERTMONITOR, false);
+          }
         }
-          
-      } catch (ClassNotFoundException | 
-               InstantiationException | 
-               IllegalAccessException e) {
-        ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                              Application.ALERTMONITOR);
       }
     }
     
