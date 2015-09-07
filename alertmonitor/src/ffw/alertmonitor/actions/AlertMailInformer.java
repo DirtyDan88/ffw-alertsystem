@@ -40,8 +40,11 @@ public class AlertMailInformer extends AlertAction {
       
       String subject    = "[ffw-alertsystem] !! ALARM !! ";
       String text       = "Alarm eingegangen am " + DateAndTime.get() + "\n"
-                        + "Kurzstichwort: " + this.message.getShortKeyword() 
-                                            + this.message.getAlertLevel() + "\n\n"
+                        + "Kurzstichwort: " + this.message.getAlertSymbol()
+                                            + this.message.getAlertLevel()
+                                            + " " 
+                                            + this.message.getAlertKeyword() 
+                                            + "\n\n"
                         + "Weitere Einsatzstichwoerter: \n";
       for (int i = 0; i < this.message.getKeywords().size(); i++) {
         text += this.message.getKeywords().get(i) + "\n";

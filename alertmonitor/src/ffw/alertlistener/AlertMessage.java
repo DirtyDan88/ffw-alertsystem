@@ -19,38 +19,54 @@
 
 package ffw.alertlistener;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
 public abstract class AlertMessage {
   
-  protected boolean isComplete  = false;
-  protected boolean isEncrypted = false;
-  protected boolean isTestAlert = false;
+  /* original received string */
+  protected String messageString;
   
+  /* Message meta data */
   protected String timestamp = null;
   protected String address   = null;
   protected String function  = null;
   protected String alpha     = null;
   
-  protected boolean hasCoordinates = false;
-  protected String  latitude       = null;
-  protected String  longitude      = null;
-  protected String  street         = null;
-  protected String  village        = null;
-  protected String  alertNumber    = null;
-  protected String  shortKeyword   = null;
-  protected String  alertLevel     = null;
+  protected boolean isComplete         = false;
+  protected boolean isEncrypted        = false;
+  protected boolean isTestAlert        = false;
+  protected boolean isFireAlert        = false;
+  protected boolean unknownMessageType = false;
   
-  protected String messageString;
+  /* Alert info */
+  protected String  alertNumber  = null;
+  protected String  alertSymbol  = null;
+  protected String  alertLevel   = null;
+  protected String  alertKeyword = null;
   
-  protected Vector<String> keywords = new Vector<String>();
+  /* Place description */
+  protected boolean      hasCoordinates   = false;
+  protected String       latitude         = null;
+  protected String       longitude        = null;
+  protected String       street           = null;
+  protected String       village          = null;
+  protected List<String> furtherPlaceDesc = new ArrayList<String>();
+  
+  /* Emergency description */
+  protected List<String> keywords = new ArrayList<String>();
   
   
   
   public AlertMessage(String messageString) {
     this.timestamp     = String.valueOf(new java.util.Date().getTime() / 1000);
+    this.messageString = messageString;
+  }
+  
+  public AlertMessage(String messageString, String timestamp) {
+    this.timestamp     = timestamp;
     this.messageString = messageString;
   }
   
@@ -63,6 +79,14 @@ public abstract class AlertMessage {
     AlertMessage other = (AlertMessage) o;
     
     if (this.isEncrypted || other.isEncrypted()) {
+      return false;
+    }
+    
+    if (!this.isComplete || !other.isComplete) {
+      return false;
+    }
+    
+    if (this.unknownMessageType || other.unknownMessageType) {
       return false;
     }
     
@@ -84,18 +108,6 @@ public abstract class AlertMessage {
     return this.messageString;
   }
   
-  public boolean isComplete() {
-    return this.isComplete;
-  }
-  
-  public boolean isEncrypted() {
-    return this.isEncrypted;
-  }
-  
-  public boolean isTestAlert() {
-    return this.isTestAlert;
-  }
-  
   public String getTimestamp() {
     return this.timestamp;
   }
@@ -111,7 +123,49 @@ public abstract class AlertMessage {
   public String getAlpha() {
     return this.alpha;
   }
-   
+  
+  
+  
+  public boolean isComplete() {
+    return this.isComplete;
+  }
+  
+  public boolean isEncrypted() {
+    return this.isEncrypted;
+  }
+  
+  public boolean isTestAlert() {
+    return this.isTestAlert;
+  }
+  
+  public boolean isFireAlert() {
+    return this.isFireAlert;
+  }
+  
+  public boolean isUnknownMessageType() {
+    return this.unknownMessageType;
+  }
+  
+  
+  
+  public String getAlertNumber() {
+    return this.alertNumber;
+  }
+  
+  public String getAlertSymbol() {
+    return this.alertSymbol;
+  }
+  
+  public String getAlertLevel() {
+    return this.alertLevel;
+  }
+  
+  public String getAlertKeyword() {
+    return this.alertKeyword;
+  }
+  
+  
+  
   public boolean hasCoordinates() {
     return this.hasCoordinates;
   }
@@ -132,19 +186,32 @@ public abstract class AlertMessage {
     return this.village;
   }
   
-  public String getAlertNumber() {
-    return this.alertNumber;
+  public List<String> getFurtherPlaceDesc() {
+    return this.furtherPlaceDesc;
   }
   
-  public String getShortKeyword() {
-    return this.shortKeyword;
+  public String getFurtherPlaceDescAsString() {
+    String places = "";
+    for (String place : this.furtherPlaceDesc) {
+      places = places.concat(place).concat(",");
+    }
+    
+    return (places.equals("")) ? "" : places.substring(0, places.length() - 1);
   }
   
-  public String getAlertLevel() {
-    return this.alertLevel;
-  }
   
-  public Vector<String> getKeywords() {
+  
+  public List<String> getKeywords() {
     return this.keywords;
+  }
+  
+  public String getKeywordsAsString() {
+    String furtherKeywords = "";
+    for (String keyword : this.keywords) {
+      furtherKeywords = furtherKeywords.concat(keyword).concat(",");
+    }
+    
+    return (furtherKeywords.equals("")) ? "" : 
+            furtherKeywords.substring(0, furtherKeywords.length() - 1);
   }
 }

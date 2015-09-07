@@ -62,6 +62,7 @@ public class HtmlBuilder extends AlertAction {
   }
   
   public void build() {
+    // TODO: new template for new AlertMessage class
     this.loadTemplate("html/templates/" + this.templateName + ".html");
 
     this.setElement("#timestamp",    this.message.getTimestamp());
@@ -70,7 +71,7 @@ public class HtmlBuilder extends AlertAction {
       this.setElement("#latitude",   this.message.getLatitude());
       this.setElement("#longitude",  this.message.getLongitude());
     }
-    this.setElement("#shortKeyword", this.message.getShortKeyword());
+    this.setElement("#shortKeyword", this.message.getAlertSymbol());
     this.setElement("#alertLevel",   this.message.getAlertLevel());
     
     for (int i = 0; i < this.message.getKeywords().size(); i++) {

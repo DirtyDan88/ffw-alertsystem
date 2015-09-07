@@ -1,17 +1,26 @@
 INSERT INTO AlertMessage (
   timestamp, 
   address, 
-  function, 
+  function,
+
   isComplete, 
   isEncrypted, 
   isTestAlert, 
+  isFireAlert,
+  unknownMessageType,
+
+  alertNumber,
+  alertSymbol,  
+  alertLevel,
+  alertKeyword, 
+  
   hasCoordinates, 
   latitude, 
   longitude, 
   street, 
   village,
-  alertNumber, 
-  shortKeyword, 
-  alertLevel, 
+  furtherPlaceDesc, 
+
+  keywords,
   messageString
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

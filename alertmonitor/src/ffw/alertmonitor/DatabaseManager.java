@@ -85,18 +85,27 @@ public class DatabaseManager {
       sqlPStmt.setString( 1, alertMessage.getTimestamp());
       sqlPStmt.setString( 2, alertMessage.getAddress());
       sqlPStmt.setString( 3, alertMessage.getFunction());
-      sqlPStmt.setInt   ( 4, ((alertMessage.isComplete()) ? 1 : 0));
-      sqlPStmt.setInt   ( 5, ((alertMessage.isEncrypted()) ? 1 : 0));
-      sqlPStmt.setInt   ( 6, ((alertMessage.isTestAlert()) ? 1 : 0));
-      sqlPStmt.setInt   ( 7, ((alertMessage.hasCoordinates()) ? 1 : 0));
-      sqlPStmt.setString( 8, alertMessage.getLatitude());
-      sqlPStmt.setString( 9, alertMessage.getLongitude());
-      sqlPStmt.setString(10, alertMessage.getStreet());
-      sqlPStmt.setString(11, alertMessage.getVillage());
-      sqlPStmt.setString(12, alertMessage.getAlertNumber());
-      sqlPStmt.setString(13, alertMessage.getShortKeyword());
-      sqlPStmt.setString(14, alertMessage.getAlertLevel());
-      sqlPStmt.setString(15, alertMessage.getMessageString());
+      
+      sqlPStmt.setInt   ( 4, ((alertMessage.isComplete())           ? 1 : 0));
+      sqlPStmt.setInt   ( 5, ((alertMessage.isEncrypted())          ? 1 : 0));
+      sqlPStmt.setInt   ( 6, ((alertMessage.isTestAlert())          ? 1 : 0));
+      sqlPStmt.setInt   ( 7, ((alertMessage.isFireAlert())          ? 1 : 0));
+      sqlPStmt.setInt   ( 8, ((alertMessage.isUnknownMessageType()) ? 1 : 0));
+      
+      sqlPStmt.setString( 9, alertMessage.getAlertNumber());
+      sqlPStmt.setString(10, alertMessage.getAlertSymbol());
+      sqlPStmt.setString(11, alertMessage.getAlertLevel());
+      sqlPStmt.setString(12, alertMessage.getAlertKeyword());
+      
+      sqlPStmt.setInt   (13, ((alertMessage.hasCoordinates()) ? 1 : 0));
+      sqlPStmt.setString(14, alertMessage.getLatitude());
+      sqlPStmt.setString(15, alertMessage.getLongitude());
+      sqlPStmt.setString(16, alertMessage.getStreet());
+      sqlPStmt.setString(17, alertMessage.getVillage());
+      sqlPStmt.setString(18, alertMessage.getFurtherPlaceDescAsString());
+      
+      sqlPStmt.setString(19, alertMessage.getKeywordsAsString());
+      sqlPStmt.setString(20, alertMessage.getMessageString());
       
       sqlPStmt.executeUpdate();
       sqlPStmt.close();

@@ -50,6 +50,7 @@ public class AlertMonitor implements Runnable {
     this.messageQueue = messageQueue;
     this.alertNumbers = new ArrayList<String>();
     
+    /* Queue with max 20 entries, a new entry will remove the oldest one */
     this.prevMessages = new LinkedList<AlertMessage>() {
       private static final long serialVersionUID = 1L;
       
@@ -164,6 +165,7 @@ public class AlertMonitor implements Runnable {
     }
   }
   
+  // TODO: move this to an action class? First enable action RICs
   private void saveToDB(AlertMessage alertMessage) {
     alertMessage.evaluateMessage();
     

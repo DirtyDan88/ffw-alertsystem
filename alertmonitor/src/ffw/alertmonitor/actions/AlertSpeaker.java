@@ -104,7 +104,7 @@ public class AlertSpeaker extends AlertAction {
     
     private String buildText() {
         StringBuilder text = new StringBuilder();
-        String shortKeyword = this.message.getShortKeyword();
+        String shortKeyword = this.message.getAlertSymbol();
         
         if (shortKeyword.equals("F") || shortKeyword.equals("B")) {
             text.append("Brandalarm");
@@ -114,6 +114,8 @@ public class AlertSpeaker extends AlertAction {
             text.append("Gefahrgutunfall");
         } else if (shortKeyword.equals("W")) {
             text.append("Einsatz auf Gewässer");
+        } else if (shortKeyword.equals("BMA")) {
+            text.append("Brandmeldeanlage");
         } else {
             text.append("Unbekannt");
         }

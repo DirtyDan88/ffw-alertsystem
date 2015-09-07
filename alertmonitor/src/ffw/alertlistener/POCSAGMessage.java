@@ -32,6 +32,10 @@ public class POCSAGMessage extends AlertMessage {
   public POCSAGMessage(String pocsagString) {
     super(pocsagString);
   }
+  
+  public POCSAGMessage(String pocsagString, String timestamp) {
+    super(pocsagString, timestamp);
+  }
 
   public void evaluateMessageHead() {
     int startIndex, endIndex;
@@ -55,54 +59,50 @@ public class POCSAGMessage extends AlertMessage {
     if (alphaExits) {
       startIndex = messageString.indexOf("Alpha:") + 6;
       alpha      = messageString.substring(startIndex).trim();
+      if (alpha.equals("")) {
+        alphaExits = false;
+      }
     }
     
-    isEncrypted = checkEncryption();
     isComplete  = addressExits && functionExits && alphaExits;
+    
+    if (isComplete) {
+      isEncrypted = checkEncryption();
+    }
   }
   
   public boolean evaluateMessage() {
-    if (!isEncrypted() && getAlpha() != null) {
-      String[] alphaStr = cleanAlphaString().split("#");
-      int index = 0;
+    if (!isEncrypted() && isComplete()) {
+      /* matches '[AlertInfo]//[PlaceDescription]//[EmergencyDescription]' */
+      Pattern pattern = Pattern.compile(".*\\/\\/.*\\/\\/.*");
+      Matcher matcher = pattern.matcher(alpha);
       
-      if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
-        /* alert with latitude and longitude */
-        hasCoordinates = true;
-        latitude  = alphaStr[index++];
-        longitude = alphaStr[index++];
+      if (matcher.find()) {
+        String[] message = alpha.split("//");
+        
+        try {
+          int i = 0;
+          for (String messagePart : message) {
+            if (isStringClean(messagePart)) {
+            //if (!(messagePart.startsWith("<") && messagePart.endsWith(">")) &&
+            //      messagePart.trim().length() > 0) {
+              if (i == 0) evaluateAlertInfo    (messagePart.split("/"));
+              if (i == 1) evaluatePlaceDesc    (messagePart.split("/"));
+              if (i == 2) evaluateEmergencyDesc(messagePart.split("/"));
+              i++;
+            }
+          }
+          
+        } catch (Exception e) {
+          ApplicationLogger.log("## Was not able to evaluate alpha string " + 
+                                "(timestamp: " + timestamp + ")",
+                                Application.ALERTMONITOR, false);
+          isComplete = false;
+        }
+        
       } else {
-        /* alert without gps coordinates */
-        hasCoordinates = false;
-        latitude  = null;
-        longitude = null;
-      }
-      
-      alertNumber = alphaStr[index++];
-      
-      if (isShortKeyword(alphaStr[index])) {
-        shortKeyword = alphaStr[index].substring(0, 1);
-        alertLevel   = alphaStr[index].substring(1, 2);
-        if (alphaStr[index].length() > 3) {
-          keywords.add(alphaStr[index].substring(3));
-        }
-        index++;
-        
-      } else {
-        shortKeyword = "-";
-        alertLevel   = "-";
-      }
-      
-      for (int i = index; i < alphaStr.length; i++) {
-        keywords.add(alphaStr[i]);
-        
-        if (isStreet(alphaStr[i])) {
-          street = alphaStr[i];
-        }
-        
-        if (isVillage(alphaStr[i])) {
-          village = alphaStr[i];
-        }
+        // TODO: 2822/F2 Zimmerbrand///Senefelderstr. 10/Leimen/ Geb. Berraucht
+        unknownMessageType = true;
       }
       
       return true;
@@ -114,12 +114,114 @@ public class POCSAGMessage extends AlertMessage {
     }
   }
   
-
+  
+  
+  private boolean checkEncryption() {
+    if (!isStringClean(alpha)) {
+      return true;
+    }
+    
+    // matches double '<[...]>[...]<[...]>', eg. '<STX>e<STX>' 
+    Pattern pattern = Pattern.compile("\\<[^>]*\\>[^>]+\\<[^>]*\\>");
+    if (pattern.matcher(alpha).find()) {
+      return true;
+    }
+    
+    /*
+    // matches double '<[...]><[...]>', eg. '<FF><CAN>'
+    pattern = Pattern.compile("\\<[^>]*\\>\\<[^>]*\\>");
+    if (pattern.matcher(alpha).find()) {
+      return true;
+    }
+    */
+    
+    // matches single '<[...]>' and counts them 
+    pattern = Pattern.compile("\\<[^>]*\\>");
+    Matcher matcher = pattern.matcher(alpha);
+    int count = 0;  
+    while (matcher.find()) {
+      count++;
+    }
+    int threshold = 8;
+    if (count >= threshold) {
+      return true;
+    }
+    
+    // if all checks are passed, most probably not encrypted 
+    return false;
+  }
+  
+  private void evaluateAlertInfo(String[] alertInfo) {
+    // Lang- and longitude, alertnumber, short-keyword
+    int i = 0;
+    
+    if (isLatOrLong(alertInfo[0]) && isLatOrLong(alertInfo[1])) {
+      // alert with latitude and longitude
+      hasCoordinates = true;
+      latitude  = alertInfo[i++];
+      longitude = alertInfo[i++];
+    } else {
+      // alert without gps coordinates
+      hasCoordinates = false;
+      latitude  = null;
+      longitude = null;
+    }
+    
+    alertNumber = alertInfo[i++];
+    if (!isNumeric(alertNumber)) {
+      // happens when message has no alertnumber
+      alertNumber = "";
+      i--;
+    }
+    
+    isFireAlert = getShortKeyword(alertInfo[i]);
+    if (!isFireAlert) {
+      // TODO: THW or RedCross, String is often unordered
+      for (i++; i < alertInfo.length; i++) {
+        if (isStringClean(alertInfo[i])) {
+          keywords.add(alertInfo[i]);
+        }
+      }
+    }
+  }
+  
+  private void evaluatePlaceDesc(String[] placeDesc) {
+    // Last index is always village, second-last is street
+    village = placeDesc[placeDesc.length - 1];
+    if (!isStringClean(village)) {
+      village = "";
+    }
+    street  = placeDesc[placeDesc.length - 2];
+    if (!isStringClean(street)) {
+      street = "";
+    }
+    
+    if (!isVillage(village) || !isStreet(street)) {
+      // TODO: What to do then?
+    }
+    
+    for (int i = 0; i <= placeDesc.length - 3; i++) {
+      if (isStringClean(placeDesc[i])) {
+        furtherPlaceDesc.add(placeDesc[i]);
+      }
+    }
+  }
+  
+  private void evaluateEmergencyDesc(String[] emergencyDesc) {
+    for (int i = 0; i < emergencyDesc.length; i++) {
+      
+      if (isStringClean(emergencyDesc[i])) {
+      //if (!(emergencyDesc[i].startsWith("<") && emergencyDesc[i].endsWith(">")) &&
+      //      emergencyDesc[i].trim().length() > 0) {
+        keywords.add(emergencyDesc[i]);
+      }
+    }
+  }
   
   
   
+  /*
   private String cleanAlphaString() {
-    // TODO: check for double //
     
     String[] alphaStr  = getAlpha().split("/");
     String newAlphaStr = "";
@@ -134,33 +236,61 @@ public class POCSAGMessage extends AlertMessage {
     
     return newAlphaStr;
   }
+  */
   
-  private boolean checkEncryption() {
-    // TODO: How to check that more properly?
-    Pattern pattern = Pattern.compile("\\<[a-zA-Z]*\\>[a-zA-Z]*\\<[a-zA-Z]*\\>");
-    Matcher matcher = pattern.matcher(alpha);
-    
-    return matcher.find();
+  private boolean isStringClean(String str) {
+    if (!(str.trim().startsWith("<") && str.trim().endsWith(">")) &&
+        str.trim().length() > 0) {
+      return true;
+    }
+    return false;
   }
   
-  private boolean isShortKeyword(String shortKeyword) {
-    return shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]");
+  private boolean isNumeric(String str) {
+    try {
+      Double.parseDouble(str);
+    } catch(NumberFormatException e) {
+      return false;
+    }
+    return true;
+  }
+  
+  private boolean getShortKeyword(String shortKeyword) {
+    if (shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]")) {
+      alertSymbol  = shortKeyword.substring(0, 1);
+      alertLevel   = shortKeyword.substring(1, 2);
+      alertKeyword = shortKeyword.substring(3);
+      return true;
+      
+    } else if (shortKeyword.startsWith("BMA")) {
+      alertSymbol  = "BMA";
+      alertLevel   = "-";
+      alertKeyword = shortKeyword;
+      return true;
+    
+    } else {
+      alertSymbol  = "-";
+      alertLevel   = "-";
+      alertKeyword = shortKeyword;
+      return false;
+      
+    }
   }
   
   private boolean isLatOrLong(String latOrlong) {
     return latOrlong.matches("\\d{1,2}\\.\\d{5,}");
   }
   
-  private boolean isStreet(String keyword) {
-    // TODO: check if string is a valid street
-    //       use txt file
-    //       check for 'str.' or 'straße'
-    return false;
+  private boolean isVillage(String keyword) {
+    // TODO: verify that string is village name 
+    return true;
   }
   
-  private boolean isVillage(String keyword) {
-    // TODO: check if string is village name 
-    return false;
+  private boolean isStreet(String keyword) {
+    // TODO: verify that string is a valid street
+    //       use txt file
+    //       check for 'str.', 'straße', 'weg' 
+    //       Levenshtein-Distanz
+    return true;
   }
-
 }

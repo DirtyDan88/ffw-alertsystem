@@ -22,6 +22,8 @@ package ffw.alertmonitor.actions;
 import ffw.alertlistener.AlertMessage;
 
 
+// TODO: renew all alertactions with new available data from AlertMessage 
+
 
 public abstract class AlertAction implements Runnable {
   

@@ -43,11 +43,13 @@ public class AlertSMSInformer extends AlertAction {
     
     @Override
     public void run() {
-        ConfigReader.fileName = "twilio.txt";
+        ConfigReader.fileName = "data/twilio.txt";
         String ACCOUNT_SID = ConfigReader.getConfigVar("ACCOUNT_SID");
         String AUTH_TOKEN  = ConfigReader.getConfigVar("AUTH_TOKEN");
         String To          = ConfigReader.getConfigVar("To");
         String From        = ConfigReader.getConfigVar("From");
+        
+        // TODO: changes this when config file is read in via command line
         ConfigReader.fileName = "config.txt";
         
         try {
@@ -70,7 +72,7 @@ public class AlertSMSInformer extends AlertAction {
     private String buildText() {
         String text = "[ffw-alertsystem] !! ALARM !! "
                     + "Alarm eingegangen am " + DateAndTime.get() + "\n"
-                    + "Kurzstichwort: " + this.message.getShortKeyword() 
+                    + "Kurzstichwort: " + this.message.getAlertKeyword() 
                     + this.message.getAlertLevel() + "\n\n"
                     + "Weitere Einsatzstichwoerter: \n";
         for (int i = 0; i < this.message.getKeywords().size(); i++) {
