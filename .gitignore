@@ -3,8 +3,8 @@
 alertmonitor/bin/
 alertmonitor/html/alerts/
 alertmonitor/log/
+alertmonitor/*.jar
 
-*.jar
 *.txt
 *.db
 
