@@ -31,6 +31,8 @@ import ffw.util.logging.ApplicationLogger.Application;
 
 
 public class DatabaseManager {
+  
+  public static String pathSQLCommands = "data/sql-commands/";
   private static Connection connection;
   
   public static void connectToCurrent() {
@@ -68,7 +70,7 @@ public class DatabaseManager {
       sqlStmt = connection.createStatement();
       sqlStmt.executeUpdate(
         FileReader.getContent(
-          "data/sql-createAlertMessageTable.sql", 
+          pathSQLCommands + "sql-createAlertMessageTable.sql",
           Application.ALERTMONITOR
         )
       );
@@ -77,7 +79,7 @@ public class DatabaseManager {
       /* Insert the alert-message */
       sqlPStmt = connection.prepareStatement(
         FileReader.getContent(
-          "data/sql-insertAlertMessage.sql", 
+            pathSQLCommands + "sql-insertAlertMessage.sql", 
           Application.ALERTMONITOR
         )
       );
