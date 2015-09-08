@@ -33,6 +33,7 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/javax.mail.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/marytts-client-5.1.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/twilio-java-sdk-3.7.2-jar-with-dependencies.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/sqlite-jdbc-3.8.11.1.jar"/>
         </jar>
         <jar destfile="ffw-alertsystem-watchdog.jar" filesetmanifest="mergewithoutmain">
             <manifest>
