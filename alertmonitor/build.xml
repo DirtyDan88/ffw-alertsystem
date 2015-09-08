@@ -24,7 +24,7 @@
     <target name="create_run_jar">
         <jar destfile="ffw-alertmonitor.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="ffw.alertmonitor.Application"/>
+                <attribute name="Main-Class" value="ffw.Application"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="bin"/>

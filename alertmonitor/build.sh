@@ -54,8 +54,10 @@ echo ">> compiling source files ..."
 javac -g:none \
       -d bin/ \
       -cp "lib/*" \
+      src/ffw/*.java \
       src/ffw/util/*.java \
       src/ffw/util/logging/*.java \
+      src/ffw/alertlistener/*.java \
       src/ffw/alertmonitor/*.java \
       src/ffw/alertmonitor/actions/*.java \
       src/ffw/watchdog/*.java
