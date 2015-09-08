@@ -52,9 +52,9 @@ public class POCSAGMessage extends AlertMessage {
     
     if (functionExits) {
       startIndex = messageString.indexOf("Function:") + 9;
-      endIndex   = startIndex + 3;
+      endIndex   = startIndex + 2; //3;
       function   = messageString.substring(startIndex, endIndex).trim();
-    }
+    } 
     
     if (alphaExits) {
       startIndex = messageString.indexOf("Alpha:") + 6;
@@ -175,12 +175,11 @@ public class POCSAGMessage extends AlertMessage {
     }
     
     isFireAlert = getShortKeyword(alertInfo[i]);
-    if (!isFireAlert) {
-      // TODO: THW or RedCross, String is often unordered
-      for (i++; i < alertInfo.length; i++) {
-        if (isStringClean(alertInfo[i])) {
-          keywords.add(alertInfo[i]);
-        }
+    
+    // TODO: THW or RedCross, String is often unordered
+    for (i++; i < alertInfo.length; i++) {
+      if (isStringClean(alertInfo[i])) {
+        keywords.add(alertInfo[i]);
       }
     }
   }
