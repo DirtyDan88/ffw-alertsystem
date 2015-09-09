@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ffw-alertsystem-config>
+
+  <pocsag-port>50000</pocsag-port>
+
+  <alertactions>
+    <!--
+    Test action without <rics> <ric> <params> against schema-file
+    <alertaction name="TestAction" active="false">
+      <packageName/>
+      <className>testtest</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="html-template"><test><asd>withMap</asd></test></param>
+      </params>
+    </alertaction>
+    -->
+
+    <alertaction instanceName="AlertActionExample">
+      <packageName>ffw.test<packageName/>
+      <className>AlertActionTestClass</className>
+      <active>false</active>
+      <description>just for test purpose</description>
+      <rics>
+        <!-- <ric>158973</ric> -->
+      </rics>
+      <params>
+        <param name="test-param1">some value</param>
+        <param name="test-param2">
+          <someInnerTag>
+            <anotherInnerTag/>
+          </someInnerTag>
+        </param>
+      </params>
+    </alertaction>
+
+
+  </alertactions>
+</ffw-alertsystem-config>
