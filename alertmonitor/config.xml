@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ffw-alertsystem-config>
+
+  <pocsag-port>50000</pocsag-port>
+
+  <alertactions>
+    <!--
+    Test action without <rics> <ric> <params> against schema-file
+    <alertaction name="TestAction" active="false">
+      <packageName/>
+      <className>testtest</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="html-template"><test><asd>withMap</asd></test></param>
+      </params>
+    </alertaction>
+    -->
+
+    <alertaction instanceName="HtmlBuilderVehicleHall">
+      <packageName/>
+      <className>HtmlBuilder</className>
+      <active>false</active>
+      <description>with map-template (googlemaps)</description>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="html-template">withMap</param>
+        <param name="html-map-provider">googlemaps</param>
+      </params>
+    </alertaction>
+
+<!--
+    <alertaction name="AlertMailInformer" active="false">
+      <packageName/>
+      <className>AlertMailInformer</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="email-address">ffw-moe-geraetehaus@web.de</param>
+        <param name="email-password">R8A825Tm</param>
+        <param name="email-alert-recipients">Max.Stark88@web.de</param>
+      </params>
+    </alertaction>
+
+    <alertaction name="AlertSMSInformer" active="false">
+      <packageName/>
+      <className>AlertSMSInformer</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="sms-alert-recipients"></param>
+      </params>
+    </alertaction>
+
+    <alertaction name="TVSwitchOn" active="false">
+      <packageName/>
+      <className>TVSwitchOn</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="serial-port">/dev/ttyAMA0</param>
+      </params>
+    </alertaction>
+
+    <alertaction name="AlertSpeaker" active="false">
+      <packageName/>
+      <className>AlertSpeaker</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="marytts-start-delay">10</param>
+        <param name="marytts-server">localhost</param>
+        <param name="marytts-port">59125</param>
+        <param name="marytts-voice">bits3-hsmm</param>
+        <param name="marytts-effect">Stadium</param>
+        <param name="marytts-repeat">30</param>
+        <param name="marytts-pause">10</param>
+      </params>
+    </alertaction>
+
+    <alertaction name="SystemHibernate" active="false">
+      <packageName/>
+      <className>SystemHibernate</className>
+      <rics>
+        <ric>158973</ric>
+      </rics>
+      <params>
+        <param name="system-hibernate-time">1</param>
+      </params>
+    </alertaction>
+-->
+
+  </alertactions>
+</ffw-alertsystem-config>

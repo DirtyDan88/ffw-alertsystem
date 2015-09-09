@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+
+  <xs:complexType name="alertaction-typ">
+    <xs:sequence>
+      <!-- packageName und className are refering to the corresponding java 
+           package and class which contains the code to be executed (class has
+           to inherit from abstract base class 'AlertAction') -->
+      <xs:element name="packageName" type="xs:string" default="ffw.alertmonitor.actions"/>
+      <xs:element name="className"   type="xs:string"/>
+      <!-- determines if the action is triggered when an alert is raised -->
+      <xs:element name="active" type="xs:boolean"/>
+      <!-- additional description for later traceability in logfiles, for 
+           example which params were used -->
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <!-- list with RICs (Radio Identification Code) for which this action 
+           will be triggered -->
+      <xs:element name="rics">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ric" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!-- list with freely configurable parameters for the action -->
+      <xs:element name="params" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType mixed="true">
+                <xs:sequence>
+                  <xs:any processContents="skip" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:anyAttribute/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <!-- Instance name of this action -->
+    <xs:attribute name="instanceName" type="xs:ID"/>
+  </xs:complexType>
+
+  <!-- root node -->
+  <xs:element name="ffw-alertsystem-config">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- the network port for incoming POCSAG messages -->
+        <xs:element name="pocsag-port" type="xs:string"/>
+        <!-- list with action which will be triggered in case of alert -->
+        <xs:element name="alertactions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="alertaction" type="alertaction-typ" 
+                minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
