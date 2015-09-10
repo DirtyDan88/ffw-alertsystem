@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ffw.alertlistener.AlertMessage;
-import ffw.alertmonitor.actions.AlertAction;
-import ffw.util.ConfigReader;
+import ffw.util.config.ConfigFile;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 
@@ -32,51 +31,71 @@ import ffw.util.logging.ApplicationLogger.Application;
 
 public class AlertActionManager {
   
+  private static List<AlertAction> actionList = null;
+  
   public static void executeActions(AlertMessage alertMessage) {
-    ApplicationLogger.log("## alert was triggered, following actions were " +
-                          "executed: ", Application.ALERTMONITOR);
+    ApplicationLogger.log("## received message (" + alertMessage.getType() + "), " +
+                          "following actions will be executed: ", 
+                          Application.ALERTMONITOR);
+    boolean atLeastOne = false;
     
-    List<AlertAction> actionList = loadAlertActions();
+    loadAlertActions();
     for (AlertAction action : actionList) {
-      try {
-        action.execute(alertMessage);
-      } catch (Exception e) {
-        ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                              Application.ALERTMONITOR);
+      if (action.isActive()) {
+        if (action.getRicList().contains(alertMessage.getAddress()) ||
+            action.getRicList().contains("*")) {
+          action.execute(alertMessage);
+          
+          ApplicationLogger.log(action.getClass().getName() + ": " + 
+                                action.getInfo() + " " +
+                                "(" + action.getDescription() + ")",
+                                Application.ALERTMONITOR, false);
+          atLeastOne = true;
+        }
       }
-      
-      ApplicationLogger.log(action.getClass().getName() + ": " + 
-                            action.getDescription(), 
+    }
+    
+    if (!atLeastOne) {
+      ApplicationLogger.log("## no matching action for this RIC", 
                             Application.ALERTMONITOR, false);
     }
   }
   
-  private static List<AlertAction> loadAlertActions() {
-    List<AlertAction> actionList = new ArrayList<AlertAction>();
-    
-    String actionPackageName = "ffw.alertmonitor.actions";
-    String actionClassNames  = ConfigReader.getConfigVar("actionClassNames");
-    
-    if (actionClassNames.isEmpty()) {
-      ApplicationLogger.log("## No actions were specified in config-file",
-                            Application.ALERTMONITOR, false);
-    } else {
-      String[] actionClassNamesArray = actionClassNames.split(",");
+  
+  
+  private static void loadAlertActions() {
+    if (actionList == null || ConfigFile.hasChanged()) {
+      actionList = new ArrayList<AlertAction>();
       
-      if (actionClassNamesArray.length == 0) {
+      List<AlertActionDesc> actionDescList = ConfigFile.getAlertActionDescs();
+      if (actionDescList.isEmpty()) {
         ApplicationLogger.log("## No actions were specified in config-file",
                               Application.ALERTMONITOR, false);
       } else {
-        for (String actionClassName : actionClassNamesArray) {
+        for (AlertActionDesc actionDesc : actionDescList) {
           try {
-            Class<?> actionClass = Class.forName(actionPackageName + "." + 
-                                                 actionClassName);
+            Class<?> actionClass = Class.forName(actionDesc.packageName + "." + 
+                                                 actionDesc.className);
             Class<?> superClass  = actionClass.getSuperclass();
             
             if (superClass.equals(AlertAction.class)) {
-              actionList.add(
-                (AlertAction) actionClass.newInstance()
+              AlertAction action = (AlertAction) actionClass.newInstance();
+              action.setInstanceName(actionDesc.instanceName);
+              action.setActive(actionDesc.isActive);
+              action.setDescription(actionDesc.description);
+              
+              action.setRicList(
+                ConfigFile.getAlertActionRics(
+                  action.getInstanceName()
+                )
               );
+              action.setParamList(
+                ConfigFile.getAlertActionParams(
+                  action.getInstanceName()
+                )
+              );
+              
+              actionList.add(action);
             }
               
           } catch (ClassNotFoundException | 
@@ -88,7 +107,25 @@ public class AlertActionManager {
         }
       }
     }
+  }
+  
+  public static class AlertActionDesc {
+    public String packageName  = null;
+    public String className    = null;
+    public String instanceName = null;
+    public boolean isActive    = false;
+    public String description  = null;
     
-    return actionList;
+    public AlertActionDesc(String packageName,
+                           String className,
+                           String instanceName,
+                           String isActive,
+                           String description) {
+      this.packageName  = packageName;
+      this.className    = className;
+      this.instanceName = instanceName;
+      this.isActive     = (isActive.equals("true")) ? true : false ;
+      this.description  = description;
+    }
   }
 }

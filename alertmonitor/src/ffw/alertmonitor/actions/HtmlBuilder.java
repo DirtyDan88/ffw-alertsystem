@@ -31,6 +31,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import ffw.alertmonitor.AlertAction;
 import ffw.util.ConfigReader;
 import ffw.util.ShellScript;
 
@@ -40,7 +41,7 @@ public class HtmlBuilder extends AlertAction {
   private Document doc;
   
   @Override
-  public String getDescription() {
+  public String getInfo() {
     return "shows the alert information as HTML-page in browser";
   }
   

@@ -17,110 +17,62 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertmonitor;
+package ffw.util;
 
 import java.io.File;
 import java.sql.*;
 
-import ffw.alertlistener.AlertMessage;
 import ffw.util.DateAndTime;
-import ffw.util.FileReader;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 
 
 
-public class DatabaseManager {
+public class SQLiteConnection {
   
-  public static String pathSQLCommands = "data/sql-commands/";
-  private static Connection connection;
+  public String pathSQLCommands = "data/sql-commands/";
+  private Connection connection;
   
-  public static void connectToCurrent() {
+  public void openCurrent() {
     String dbDir  = "data/" + DateAndTime.getYearAndMonthName();
     String dbName = "" + DateAndTime.getDate() + ".db";
     
-    connect(dbDir, dbName);
+    open(dbDir, dbName);
   }
   
-  public static void connect(String dbDir, String dbName) {
-    connection = null;
-    
+  public void open(String dbDir, String dbName) {
     try {
       File databaseDir = new File(dbDir);
       databaseDir.mkdirs();
-      String databaseFilename = dbName;
-      
+    } catch (Exception e) {
+      ApplicationLogger.log("## ERROR: could not create database dir", 
+                            Application.ALERTMONITOR, false);
+    }
+    
+    open(dbDir + "/" + dbName);
+  }
+  
+  public void open(String db) {
+    connection = null;
+    
+    try {
       Class.forName("org.sqlite.JDBC");
-      connection = DriverManager.getConnection("jdbc:sqlite:" + 
-                                               databaseDir + "/" + 
-                                               databaseFilename);
-      
+      connection = DriverManager.getConnection("jdbc:sqlite:" + db);
     } catch (Exception e) {
       ApplicationLogger.log("## ERROR during database connection opening", 
                             Application.ALERTMONITOR, false);
     }
   }
   
-  public static void insertAlertMessage(AlertMessage alertMessage) {
-    Statement         sqlStmt  = null;
-    PreparedStatement sqlPStmt = null;
-    
-    try {
-      /* Create table if it not exist */
-      sqlStmt = connection.createStatement();
-      sqlStmt.executeUpdate(
-        FileReader.getContent(
-          pathSQLCommands + "sql-createAlertMessageTable.sql",
-          Application.ALERTMONITOR
-        )
-      );
-      sqlStmt.close();
-      
-      /* Insert the alert-message */
-      sqlPStmt = connection.prepareStatement(
-        FileReader.getContent(
-            pathSQLCommands + "sql-insertAlertMessage.sql", 
-          Application.ALERTMONITOR
-        )
-      );
-      
-      sqlPStmt.setString( 1, alertMessage.getTimestamp());
-      sqlPStmt.setString( 2, alertMessage.getAddress());
-      sqlPStmt.setString( 3, alertMessage.getFunction());
-      
-      sqlPStmt.setInt   ( 4, ((alertMessage.isComplete())           ? 1 : 0));
-      sqlPStmt.setInt   ( 5, ((alertMessage.isEncrypted())          ? 1 : 0));
-      sqlPStmt.setInt   ( 6, ((alertMessage.isTestAlert())          ? 1 : 0));
-      sqlPStmt.setInt   ( 7, ((alertMessage.isFireAlert())          ? 1 : 0));
-      sqlPStmt.setInt   ( 8, ((alertMessage.isUnknownMessageType()) ? 1 : 0));
-      
-      sqlPStmt.setString( 9, alertMessage.getAlertNumber());
-      sqlPStmt.setString(10, alertMessage.getAlertSymbol());
-      sqlPStmt.setString(11, alertMessage.getAlertLevel());
-      sqlPStmt.setString(12, alertMessage.getAlertKeyword());
-      
-      sqlPStmt.setInt   (13, ((alertMessage.hasCoordinates()) ? 1 : 0));
-      sqlPStmt.setString(14, alertMessage.getLatitude());
-      sqlPStmt.setString(15, alertMessage.getLongitude());
-      sqlPStmt.setString(16, alertMessage.getStreet());
-      sqlPStmt.setString(17, alertMessage.getVillage());
-      sqlPStmt.setString(18, alertMessage.getFurtherPlaceDescAsString());
-      
-      sqlPStmt.setString(19, alertMessage.getKeywordsAsString());
-      sqlPStmt.setString(20, alertMessage.getMessageString());
-      
-      sqlPStmt.executeUpdate();
-      sqlPStmt.close();
-      
-    } catch (Exception e) {
-      ApplicationLogger.log("## ERROR during database writing", 
-                            Application.ALERTMONITOR, false);
-    }
+  public Connection getHandle() {
+    return connection;
   }
   
-  public static void close() {
+  
+  public void close() {
     try {
       connection.close();
+      connection = null;
     } catch (Exception e) {
       ApplicationLogger.log("## ERROR during database closing", 
                             Application.ALERTMONITOR, false);

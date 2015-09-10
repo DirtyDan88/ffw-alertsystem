@@ -17,9 +17,15 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertmonitor.actions;
+package ffw.alertmonitor;
+
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.List;
+import java.util.Map;
 
 import ffw.alertlistener.AlertMessage;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
 
 
 // TODO: renew all alertactions with new available data from AlertMessage 
@@ -27,14 +33,86 @@ import ffw.alertlistener.AlertMessage;
 
 public abstract class AlertAction implements Runnable {
   
-  protected AlertMessage message;
+  protected AlertMessage message = null;
   
-  public abstract String getDescription();
+  private String instanceName = null;
+  private String description  = null;
+  
+  private boolean isActive = false;
+  
+  private List<String> ricList = null;
+  protected Map<String, String> paramList = null;
+  
+  
+  
+  public abstract String getInfo();
   
   /* to make sure each action is executed in his own thread it is not 
-     allowed to override this method */
+    allowed to override this method */
   public final void execute(AlertMessage alertMessage) {
-    this.message = alertMessage;
-    new Thread(this).start();
+   this.message = alertMessage;
+   
+   Thread thread = new Thread(this);
+   thread.setUncaughtExceptionHandler(new ExceptionHandler(this));
+   thread.start();
+  }
+  
+  public String getInstanceName() {
+    return this.instanceName;
+  }
+  
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+  
+  public String getDescription() {
+    return this.description;
+  }
+  
+  public void setDescription(String description) {
+    this.description = description;
+  }
+  
+  public boolean isActive() {
+    return this.isActive;
+  }
+  
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
+  }
+  
+  public List<String> getRicList() {
+    return this.ricList;
+  }
+  
+  public void setRicList(List<String> ricList) {
+    this.ricList = ricList;
+  }
+  
+  public Map<String, String> getParamList() {
+    return this.paramList;
+  }
+  
+  public void setParamList(Map<String, String> paramList) {
+    this.paramList = paramList;
+  }
+  
+  
+  
+  class ExceptionHandler implements UncaughtExceptionHandler {
+    
+    private AlertAction alertAction;
+    
+    public ExceptionHandler(AlertAction alertAction) {
+      this.alertAction = alertAction;
+    }
+    
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+      ApplicationLogger.log("## ERROR: unexpected and uncaught exception in " + 
+                            "alert-action (name: " + alertAction.getInstanceName() + ") " + 
+                            "thread: " + e.getMessage(), 
+                            Application.ALERTMONITOR);
+    }
   }
 }

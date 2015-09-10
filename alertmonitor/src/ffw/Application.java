@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import ffw.alertlistener.AlertListener;
 import ffw.alertlistener.AlertMessage;
 import ffw.alertmonitor.AlertMonitor;
+import ffw.util.config.ConfigFile;
 import ffw.util.logging.ApplicationLogger;
 
 
@@ -40,6 +41,38 @@ public class Application {
   private static Thread        alertListenerThread;
   
   public static void main(String[] args) {
+    
+    // TODO: use command line parser lib (JCommander, argparse4j ...)
+    
+    // TODO: config-file via command line param, std is 'config.txt' 
+    //       use different configs for unit tests
+    
+    // TODO: implement unit tests
+    //       use a .db file with a bunch of typical messages and a config file 
+    //       with no triggered alert actions
+    //       test with broken config file
+    //       test with broken alertactions (eg crashing alertactions)
+    
+    // TODO: decouple Listener and Monitor (in different .jars)
+    //  communication:
+    //  - observer-pattern
+    //  - listener as webservice
+    //  - OR actors/rpc instead the message queue
+    //  own main method in both AlertListener and AlertMonitor
+    //  possibility to run other monitors (with different configs) on 
+    //  other pi's in the network
+    
+    
+    
+    if (!ConfigFile.setFileName("config.xml")) {
+      ApplicationLogger.log("Not a valid config file", 
+                             ApplicationLogger.Application.ALERTMONITOR);
+      return;
+    } else {
+      ApplicationLogger.log("Config file is valid", 
+          ApplicationLogger.Application.ALERTMONITOR);
+    }
+    
     if (args.length > 0) {
       if (args[0].equals("-logInFile")) {
         ApplicationLogger.inFile = true;
@@ -48,7 +81,7 @@ public class Application {
     
     startApplication();
     
-    /* application is either terminated via signal or user */
+    // application is either terminated via signal or user
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
@@ -76,9 +109,12 @@ public class Application {
       ApplicationLogger.log("ERROR: " + e.getMessage(), 
                             ApplicationLogger.Application.ALERTMONITOR);
     }
+    
   }
   
   private static void startApplication() {
+    ApplicationLogger.log("ffw-alertsystem started", 
+                          ApplicationLogger.Application.ALERTLISTENER);
     ApplicationLogger.log("ffw-alertsystem started", 
                           ApplicationLogger.Application.ALERTMONITOR);
     

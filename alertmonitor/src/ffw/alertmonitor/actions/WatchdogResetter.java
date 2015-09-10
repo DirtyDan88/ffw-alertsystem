@@ -19,34 +19,47 @@
 
 package ffw.alertmonitor.actions;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import ffw.alertmonitor.AlertAction;
-import ffw.util.ShellScript;
-import ffw.util.TVController;
-import ffw.util.TVController.TVAction;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 
 
 
-public class SystemHibernate extends AlertAction {
-
+public class WatchdogResetter extends AlertAction {
+  
   @Override
   public String getInfo() {
-    return "switches off TV and closes open applications after a given time";
+    return "sends a network message to reset the watchdogs";
   }
   
   @Override
   public void run() {
-    int time = Integer.parseInt(paramList.get("system-hibernate-time"));
+    int port          = Integer.parseInt(paramList.get("watchdog-port"));
+    String addressStr =                  paramList.get("watchdog-addr");
+    byte[] buf        = "I am alive!".getBytes();
+    
+    ApplicationLogger.log("## reset watchdog on: " + addressStr + ":" + port,
+                          Application.ALERTMONITOR, false);
     
     try {
-      Thread.sleep(time * 1000 * 60);
-    } catch (InterruptedException e) {
+      InetAddress address   = InetAddress.getByName(addressStr);
+      DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
+      DatagramSocket socket = new DatagramSocket();
+      
+      if (addressStr.equals("255.255.255.255")) {
+        socket.setBroadcast(true);
+      }
+      socket.send(packet);
+      socket.close();
+        
+    } catch (IOException e) {
       ApplicationLogger.log("## ERROR: " + e.getMessage(), 
-                            Application.ALERTMONITOR);
+                            Application.ALERTMONITOR, false);
     }
-    
-    ShellScript.execute("close-applications");
-    TVController.sendCommand(TVAction.TURN_OFF);
   }
 }
