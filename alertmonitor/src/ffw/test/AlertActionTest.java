@@ -4,13 +4,34 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import ffw.alertlistener.AlertMessage;
 import ffw.alertlistener.AlertMessageFactory;
+import ffw.alertmonitor.AlertActionManager;
+import ffw.util.config.ConfigFile;
 
 
 
 public class AlertActionTest  {
 
-
+  private final String pathToTestFiles = "test/";
+  
+  public static boolean action1WasExecuted = false;
+  public static boolean action2WasExecuted = false;
+  public static boolean action3WasExecuted = false;
+  
+  @Test
+  public void testAlertActionManager() {
+    ConfigFile.setFileName(pathToTestFiles + "validExampleConfig.xml");
+    
+    AlertMessage message = new AlertMessageTestClass("");
+    message.evaluateMessageHead();
+    AlertActionManager.executeActions(message);
+    assertTrue(action1WasExecuted);
+    assertFalse(action1WasExecuted);
+    assertTrue(action3WasExecuted);
+    
+    // TODO: How to test caching mechanism?
+  }
   
   @Test
   public void testAlertActionSandbox() {
@@ -30,6 +51,7 @@ public class AlertActionTest  {
     assertTrue(true);
   }
   
+
   
   
 

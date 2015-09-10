@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ffw-alertsystem-config>
-  <pocsag-port>50000</pocsag-port>
+  <pocsag-port>12345</pocsag-port>
 
   <alertactions>
     <alertaction instanceName="AlertActionExample1">
       <packageName>ffw.test</packageName>
       <className>AlertActionTestClass</className>
-      <active>false</active>
-      <description>just for test purpose</description>
+      <active>true</active>
+      <description>just for test purpose (AlertActionExample1)</description>
       <rics>
-        <ric>158973</ric>
+        <ric>42</ric>
       </rics>
       <params>
         <param name="test-param1">some value</param>
-        <param name="test-param2">
+        <param name="test-param2">other value</param>
+        <param name="test-param3">
           <someInnerTag>
             <anotherInnerTag/>
           </someInnerTag>
@@ -25,23 +26,22 @@
       <packageName>ffw.test</packageName>
       <className>AlertActionTestClass</className>
       <active>false</active>
-      <description>just for test purpose</description>
+      <description>just for test purpose (AlertActionExample2)</description>
       <rics>
-        <ric>158973</ric>
+        <ric>42</ric>
+        <ric>99</ric>
       </rics>
     </alertaction>
 
     <alertaction instanceName="AlertActionExample3">
       <packageName>ffw.test</packageName>
       <className>AlertActionTestClass</className>
-      <active>false</active>
-      <description>just for test purpose</description>
+      <active>true</active>
+      <description>just for test purpose (AlertActionExample3)</description>
       <rics>
-        <ric>158973</ric>
+        <ric>*</ric>
       </rics>
-      <params>
-        <param name="test-param1">some value</param>
-      </params>
+      <params></params>
     </alertaction>
   </alertactions>
 </ffw-alertsystem-config>
