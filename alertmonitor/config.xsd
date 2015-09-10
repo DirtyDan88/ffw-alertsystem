@@ -7,7 +7,7 @@
       <!-- packageName und className are refering to the corresponding java 
            package and class which contains the code to be executed (class has
            to inherit from abstract base class 'AlertAction') -->
-      <xs:element name="packageName" type="xs:string" default="ffw.alertmonitor.actions"/>
+      <xs:element name="packageName" type="xs:string"/>
       <xs:element name="className"   type="xs:string"/>
       <!-- determines if the action is triggered when an alert is raised -->
       <xs:element name="active" type="xs:boolean"/>
@@ -41,7 +41,7 @@
       </xs:element>
     </xs:sequence>
     <!-- Instance name of this action -->
-    <xs:attribute name="instanceName" type="xs:ID"/>
+    <xs:attribute name="instanceName" type="xs:string"/>
   </xs:complexType>
 
   <!-- root node -->

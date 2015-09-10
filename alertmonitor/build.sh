@@ -56,6 +56,7 @@ javac -g:none \
       -cp "lib/*" \
       src/ffw/*.java \
       src/ffw/util/*.java \
+      src/ffw/util/config/*.java \
       src/ffw/util/logging/*.java \
       src/ffw/alertlistener/*.java \
       src/ffw/alertmonitor/*.java \

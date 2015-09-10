@@ -15,7 +15,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ffw.alertmonitor.AlertActionManager.AlertActionDesc;
@@ -27,11 +26,22 @@ import ffw.util.logging.ApplicationLogger.Application;
 public class ConfigFile {
   
   private static String xsdFileName = "config.xsd";
-  private static String xmlFileName;
+  private static String xmlFileName = null;
+  
+  private static long lastReadTime = -1;
+  
+  
   
   public static boolean setFileName(String xmlFileName) {
     ConfigFile.xmlFileName = xmlFileName;
-    return validate();
+    lastReadTime = -1;
+    
+    if (validate()) {
+      return true;
+    }
+    
+    ConfigFile.xmlFileName = null;
+    return false;
   }
   
   public static boolean validate() {
@@ -48,152 +58,158 @@ public class ConfigFile {
     }
   }
   
-  
-  
-  public String getConfigParam() {
-    
-    
-    Document doc = openConfig();
-    if (doc == null) {
-      
+  public static boolean hasChanged() {
+    if (lastReadTime == getLastModifiedTime()) {
+      return false;
     }
     
-    
-    
-    
-    try { 
-      
-      
-      System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-      
-   } catch (Exception e) {
-      e.printStackTrace();
-   }
-    
-    
-    
-    return null;
+    return true;
   }
   
   
+  
+  public static String getConfigParam(String paramName) {
+    Document config = openConfig();
+    
+    if (config != null) {
+      NodeList nodes = config.getElementsByTagName(paramName);
+      
+      if (nodes.getLength() == 0) {
+        ApplicationLogger.log("## ERROR: parameter " + paramName + 
+                              " does not exist.",
+                              Application.ALERTMONITOR, true);
+      } else {
+        return nodes.item(0).getTextContent();
+      }
+    }
+    
+    return null;
+  }
   
   public static List<AlertActionDesc> getAlertActionDescs() {
     List<AlertActionDesc> alertActionDescs = new ArrayList<AlertActionDesc>();
     Document config = openConfig();
     
     if (config != null) {
-      NodeList alertActionNodes = config.getElementsByTagName("alertaction");
-      for (int i = 0; i < alertActionNodes.getLength(); i++) {
-        Node alertActionNode = alertActionNodes.item(i);
+      NodeList actionNodes = config.getElementsByTagName("alertaction");
+      for (int i = 0; i < actionNodes.getLength(); i++) {
+        Element elem = (Element) actionNodes.item(i);
         
-        if (alertActionNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element elem = (Element) alertActionNode;
-          
-          String packageName  = elem.getElementsByTagName("packageName").
-                                     item(0).getTextContent();
-          String className    = elem.getElementsByTagName("className").
-                                     item(0).getTextContent();
-          String instanceName = elem.getAttribute("instanceName");
-          
-          alertActionDescs.add(new AlertActionDesc(packageName,
-                                                   className,
-                                                   instanceName));
-        }
+        String packageName  = elem.getElementsByTagName("packageName").
+                                   item(0).getTextContent();
+        String className    = elem.getElementsByTagName("className").
+                                   item(0).getTextContent();
+        String instanceName = elem.getAttribute("instanceName");
+        String isActive     = elem.getElementsByTagName("active").
+                                   item(0).getTextContent();
+        String description  = elem.getElementsByTagName("description").
+                                   item(0).getTextContent();
+        
+        alertActionDescs.add(
+          new AlertActionDesc(
+            packageName,
+            className,
+            instanceName,
+            isActive,
+            description
+          )
+        );
       }
     }
     
     return alertActionDescs;
   }
   
+  public static List<String> getAlertActionRics(String alertActionName) {
+    ArrayList<String> ricList = new ArrayList<String>();
+    Document config = openConfig();
+    
+    if (config != null) {
+      NodeList actionNodes = config.getElementsByTagName("alertaction");
+      for (int i = 0; i < actionNodes.getLength(); i++) {
+        Element action = (Element) actionNodes.item(i);
+        
+        if (action.getAttribute("instanceName").equals(alertActionName)) {
+          NodeList ricNodes = action.getElementsByTagName("ric"); 
+          for (int j = 0; j < ricNodes.getLength(); j++) {
+            Element ric = (Element) ricNodes.item(j);
+            ricList.add(ric.getTextContent());
+          }
+          
+          return ricList;
+        }
+      }
+      
+      ApplicationLogger.log("## ERROR: alert-action " + alertActionName + 
+                            " does not exist.",
+                            Application.ALERTMONITOR, true);
+    }
+    
+    return ricList;
+  }
   
+  public static Map<String, String> getAlertActionParams(String alertActionName) {
+    Map<String, String> paramList = new HashMap<String, String>();
+    Document config = openConfig();
+    
+    if (config != null) {
+      NodeList actionNodes = config.getElementsByTagName("alertaction");
+      for (int i = 0; i < actionNodes.getLength(); i++) {
+        Element action = (Element) actionNodes.item(i);
+        
+        if (action.getAttribute("instanceName").equals(alertActionName)) {
+          NodeList paramNodes = action.getElementsByTagName("param"); 
+          for (int j = 0; j < paramNodes.getLength(); j++) {
+            Element param = (Element) paramNodes.item(j);
+            paramList.put(param.getAttribute("name"), param.getTextContent());
+          }
+          
+          return paramList;
+        }
+      }
+      
+      ApplicationLogger.log("## ERROR: alert-action " + alertActionName + 
+                            " does not exist.",
+                            Application.ALERTMONITOR, true);
+    }
+    
+    return paramList;
+  }
   
+  /*
   public static String getAlertActionParam(String alertActionName, 
                                            String paramName) {
     Document config = openConfig();
     
     if (config != null) {
-      
-      //NodeList actionNodes = config.getElementsByTagName("alertactions");
-      //actionNodes.item(0).getAttributes()
-      
-      Element elem = config.getElementById("instanceName");
-      NodeList paramNodes = elem.getElementsByTagName("param");
-      
-      
-      for (int i = 0; i < paramNodes.getLength(); i++) {
-        String attrName = paramNodes.item(i).getAttributes().item(0).getNodeValue();
+      NodeList actionNodes = config.getElementsByTagName("alertaction");
+      for (int i = 0; i < actionNodes.getLength(); i++) {
+        Element action = (Element) actionNodes.item(i);
         
-        if (attrName.equals(paramName)) {
-          return paramNodes.item(i).getNodeValue();
+        if (action.getAttribute("instanceName").equals(alertActionName)) {
+          NodeList paramNodes = action.getElementsByTagName("param"); 
+          for (int j = 0; j < paramNodes.getLength(); j++) {
+            Element param = (Element) paramNodes.item(i);
+            
+            if (param.getAttribute("name").equals(paramName)) {
+              return param.getTextContent();
+            }
+          }
+          
+          ApplicationLogger.log("## ERROR: Parameter " + paramName + " for " +
+                                "alert-action " + alertActionName + " does not exist.",
+                                Application.ALERTMONITOR, true);
+          return null;
         }
       }
       
+      ApplicationLogger.log("## ERROR: alert-action " + alertActionName + 
+                            " does not exist.",
+                            Application.ALERTMONITOR, true);
     }
-    
-    ApplicationLogger.log("## ERROR: Parameter " + paramName + " for " +
-                          "alert-action " + alertActionName + " does not exist.",
-                          Application.ALERTMONITOR, true);
-    
     return null;
   }
-  
-  
-  
-  public Map<String, String> getAllAlertActionParams(String alertActionName) {
-    Map<String, String> map = new HashMap<String, String>();
-    
-    Document doc = openConfig();
-    if (doc == null) {
-      
-    }
-    
-    
-    NodeList alertActions = doc.getElementsByTagName("alertaction");
-    
-    for (int i = 0; i < alertActions.getLength(); i++) {
-      Node alertAction = alertActions.item(i);
-      System.out.println("\nCurrent Element :" + alertAction.getNodeName());
-      
-      //if (alertAction.getNodeType() == Node.ELEMENT_NODE) {
-    }
-    
-    /*
-    for (int temp = 0; temp < nList.getLength(); temp++) {
-       Node nNode = nList.item(temp);
-       System.out.println("\nCurrent Element :" 
-          + nNode.getNodeName());
-       
-       if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-          Element eElement = (Element) nNode;
-          System.out.println("Student roll no : " 
-             + eElement.getAttribute("rollno"));
-          System.out.println("First Name : " 
-             + eElement
-             .getElementsByTagName("firstname")
-             .item(0)
-             .getTextContent());
-          System.out.println("Last Name : " 
-          + eElement
-             .getElementsByTagName("lastname")
-             .item(0)
-             .getTextContent());
-          System.out.println("Nick Name : " 
-          + eElement
-             .getElementsByTagName("nickname")
-             .item(0)
-             .getTextContent());
-          System.out.println("Marks : " 
-          + eElement
-             .getElementsByTagName("marks")
-             .item(0)
-             .getTextContent());
-       }
-       
-    }*/
-    
-    
-    return map;
-  }
+  */
   
   
   
@@ -206,6 +222,7 @@ public class ConfigFile {
       Document config = dBuilder.parse(new File(xmlFileName));
       config.getDocumentElement().normalize();
       
+      lastReadTime = getLastModifiedTime();
       return config;
       
     } catch (Exception e) {
@@ -233,5 +250,9 @@ public class ConfigFile {
     }
     
     return null;
+  }
+  
+  private static long getLastModifiedTime() {
+    return new File(xmlFileName).lastModified();
   }
 }
