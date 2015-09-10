@@ -25,24 +25,9 @@ import ffw.util.DateAndTime;
 
 public class MessageLogger {
   
-  public enum LogEvent {
-    WATCHDOG, ALERT;
-    
-    @Override
-    public String toString() {
-      switch(this) {
-        case WATCHDOG: return "WATCHDOG-RESET";
-        case ALERT:    return "ALERT-TRIGGER ";
-        default: throw new IllegalArgumentException();
-      }
-    }
-  }
-    
-  public static void log(String text, LogEvent event) {
-    String fileName = "log-" + DateAndTime.getDate() + ".txt";
-    
+  public static void log(String text) {
+    String fileName = "log-" + DateAndTime.getDate() + "-messages.txt";
     Logger.log(fileName, "[" + DateAndTime.get() + "]" +
-                         "    " + event + 
                          "    " + text + "\n");
   }
 }

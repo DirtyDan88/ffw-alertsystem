@@ -32,12 +32,6 @@ import ffw.util.logging.ApplicationLogger.Application;
 
 
 
-// TODO: decouple Listener and Monitor (in different .jars)
-//       own main method in both AlertListener and AlertMonitor
-//       use actors or rpc for communication instead the message queue
-//       possibility to run other monitors (with different configs) on 
-//       other pi's in the network
-
 public class AlertListener implements Runnable {
   private boolean stopped = false;
   
