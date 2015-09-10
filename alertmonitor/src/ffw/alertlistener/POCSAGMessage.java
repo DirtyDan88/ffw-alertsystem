@@ -108,10 +108,13 @@ public class POCSAGMessage extends AlertMessage {
       return true;
       
     } else {
-      ApplicationLogger.log("## Alertmessage is either encrypted or empty", 
-                            Application.ALERTMONITOR, false);
       return false;
     }
+  }
+  
+  @Override
+  public String getType() {
+    return "POCSAG";
   }
   
   
@@ -292,4 +295,5 @@ public class POCSAGMessage extends AlertMessage {
     //       Levenshtein-Distanz
     return true;
   }
+
 }

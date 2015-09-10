@@ -22,6 +22,8 @@ package ffw.alertlistener;
 import java.util.ArrayList;
 import java.util.List;
 
+import ffw.util.DateAndTime;
+
 
 
 public abstract class AlertMessage {
@@ -74,6 +76,8 @@ public abstract class AlertMessage {
   
   public abstract boolean evaluateMessage();
   
+  public abstract String getType();
+  
   @Override
   public boolean equals(Object o) {
     AlertMessage other = (AlertMessage) o;
@@ -86,16 +90,11 @@ public abstract class AlertMessage {
       return false;
     }
     
-    if (this.unknownMessageType || other.unknownMessageType) {
+    if (!this.messageString.equals(other.messageString)) {
       return false;
     }
     
-    if (this.address.equals(other.getAddress()) && 
-        this.alertNumber.equals(other.getAlertNumber())) {
-      return true;
-    }
-    
-    return false;
+    return true;
   }
   
   
@@ -199,8 +198,6 @@ public abstract class AlertMessage {
     return (places.equals("")) ? "" : places.substring(0, places.length() - 1);
   }
   
-  
-  
   public List<String> getKeywords() {
     return this.keywords;
   }
@@ -213,5 +210,24 @@ public abstract class AlertMessage {
     
     return (furtherKeywords.equals("")) ? "" : 
             furtherKeywords.substring(0, furtherKeywords.length() - 1);
+  }
+  
+  
+  
+  public String buildText() {
+    long timestamp = Long.parseLong(getTimestamp());
+    
+    String text = "Eingegangen am " + DateAndTime.get(timestamp) + "\n\n";
+    
+    text += "Kurzstichwort: " + getAlertSymbol() + getAlertLevel() + " "
+                              + getAlertKeyword() + "\n";
+    text += "Ort:           " + getStreet() + ", " +  getVillage() + "\n" +
+            "               " + getFurtherPlaceDescAsString() + "\n";
+    text += "Beschreibung:  ";
+    for (int i = 0; i < getKeywords().size(); i++) {
+      text += getKeywords().get(i);
+    }
+    
+    return text;
   }
 }
