@@ -32,8 +32,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import ffw.alertmonitor.AlertAction;
-import ffw.util.ConfigReader;
 import ffw.util.ShellScript;
+import ffw.util.logging.ApplicationLogger;
+import ffw.util.logging.ApplicationLogger.Application;
+
+
 
 public class HtmlBuilder extends AlertAction {
   private String templateName;
@@ -47,41 +50,58 @@ public class HtmlBuilder extends AlertAction {
   
   @Override
   public void run() {
-    this.setTemplate(ConfigReader.getConfigVar("html-template"));
-    if (!this.message.hasCoordinates()) {
-      this.setTemplate("withoutGPS");
+    templateName = paramList.get("html-template");
+    
+    if (message.hasCoordinates()) {
+      ApplicationLogger.log("## HTMLBuilder: map loaded with GPS coordinates",
+                            Application.ALERTMONITOR, false);
+    } else if (!message.getStreet().equals("")) {
+      ApplicationLogger.log("## HTMLBuilder: map loaded with streetname and village",
+                            Application.ALERTMONITOR, false);
+    } else {
+      ApplicationLogger.log("## HTMLBuilder: load html-template without map",
+                            Application.ALERTMONITOR, false);
+      //TODO: write working template for that scenario
+      // templateName = "withoutMap";
     }
     
-    this.build();
+    build();
     
-    String fileName = this.writeHTML("html/alerts/");
+    String fileName = writeHTML("html/alerts/");
     ShellScript.execute("open-browser", fileName);
-  }
-  
-  public void setTemplate(String templateName) {
-    this.templateName = templateName;
-  }
-  
-  public void build() {
-    // TODO: new template for new AlertMessage class
-    this.loadTemplate("html/templates/" + this.templateName + ".html");
-
-    this.setElement("#timestamp",    this.message.getTimestamp());
-    if (this.message.hasCoordinates()) {
-      this.setElement("#mapProvider", ConfigReader.getConfigVar("html-map-provider"));
-      this.setElement("#latitude",   this.message.getLatitude());
-      this.setElement("#longitude",  this.message.getLongitude());
-    }
-    this.setElement("#shortKeyword", this.message.getAlertSymbol());
-    this.setElement("#alertLevel",   this.message.getAlertLevel());
     
-    for (int i = 0; i < this.message.getKeywords().size(); i++) {
-      Element tag = this.doc.select("#furtherKeywords ul").first();
-      tag.append("<li>" + this.message.getKeywords().get(i) + "</li>");
+    doc = null;
+    html = "";
+  }
+  
+  
+  
+  private void build() {
+    loadTemplate("html/templates/" + templateName + ".html");
+    
+    setElement("#timestamp",    message.getTimestamp());
+    setElement("#alertSymbol",  message.getAlertSymbol());
+    setElement("#alertLevel",   message.getAlertLevel());
+    setElement("#alertKeyword", message.getAlertKeyword());
+    
+    setElement("#mapProvider", paramList.get("html-map-provider"));
+    if (message.hasCoordinates()) {
+      setElement("#latitude",  message.getLatitude());
+      setElement("#longitude", message.getLongitude());
+    }
+    
+    setElement("#street",           message.getStreet());
+    setElement("#village",          message.getVillage());
+    setElement("#furtherPlaceDesc", message.getFurtherPlaceDescAsString());
+    
+    for (int i = 0; i < message.getKeywords().size(); i++) {
+      Element tag = doc.select("#furtherKeywords ul").first();
+      tag.append("<li>" + message.getKeywords().get(i) + "</li>");
     }
   }
   
-  public String writeHTML(String path) {
+  private String writeHTML(String path) {
+    // TODO: use DateAndTime class
     Date now = new java.util.Date();
     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy-HH.mm.ss");
     String dateAndTime = sdf.format(now);
@@ -118,7 +138,7 @@ public class HtmlBuilder extends AlertAction {
       String line;
       
       while((line = bufReader.readLine()) != null) {
-        this.html = this.html + '\n' + line;
+        html = html + '\n' + line;
       }
       
     } catch (IOException ex) {
@@ -133,12 +153,12 @@ public class HtmlBuilder extends AlertAction {
       }
     }
     
-    this.doc = Jsoup.parse(this.html);
+    doc = Jsoup.parse(html);
   }
   
   private void setElement(String cssSelector, String content) {
     if (content != null) {
-      Element tag = this.doc.select(cssSelector).first();
+      Element tag = doc.select(cssSelector).first();
       tag.html(content);
     }
   }

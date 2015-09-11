@@ -223,7 +223,23 @@ public abstract class AlertMessage {
                               + getAlertKeyword() + "\n";
     text += "Ort:           " + getStreet() + ", " +  getVillage() + "\n" +
             "               " + getFurtherPlaceDescAsString() + "\n";
-    text += "Beschreibung:  ";
+    text += "Stichworte:  ";
+    for (int i = 0; i < getKeywords().size(); i++) {
+      text += getKeywords().get(i);
+    }
+    
+    return text;
+  }
+  
+  public String buildShortText() {
+    long timestamp = Long.parseLong(getTimestamp());
+    
+    String text = "Eingegangen am " + DateAndTime.get(timestamp) + "\n\n";
+    text += "Kurzstichwort: " + getAlertSymbol() + getAlertLevel() + " "
+                              + getAlertKeyword() + "\n";
+    text += "Ort: " + getStreet() + ", " +  getVillage() + "\n" 
+                    + getFurtherPlaceDescAsString() + "\n";
+    text += "Stichworte: ";
     for (int i = 0; i < getKeywords().size(); i++) {
       text += getKeywords().get(i);
     }

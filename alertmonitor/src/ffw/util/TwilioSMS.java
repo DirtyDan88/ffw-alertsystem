@@ -66,7 +66,7 @@ public class TwilioSMS {
   }
   
   public static TwilioAccount getTwilioAccFromDB(SQLiteConnection con, 
-                                                  String id) {
+                                                 String id) {
     TwilioAccount acc = null;
     
     try {
@@ -102,6 +102,18 @@ public class TwilioSMS {
     return acc;
   }
   
+  public static TwilioAccount getTwilioAccFromTextFile(String fileName) {
+    ConfigReader.fileName = fileName;
+    
+    return new TwilioAccount(
+      ConfigReader.getConfigVar("surName"),
+      ConfigReader.getConfigVar("foreName"),
+      ConfigReader.getConfigVar("ACCOUNT_SID"),
+      ConfigReader.getConfigVar("AUTH_TOKEN"),
+      ConfigReader.getConfigVar("To"),
+      ConfigReader.getConfigVar("From")
+    );
+  }
   
   
   public static class TwilioAccount {

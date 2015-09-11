@@ -101,8 +101,13 @@ public class POCSAGMessage extends AlertMessage {
         }
         
       } else {
+        String[] alphaStr = cleanAlphaString().split("#");
         // TODO: 2822/F2 Zimmerbrand///Senefelderstr. 10/Leimen/ Geb. Berraucht
-        unknownMessageType = true;
+        if (alphaStr.length > 2) {
+          evaluateMessage(alphaStr);
+        } else {
+          unknownMessageType = true;
+        }
       }
       
       return true;
@@ -177,7 +182,7 @@ public class POCSAGMessage extends AlertMessage {
       i--;
     }
     
-    isFireAlert = getShortKeyword(alertInfo[i]);
+    isFireAlert = setShortKeyword(alertInfo[i]);
     
     // TODO: THW or RedCross, String is often unordered
     for (i++; i < alertInfo.length; i++) {
@@ -222,7 +227,36 @@ public class POCSAGMessage extends AlertMessage {
   
   
   
-  /*
+  
+  public void evaluateMessage(String[] alphaStr) {
+    int index = 0;
+    
+    if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
+      /* alert with latitude and longitude */
+      hasCoordinates = true;
+      latitude  = alphaStr[index++];
+      longitude = alphaStr[index++];
+    } else {
+      /* alert without gps coordinates */
+      hasCoordinates = false;
+      latitude  = null;
+      longitude = null;
+    }
+    
+    alertNumber = alphaStr[index++];
+    
+    isFireAlert = setShortKeyword(alphaStr[index++]);
+    
+    street = "-";
+    village = "-";
+    
+    for (int i = index; i < alphaStr.length; i++) {
+      if (isStringClean(alphaStr[i])) {
+        keywords.add(alphaStr[i]);
+      }
+    }
+  }
+  
   private String cleanAlphaString() {
     
     String[] alphaStr  = getAlpha().split("/");
@@ -238,7 +272,8 @@ public class POCSAGMessage extends AlertMessage {
     
     return newAlphaStr;
   }
-  */
+  
+  
   
   private boolean isStringClean(String str) {
     if (!(str.trim().startsWith("<") && str.trim().endsWith(">")) &&
@@ -257,7 +292,7 @@ public class POCSAGMessage extends AlertMessage {
     return true;
   }
   
-  private boolean getShortKeyword(String shortKeyword) {
+  private boolean setShortKeyword(String shortKeyword) {
     if (shortKeyword.substring(0, 2).matches("[F|B|H|T|G|W][1-7]")) {
       alertSymbol  = shortKeyword.substring(0, 1);
       alertLevel   = shortKeyword.substring(1, 2);

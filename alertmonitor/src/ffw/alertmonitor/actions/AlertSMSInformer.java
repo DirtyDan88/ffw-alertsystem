@@ -37,10 +37,41 @@ public class AlertSMSInformer extends AlertAction {
   
   @Override
   public void run() {
+    if (paramList.get("source").equals("text-files")) {
+      loadFromTextFiles();
+    } else if (paramList.get("source").equals("database")) {
+      loadFromDB();
+    }
+  }
+  
+  private void loadFromTextFiles() {
+    String[] textFiles = paramList.get("file-list").split(",");
+    String text = "[ffw-alertsystem] !! ALARM !! \n" + message.buildShortText();
+    
+    for (int i = 0; i < textFiles.length; i++) {
+      String fileName = textFiles[i].trim();
+      if (fileName.equals("")) continue;
+      TwilioAccount acc = TwilioSMS.getTwilioAccFromTextFile(fileName);
+      
+      if (acc != null) {
+        boolean ok = TwilioSMS.send(acc, text);
+        
+        if (ok) {
+          ApplicationLogger.log("## sent SMS to " + acc.surName + acc.foreName, 
+                                Application.ALERTMONITOR, false);
+        }
+      } else {
+        ApplicationLogger.log("## ERROR: could not find twilio account data", 
+                              Application.ALERTMONITOR, false);
+      }
+    }
+  }
+  
+  private void loadFromDB() {
     SQLiteConnection con = new SQLiteConnection();
     con.open(paramList.get("database"));
     
-    String text = "[ffw-alertsystem] !! ALARM !! \n" + message.buildText();
+    String text = "[ffw-alertsystem] !! ALARM !! \n" + message.buildShortText();
     String[] recipients = paramList.get("sms-alert-recipients").split(",");
     for (int i = 0; i < recipients.length; i++) {
       String id = recipients[i].trim();
