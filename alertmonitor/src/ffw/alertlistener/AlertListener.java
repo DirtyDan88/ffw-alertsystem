@@ -26,7 +26,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Queue;
 
-import ffw.util.ConfigReader;
+import ffw.util.config.ConfigFile;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 
@@ -46,7 +46,7 @@ public class AlertListener implements Runnable {
     this.messageQueue = messageQueue;
     this.buffer       = new StringBuilder();
     
-    this.port = Integer.parseInt(ConfigReader.getConfigVar("pocsag-port"));
+    this.port = Integer.parseInt(ConfigFile.getConfigParam("pocsag-port"));
     
     try {
       this.socket = new DatagramSocket(this.port);
