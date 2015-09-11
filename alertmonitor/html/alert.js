@@ -18,28 +18,32 @@
 */
 
 function setAlertKeywordAndLevel() {
-    var shortKeyword = $("#shortKeyword").text();
-        shortKeyword = $.trim(shortKeyword);
+    var alertSymbol  = $("#alertSymbol").text();
+        alertSymbol  = $.trim(alertSymbol);
     var alertLevel   = $("#alertLevel").text();
-    var keyword      = "";
+    var alertKeyword = $("#alertKeyword").text();
     
-    if (shortKeyword == "F" || shortKeyword == "B") {
+    $("#keyword").text(alertSymbol.trim() + alertLevel.trim() + " " + alertKeyword);
+
+    /*
+    var keyword      = "";    
+    if (alertSymbol == "F" || alertSymbol == "B") {
         keyword = "Brandeinsatz";
-    } else if (shortKeyword == "H" || shortKeyword == "T") {
+    } else if (alertSymbol == "H" || alertSymbol == "T") {
         keyword = "Technische Hilfeleistung";
-    } else if (shortKeyword == "G") {
+    } else if (alertSymbol == "G") {
         keyword = "Gefahrgutunfall";
-    } else if (shortKeyword == "W") {
+    } else if (alertSymbol == "W") {
         keyword = "Einsatz auf Gewässer";
     } else {
         keyword = "Unbekannt";
     }
-    $("#shortKeywordDesc").text(keyword);
+    */
     
     var levels = new Array("Kleinbrand", "Mittelbrand", "Großbrand", 
-                             "TH klein", "TH mittel", "TH groß", "Gefahrgut");
+                           "TH klein", "TH mittel", "TH groß", "Gefahrgut");
     $("#alertLevelDesc").text(levels[alertLevel - 1]);
     
     // TODO: get some more pictures
-    $("#keywordImage").prepend('<img src="../images/F.png" />')
+    $("#keywordImage").prepend('<img src="../images/' + alertSymbol + '.png" />')
 }

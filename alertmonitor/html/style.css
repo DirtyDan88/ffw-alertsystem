@@ -73,7 +73,7 @@ div.alertKeyword {
 div.alertKeyword table { 
     width: 100%;
 }
-div#shortKeywordDesc,
+div#keyword,
 div#alertLevelDesc {
     font-size: 300%;
 }
@@ -83,6 +83,19 @@ div#keywordImage {
 div#keywordImage img {
     height: 100px;
     width: auto;
+}
+div.placeDesc {
+    padding: 20px;
+    border: 2px dashed red;
+    margin-bottom: 40px;
+}
+div.placeDesc table { 
+    width: 100%;
+}
+div#street,
+div#village,
+div#furtherPlaceDesc {
+    font-size: 200%;
 }
 div#furtherKeywords {
     padding-top: 20px;
