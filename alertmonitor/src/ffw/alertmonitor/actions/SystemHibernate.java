@@ -47,6 +47,6 @@ public class SystemHibernate extends AlertAction {
     }
     
     ShellScript.execute("close-applications");
-    TVController.sendCommand(TVAction.TURN_OFF);
+    TVController.sendCommand(TVAction.TURN_OFF, paramList.get("serial-port"));
   }
 }

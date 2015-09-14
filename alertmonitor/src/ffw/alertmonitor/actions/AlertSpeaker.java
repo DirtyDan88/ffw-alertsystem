@@ -33,7 +33,6 @@ import marytts.client.MaryClient;
 import marytts.util.data.audio.AudioPlayer;
 import marytts.util.http.Address;
 import ffw.alertmonitor.AlertAction;
-import ffw.util.ConfigReader;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 import ffw.util.ShellScript;
@@ -52,8 +51,7 @@ public class AlertSpeaker extends AlertAction {
     ShellScript.execute("start-marytts-server");
     
     /* wait till the server is started */
-    int time = Integer.parseInt(ConfigReader.getConfigVar("marytts-start-delay", 
-                Application.ALERTMONITOR));
+    int time = Integer.parseInt(paramList.get("marytts-start-delay"));
     try {
       Thread.sleep(time * 1000);
     } catch (InterruptedException e) {

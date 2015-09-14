@@ -80,7 +80,7 @@ public class Mail implements Runnable {
       msg.setSentDate(new Date());
       
       Transport.send(msg);
-
+      
       /*
       Transport transport = session.getTransport();
       transport.connect();

@@ -31,6 +31,7 @@ import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
 
+import ffw.util.config.ConfigReader;
 import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 

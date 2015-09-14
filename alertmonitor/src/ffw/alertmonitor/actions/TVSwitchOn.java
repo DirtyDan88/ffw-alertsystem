@@ -34,6 +34,6 @@ public class TVSwitchOn extends AlertAction {
   
   @Override
   public void run() {
-    TVController.sendCommand(TVAction.SWITCH_ON);
+    TVController.sendCommand(TVAction.SWITCH_ON, paramList.get("serial-port"));
   }
 }

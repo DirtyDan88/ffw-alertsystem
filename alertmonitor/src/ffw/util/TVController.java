@@ -52,13 +52,13 @@ public class TVController {
     }
     
     
-    public static void sendCommand(TVAction action) {
+    public static void sendCommand(TVAction action, String strSerialPort) {
         SerialPort serialPort = null;
         SerialWriter writer   = null;
         SerialReader reader   = null;
         
         try {
-            serialPort = connect(ConfigReader.getConfigVar("serial-port"));
+            serialPort = connect(strSerialPort);
             serialPort.notifyOnDataAvailable(true);
             
             writer = new SerialWriter(serialPort.getOutputStream());
