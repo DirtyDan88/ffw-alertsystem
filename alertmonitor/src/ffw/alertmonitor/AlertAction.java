@@ -28,8 +28,6 @@ import ffw.util.logging.ApplicationLogger;
 import ffw.util.logging.ApplicationLogger.Application;
 
 
-// TODO: renew all alertactions with new available data from AlertMessage 
-
 
 public abstract class AlertAction implements Runnable {
   

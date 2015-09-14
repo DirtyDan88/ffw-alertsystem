@@ -36,7 +36,7 @@ public class AlertActionManager {
   public static void executeActions(AlertMessage alertMessage) {
     ApplicationLogger.log("## received message (" + alertMessage.getType() + "), " +
                           "following actions will be executed: ", 
-                          Application.ALERTMONITOR);
+                          Application.ALERTMONITOR, false);
     boolean atLeastOne = false;
     
     loadAlertActions();

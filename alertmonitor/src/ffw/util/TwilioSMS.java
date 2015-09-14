@@ -57,6 +57,9 @@ public class TwilioSMS {
       MessageFactory messageFactory = client.getAccount().getMessageFactory();
       messageFactory.create(params);
       
+      ApplicationLogger.log("## sent SMS to " + acc.surName + ", " + acc.foreName, 
+                            Application.ALERTMONITOR);
+      
     } catch (TwilioRestException e) {
         ApplicationLogger.log("## ERROR: " + e.getMessage(), 
                               Application.ALERTMONITOR);

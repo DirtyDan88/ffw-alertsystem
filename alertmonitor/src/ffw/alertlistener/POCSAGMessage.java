@@ -73,7 +73,7 @@ public class POCSAGMessage extends AlertMessage {
   
   public boolean evaluateMessage() {
     if (!isEncrypted() && isComplete()) {
-      /* matches '[AlertInfo]//[PlaceDescription]//[EmergencyDescription]' */
+      // matches '[AlertInfo]//[PlaceDescription]//[EmergencyDescription]' 
       Pattern pattern = Pattern.compile(".*\\/\\/.*\\/\\/.*");
       Matcher matcher = pattern.matcher(alpha);
       
@@ -84,8 +84,6 @@ public class POCSAGMessage extends AlertMessage {
           int i = 0;
           for (String messagePart : message) {
             if (isStringClean(messagePart)) {
-            //if (!(messagePart.startsWith("<") && messagePart.endsWith(">")) &&
-            //      messagePart.trim().length() > 0) {
               if (i == 0) evaluateAlertInfo    (messagePart.split("/"));
               if (i == 1) evaluatePlaceDesc    (messagePart.split("/"));
               if (i == 2) evaluateEmergencyDesc(messagePart.split("/"));
@@ -101,8 +99,9 @@ public class POCSAGMessage extends AlertMessage {
         }
         
       } else {
-        String[] alphaStr = cleanAlphaString().split("#");
-        // TODO: 2822/F2 Zimmerbrand///Senefelderstr. 10/Leimen/ Geb. Berraucht
+        // If message is not seperated with double slashs '//'
+        String[] alphaStr = getCleanAlphaString().split("#");
+        
         if (alphaStr.length > 2) {
           evaluateMessage(alphaStr);
         } else {
@@ -227,8 +226,7 @@ public class POCSAGMessage extends AlertMessage {
   
   
   
-  
-  public void evaluateMessage(String[] alphaStr) {
+  private void evaluateMessage(String[] alphaStr) {
     int index = 0;
     
     if (isLatOrLong(alphaStr[0]) && isLatOrLong(alphaStr[1])) {
@@ -251,14 +249,16 @@ public class POCSAGMessage extends AlertMessage {
     village = "-";
     
     for (int i = index; i < alphaStr.length; i++) {
+      // TODO: Try to find street and village in string
+      // use Levenshtein-Distanz, isVillage() and isStreet()
+      // 2822/F2 Zimmerbrand///Senefelderstr. 10/Leimen/ Geb. Berraucht
       if (isStringClean(alphaStr[i])) {
         keywords.add(alphaStr[i]);
       }
     }
   }
   
-  private String cleanAlphaString() {
-    
+  private String getCleanAlphaString() {
     String[] alphaStr  = getAlpha().split("/");
     String newAlphaStr = "";
     
@@ -330,5 +330,4 @@ public class POCSAGMessage extends AlertMessage {
     //       Levenshtein-Distanz
     return true;
   }
-
 }

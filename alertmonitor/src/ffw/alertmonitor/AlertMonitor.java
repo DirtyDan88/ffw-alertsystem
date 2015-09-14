@@ -93,29 +93,34 @@ public class AlertMonitor implements Runnable {
   private void handleMessage(AlertMessage alertMessage) {
     MessageLogger.log(alertMessage.getMessageString());
     alertMessage.evaluateMessageHead();
+    boolean multipleAlerting = false;
     
     if (!prevMessages.contains(alertMessage)) {
       if (alertMessage.evaluateMessage()) {
-        /* prevent multiple alerting by checking the alertnumber */
+        // prevent multiple alerting by checking the alertnumber 
         if (alertNumbers.contains(alertMessage.getAlertNumber())) {
           ApplicationLogger.log("## multiple alerting with different " + 
                                 "message-strings detected", 
-                                Application.ALERTMONITOR, false);
+                                Application.ALERTMONITOR);
+          multipleAlerting = true;
           // TODO: some actions could benefit from an other message string, 
           //       for example the HtmlBuilder from coordinates
           //       possibility to re-execute actions? 
         } else {
           alertNumbers.add(alertMessage.getAlertNumber());
-          AlertActionManager.executeActions(alertMessage);
         }
       } else {
-        // TODO: trigger sqlite action also for encrypted messages
         ApplicationLogger.log("## Alertmessage is either encrypted or empty", 
-                              Application.ALERTMONITOR, false);
+                              Application.ALERTMONITOR);
       }
+      
+      if (!multipleAlerting) {
+        AlertActionManager.executeActions(alertMessage);
+      }
+      
     } else {
       ApplicationLogger.log("## message already received",
-                            Application.ALERTMONITOR, false);
+                            Application.ALERTMONITOR);
     }
     
     prevMessages.add(alertMessage);
