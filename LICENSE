@@ -1,32 +1,32 @@
-Copyright (c) 2015
-        David Ruckes <David-ruckes@web.de>
-        Max Stark <max.stark88@web.de> 
-        All rights reserved.
-    
-    ffw-alertsystem - decode and handle POCSAG telegrams (please see the 
-    legal restrictions at the end of this file).
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
+Copyright (c) 2015-2016
+    David Ruckes <David-ruckes@web.de>
+    Max Stark <max.stark88@web.de> 
+    All rights reserved.
+  
+  ffw-alertsystem - decode and handle POCSAG telegrams (please see the 
+  legal restrictions at the end of this file).
+  
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     
     
-    !!! NOTICE - WICHTIGER HINWEIS !!!
-        Rechtliche Einschränkungen
-    
-    Nach deutscher Rechtslage ist es verboten, Sendungen die nicht für 
-    die Öffentlichkeit bestimmt sind (z.B. BOS-Funk) mitzuhören. Hierzu 
-    gehört auch das Entschlüsseln von Datentelegrammen. §4 der BOS-Funk-
-    richtlinie der Bundesnetzagentur listet Berechtigte des BOS-Funks auf, 
-    bestimmte Teile dieser Software dürfen daher nur von entsprechend 
-    befugten Personen benutzt werden.
+  !!! NOTICE - WICHTIGER HINWEIS !!!
+      Rechtliche Einschränkungen
+  
+  Nach deutscher Rechtslage ist es verboten, Sendungen die nicht für 
+  die Öffentlichkeit bestimmt sind (z.B. BOS-Funk) mitzuhören. Hierzu 
+  gehört auch das Entschlüsseln von Datentelegrammen. §4 der BOS-Funk-
+  richtlinie der Bundesnetzagentur listet Berechtigte des BOS-Funks auf, 
+  bestimmte Teile dieser Software dürfen daher nur von entsprechend 
+  befugten Personen benutzt werden.

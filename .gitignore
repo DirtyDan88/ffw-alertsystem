@@ -1,16 +1,13 @@
-.gitignore~
+build/
+data/
+bin/
 
-alertmonitor/bin/
-alertmonitor/html/alerts/
-alertmonitor/log/
-alertmonitor/*.jar
-
-*.txt
-*.xml
-*.db
+config-*.xml
 
 .alertmonitor.lock
+.alertreceiver.lock
 .watchdog.lock
+
 .classpath
 .project
 .settings
