@@ -165,7 +165,8 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   }
   
   /**
-   * This method is supposed to read add 
+   * This method is supposed to read additional properties defined by sub-
+   * classes which extends the PluginConfigT.
    * @param config The plugin-config object.
    * @param xml    The XML-tree of the plugin-config.
    */

@@ -37,7 +37,7 @@ public class MonitorPluginConfig extends PluginConfig {
   
   /**
    * List with RICs. If a new message is received the first check is if this
-   * list contains the message's RIC ('*' is wildcard -> plugin will processe
+   * list contains the message's RIC ('*' is wildcard -> plugin will process
    * all messages).
    */
   private List<String> ricList;
