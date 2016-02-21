@@ -26,6 +26,7 @@ CLASSPATH=$CLASSPATH":$LOCATION/../../3rdparty/jetty/*"
 
 JAVASRC="$LOCATION/../src/ffw/alertsystem/plugins/monitor/MessageListener.java
          $LOCATION/../../core/src/ffw/alertsystem/core/receiver/ReceiverServer.java
+         $LOCATION/../../core/src/ffw/alertsystem/core/receiver/ReceiverWebSocket.java
          $LOCATION/../../util/src/ffw/alertsystem/util/JettyLogger.java
          $LOCATION/../../util/src/ffw/alertsystem/util/JettyWebSocket.java"
 
