@@ -52,6 +52,8 @@ public class AlertActionExecuter extends MonitorPlugin {
   protected void onReceivedMessage(Message message) {
     log.info("!! " + config().getInstanceName() + " !! alert detected");
     
+    // TODO: multiple-alerting check is already done in MonitorPlugin.java
+    
     // prevent multiple alerting by checking the alertnumber 
     if (alertNumbers.contains(message.getAlertNumber())) {
       log.info("multiple alerting with different message-strings detected");
