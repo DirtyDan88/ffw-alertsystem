@@ -444,7 +444,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   
   /**
    * Creates the @PluginLogger, either with DEBUG-level if plugin is in debug-
-   * mode or with level INFO.
+   * mode or with level of encapsulated Logger.
    */
   private final void createPluginLogger(Logger encapsulatedLogger) {
     if (config.isInDebugMode()) {
@@ -453,7 +453,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
       log.debug("plugin is in debug mode");
     } else {
       log = new PluginLogger(encapsulatedLogger, config.getInstanceName(),
-                             Logger.INFO); //log.getLogLevel());
+                             encapsulatedLogger.getLogLevel());
     }
   }
   
