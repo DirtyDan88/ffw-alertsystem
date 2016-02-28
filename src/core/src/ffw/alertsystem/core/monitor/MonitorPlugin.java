@@ -112,7 +112,7 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
     // only wake up if the plugin is not stopped
     if (state() != PluginState.STOPPED) {
       messageQueue.offer(message);
-      log.debug("inserted message into plugin-queue");
+      log.debug("new message was inserted into plugin-queue");
       wakeUp();
     }
   }

@@ -19,29 +19,41 @@
 
 package ffw.alertsystem.core.message;
 
+
 import ffw.alertsystem.util.Logger;
 
 
 
+/**
+ * Creates @Message objects from strings.
+ */
 public class MessageFactory {
   
+  /**
+   * @param messageString The message-string.
+   * @return The new created @Message or null.
+   */
   public static Message create(String messageString, Logger log) {
-    Message message;
+    if (messageString == null) {
+      log.warn("message-string was null");
+      return null;
+    }
     
-    if (messageString == null) return null;
+    messageString = messageString.trim();
     
     if (messageString.startsWith("POCSAG")) {
-      message = new POCSAGMessage(messageString);
+      return new POCSAGMessage(messageString);
       
-    /* } else if (messageString.startsWith("TETRA")) {
-      alertMessage = new TETRAMessage(messageString); */
+    } else if (messageString.startsWith("TETRA")) {
+      // message = new TETRAMessage(messageString);
+      log.error("TETRA messages are not yet implemented",
+                new Exception("NotYetImplementedException"), true);
+      return null;
       
     } else {
       log.warn("could not create message from string: " + messageString);
       return null;
     }
-    
-    return message;
   }
   
 }
