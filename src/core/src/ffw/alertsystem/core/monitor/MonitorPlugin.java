@@ -109,12 +109,14 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
    * @param message The message to store in the plugins message-queue.
    */
   protected final void notifyReceivedMessage(Message message) {
-    // only wake up if the plugin is not stopped
+    // only wake up if the plugin is was already started, is not stopped and
+    // not in error state
     if (state() != PluginState.STOPPED &&
-        state() != PluginState.INITIALIZED) {
+        state() != PluginState.INITIALIZED &&
+        state() != PluginState.ERROR) {
       messageQueue.offer(message);
       log.debug("new message was inserted into plugin-queue");
-      wakeUp();
+      callRun();
     }
   }
   
@@ -126,10 +128,13 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
    */
   protected final void notifyMonitorObserver() {
     if (config().isMonitorObserver()) {
-      // only wake up if the plugin is not stopped
-      if (state() != PluginState.STOPPED) {
+      // only wake up if the plugin is was already started, is not stopped and
+      // not in error state
+      if (state() != PluginState.STOPPED &&
+          state() != PluginState.INITIALIZED &&
+          state() != PluginState.ERROR) {
         notifyMonitorObserver = true;
-        wakeUp();
+        callRun();
       }
     }
   }

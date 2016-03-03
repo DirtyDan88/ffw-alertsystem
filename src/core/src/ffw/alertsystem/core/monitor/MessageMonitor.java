@@ -301,6 +301,11 @@ public class MessageMonitor implements Runnable,
   }
   
   @Override
+  public void onPluginIsReloading(String instanceName) {
+    log.info("plugin is reloading: " + instanceName, true);
+  }
+  
+  @Override
   public synchronized void onPluginStopped(String instanceName) {
     log.info("plugin was stopped: " + instanceName);
     pluginManager.notifyMonitorObserver();
@@ -313,5 +318,8 @@ public class MessageMonitor implements Runnable,
     
     pluginManager.notifyMonitorObserver();
   }
+
+
+
   
 }

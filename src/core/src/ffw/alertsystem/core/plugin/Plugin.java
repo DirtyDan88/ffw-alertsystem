@@ -75,6 +75,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
     STARTED,
     SLEEPING,
     RUNNING,
+    RELOADING,
     ERROR;
     
     @Override
@@ -85,6 +86,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
         case STARTED:     return "started";
         case SLEEPING:    return "sleeping";
         case RUNNING:     return "running";
+        case RELOADING:   return "reloading";
         case ERROR:       return "error";
         default: throw new IllegalArgumentException();
       }
@@ -151,12 +153,13 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   /**
    * Starts the plugin-thread and sets the exception-handler, see
    * {@link Plugin#getExceptionHandler()}. If the plugin is already running this
-   * method has no effect; actually the plugin-state has to be INITIALIZED or
-   * STOPPED, otherwise the same applies.
+   * method has no effect; actually the plugin-state has to be INITIALIZED,
+   * STOPPED or ERROR, otherwise the same applies.
    */
   protected final void start() {
     if (state == PluginState.INITIALIZED ||
-        state == PluginState.STOPPED) {
+        state == PluginState.STOPPED ||
+        state == PluginState.ERROR) {
       // (re-)set the error-object
       error = null;
       
@@ -195,7 +198,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
     createPluginLogger(log);
     
     raiseReload = true;
-    wakeUp();
+    callRun();
   }
   
   /**
@@ -241,6 +244,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
       
       if (raiseReload) {
         log.info("plugin reload was raised", true);
+        state = PluginState.RELOADING;
+        notifyObserver();
         onPluginReload();
         raiseReload = false;
       
@@ -265,13 +270,16 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   protected abstract void onRun();
   
   /**
-   * Wakes the plugin if it is sleeping.
+   * Wakes the plugin if it is sleeping or sets a flag that it shall keep
+   * running if it is currently executing something. Has no effect if plugin is
+   * not yet started (INITIALIZED), STOPPED or in ERROR state.
    */
-  protected final void wakeUp() {
+  protected final void callRun() {
     if (state == PluginState.SLEEPING) {
       thread.interrupt();
-    } else if (state != PluginState.STOPPED &&
-               state != PluginState.ERROR) {
+    } else if (state == PluginState.STARTED ||
+               state == PluginState.RUNNING ||
+               state == PluginState.RELOADING) {
       keepOnRunning = true;
     }
   }
@@ -389,6 +397,10 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
         break;
       case RUNNING:     observer.forEach(observer ->
                           observer.onPluginIsRunning(config.getInstanceName())
+                        );
+        break;
+      case RELOADING:   observer.forEach(observer ->
+                          observer.onPluginIsReloading(config.getInstanceName())
                         );
         break;
       case STOPPED:     observer.forEach(observer ->

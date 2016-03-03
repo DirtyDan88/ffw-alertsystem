@@ -26,7 +26,9 @@ import ffw.alertsystem.core.plugin.Plugin;
 public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   
   static boolean simulateWorkForNextCall = false;
+  static int     simulateWorkDuration    = 1;
   
+  static boolean throwUncaughtException = false;
   
   
   @Override
@@ -45,6 +47,11 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   protected void onRun() {
     PluginSystemTest.onPluginRunWasCalled.is = true;
     simulateWork();
+    
+    if (throwUncaughtException) {
+      throwUncaughtException = false;
+      throw new NullPointerException();
+    }
   }
   
   @Override
@@ -62,19 +69,21 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   
   
   public void wakeMeUp() {
-    wakeUp();
+    callRun();
   }
   
   private void simulateWork() {
+    int time = simulateWorkDuration * 1000;
+    simulateWorkDuration = 1;
+    
     if (!simulateWorkForNextCall) return;
+    simulateWorkForNextCall = false;
     
     try {
-      Thread.sleep(1000);
+      Thread.sleep(time);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    
-    simulateWorkForNextCall = false;
   }
   
 }

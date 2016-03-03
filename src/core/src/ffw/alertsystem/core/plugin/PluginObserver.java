@@ -57,6 +57,12 @@ public interface PluginObserver {
   public void onPluginIsRunning(String instanceName);
   
   /**
+   * Called if the config of the plugin has changed and a reload is raised.
+   * @param instanceName The unique instance-name of the plugin.
+   */
+  public void onPluginIsReloading(String instanceName);
+  
+  /**
    * Called if the plugin was stopped.
    * @param instanceName The unique instance-name of the plugin.
    */
