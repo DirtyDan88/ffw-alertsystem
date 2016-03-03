@@ -218,6 +218,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
    */
   @Override
   public final void run() {
+    log.debug("plugin was started");
     state = PluginState.STARTED;
     notifyObserver();
     onPluginStart();
@@ -251,6 +252,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
       }
     }
     
+    log.debug("plugin was stopped");
     onPluginStop();
     notifyObserver();
   }
@@ -268,7 +270,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   protected final void wakeUp() {
     if (state == PluginState.SLEEPING) {
       thread.interrupt();
-    } else {
+    } else if (state != PluginState.STOPPED &&
+               state != PluginState.ERROR) {
       keepOnRunning = true;
     }
   }
@@ -282,6 +285,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
    * the call. For this use {@link PluginManager#stopPlugin()} instead.
    */
   protected final synchronized void stop() {
+    log.debug("plugin was asked to stop");
+    
     PluginState oldState = state;
     state = PluginState.STOPPED;
     
@@ -416,6 +421,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   protected final void errorOccured(Throwable t) {
     error  = t;
     state = PluginState.ERROR;
+    
+    log.debug("plugin error occured: " + t.toString());
     
     notifyObserver();
     onPluginError(t);
