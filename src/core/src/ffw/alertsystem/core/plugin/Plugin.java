@@ -103,6 +103,13 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   private boolean raiseReload = false;
   
   /**
+   * If the wakeUp()-method is called and the plugin isn't sleeping but in
+   * STARTED/RELOADING/RUNNING state, this flag indicates that the plugin shall
+   * not got sleeping and execute run()/reload() again.
+   */
+  private boolean keepOnRunning = false;
+  
+  /**
    * If an uncaught error occured the resulting @Throwable object will be
    * stored in this field.
    */
@@ -217,14 +224,18 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
     
     while (state != PluginState.STOPPED &&
            state != PluginState.ERROR) {
-      try {
-        state = PluginState.SLEEPING;
-        notifyObserver();
-        thread.join();
-      } catch (InterruptedException e) {
-        if (state == PluginState.STOPPED ||
-            state == PluginState.ERROR) break;
-        log.debug("plugin was woken up");
+      if (keepOnRunning) {
+        keepOnRunning = false;
+      } else {
+        try {
+          state = PluginState.SLEEPING;
+          notifyObserver();
+          thread.join();
+        } catch (InterruptedException e) {
+          if (state == PluginState.STOPPED ||
+              state == PluginState.ERROR) break;
+          log.debug("plugin was woken up");
+        }
       }
       
       if (raiseReload) {
@@ -257,6 +268,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   protected final void wakeUp() {
     if (state == PluginState.SLEEPING) {
       thread.interrupt();
+    } else {
+      keepOnRunning = true;
     }
   }
   
