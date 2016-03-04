@@ -111,6 +111,8 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
    */
   private boolean keepOnRunning = false;
   
+  private boolean stopped = true;
+  
   /**
    * If an uncaught error occured the resulting @Throwable object will be
    * stored in this field.
@@ -226,8 +228,9 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
     notifyObserver();
     onPluginStart();
     
-    while (state != PluginState.STOPPED &&
-           state != PluginState.ERROR) {
+    stopped = false;
+    
+    while (!stopped) {
       if (keepOnRunning) {
         keepOnRunning = false;
       } else {
@@ -236,8 +239,7 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
           notifyObserver();
           thread.join();
         } catch (InterruptedException e) {
-          if (state == PluginState.STOPPED ||
-              state == PluginState.ERROR) break;
+          if (stopped) break;
           log.debug("plugin was woken up");
         }
       }
@@ -258,8 +260,9 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
     }
     
     log.debug("plugin was stopped");
-    onPluginStop();
+    state = PluginState.STOPPED;
     notifyObserver();
+    onPluginStop();
   }
   
   /**
@@ -287,27 +290,23 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   
   
   /**
-   * Sets the {@link Plugin#state} to STOPPED. Can be restarted with
-   * {@link Plugin#start()}. <br>
-   * <b>Be careful:</b> It is not ensured that the plugin actually stops after
-   * the call. For this use {@link PluginManager#stopPlugin()} instead.
+   * Stops the plugin: sets the internal stopped-flag to true. The state of the
+   * plugin ({@link Plugin#state}) is not changed here, this is done when the
+   * plugin has indeed stopped its execution and left its execution loop, see
+   * {@link Plugin#run}. Can be restarted with {@link Plugin#start()}.<br>
+   * <b>Note:</b> It is not ensured that the plugin actually stops after the
+   * call. For this use {@link PluginManager#stopPlugin()} instead.
    */
   protected final synchronized void stop() {
     log.debug("plugin was asked to stop");
     
-    PluginState oldState = state;
-    state = PluginState.STOPPED;
-    
-    if (oldState == PluginState.INITIALIZED) {
-      notifyObserver();
-      
-    } else if (oldState == PluginState.SLEEPING) {
-      thread.interrupt();
-      
-    } else if (oldState == PluginState.ERROR) {
-      if (isAlive()) {
-        thread.interrupt();
-      }
+    if (state == PluginState.INITIALIZED ||
+        state == PluginState.STOPPED ||
+        state == PluginState.ERROR) {
+      log.debug("... but is not running anyways");
+    } else {
+      stopped = true;
+      callRun();
     }
   }
   

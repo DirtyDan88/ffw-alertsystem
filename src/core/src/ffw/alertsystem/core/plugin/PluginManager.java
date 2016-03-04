@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import ffw.alertsystem.core.plugin.Plugin.PluginState;
 import ffw.alertsystem.util.Logger;
 
 
@@ -93,7 +92,7 @@ public abstract class PluginManager<PluginT       extends Plugin<PluginConfigT>,
    * {@link PluginManager#configSource()}.
    */
   public List<PluginConfigT> pluginConfigs() {
-    // since the list is new created we don't need to make it unmodifiable
+    // since the list is newly created we don't need to make it unmodifiable
     return configSource.getPluginConfigs(false);
   }
   
@@ -145,18 +144,16 @@ public abstract class PluginManager<PluginT       extends Plugin<PluginConfigT>,
   }
   
   /**
-   * Stops and restarts the plugin (only if plugin-state is error).
+   * Forces the plugin to stop and restarts it, no matter what state it has.
    * @param instanceName The instanceName of the plugin to restart.
    */
   public final void restart(String instanceName) {
     PluginT plugin = getPluginByName(instanceName);
     
     if (plugin != null) {
-      if (plugin.state() == PluginState.ERROR) {
-        log.info("try to restart plugin: " + plugin.config().getInstanceName());
-        stopPlugin(plugin);
-        plugin.start();
-      }
+      log.info("try to restart plugin: " + plugin.config().getInstanceName());
+      stopPlugin(plugin);
+      plugin.start();
     } else {
       log.warn("could not find plugin " + instanceName);
     }
@@ -217,7 +214,8 @@ public abstract class PluginManager<PluginT       extends Plugin<PluginConfigT>,
     
     while (plugin.isAlive() && tries < 3) {
       tries++;
-      log.warn("try to stop plugin: " + plugin.config().getInstanceName());
+      log.warn("try to stop plugin: " + plugin.config().getInstanceName() +
+               "(state is " + plugin.state() + ")");
       
       plugin.stop();
       plugin.join(2);
