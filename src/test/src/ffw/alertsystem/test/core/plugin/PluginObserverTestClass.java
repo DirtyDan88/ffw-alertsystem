@@ -27,32 +27,37 @@ public class PluginObserverTestClass implements PluginObserver {
   
   @Override
   public void onPluginInitialized(String instanceName) {
-    PluginSystemTest.onObserverInitWasCalled.is = true;
+    _Test_PluginCoreSystem.onObserverInitWasCalled.is = true;
   }
   
   @Override
   public void onPluginStarted(String instanceName) {
-    PluginSystemTest.onObserverStartWasCalled.is = true;
+    _Test_PluginCoreSystem.onObserverStartWasCalled.is = true;
   }
   
   @Override
   public void onPluginGoesSleeping(String instanceName) {
-    PluginSystemTest.onObserverSleepingWasCalled.is = true;
+    _Test_PluginCoreSystem.onObserverSleepingWasCalled.is = true;
   }
   
   @Override
   public void onPluginIsRunning(String instanceName) {
-    PluginSystemTest.onObserverRunningWasCalled.is = true;
+    _Test_PluginCoreSystem.onObserverRunningWasCalled.is = true;
+  }
+  
+  @Override
+  public void onPluginIsReloading(String instanceName) {
+    _Test_PluginCoreSystem.onObserverReloadingWasCalled.is = true;
   }
   
   @Override
   public void onPluginStopped(String instanceName) {
-    PluginSystemTest.onObserverStopWasCalled.is = true;
+    _Test_PluginCoreSystem.onObserverStopWasCalled.is = true;
   }
   
   @Override
   public void onPluginError(String instanceName, Throwable t) {
-    PluginSystemTest.onObserverErrorWasCalled .is = true;
+    _Test_PluginCoreSystem.onObserverErrorWasCalled .is = true;
   }
   
 }

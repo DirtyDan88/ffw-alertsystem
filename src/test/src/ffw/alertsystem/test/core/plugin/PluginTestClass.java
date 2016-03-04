@@ -31,21 +31,22 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   static boolean throwUncaughtException = false;
   
   
+  
   @Override
   protected void onPluginStart() {
-    PluginSystemTest.onPluginStartWasCalled.is = true;
+    _Test_PluginCoreSystem.onPluginStartWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onPluginReload() {
-    PluginSystemTest.onPluginReloadWasCalled.is = true;
+    _Test_PluginCoreSystem.onPluginReloadWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onRun() {
-    PluginSystemTest.onPluginRunWasCalled.is = true;
+    _Test_PluginCoreSystem.onPluginRunWasCalled.is = true;
     simulateWork();
     
     if (throwUncaughtException) {
@@ -56,13 +57,13 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   
   @Override
   protected void onPluginStop() {
-    PluginSystemTest.onPluginStopWasCalled.is = true;
+    _Test_PluginCoreSystem.onPluginStopWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onPluginError(Throwable t) {
-    PluginSystemTest.onPluginErrorWasCalled.is = true;
+    _Test_PluginCoreSystem.onPluginErrorWasCalled.is = true;
     simulateWork();
   }
   
