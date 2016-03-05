@@ -17,47 +17,56 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.test.core.plugin;
+package ffw.alertsystem.test.common;
 
 import ffw.alertsystem.core.plugin.PluginObserver;
+import ffw.alertsystem.test.common._timeout.BooleanRef;
 
 
 
 public class PluginObserverTestClass implements PluginObserver {
   
+  public static BooleanRef initWasCalled      = new BooleanRef();
+  public static BooleanRef startWasCalled     = new BooleanRef();
+  public static BooleanRef sleepingWasCalled  = new BooleanRef();
+  public static BooleanRef runningWasCalled   = new BooleanRef();
+  public static BooleanRef reloadingWasCalled = new BooleanRef();
+  public static BooleanRef stopWasCalled      = new BooleanRef();
+  public static BooleanRef errorWasCalled     = new BooleanRef();
+  
   @Override
   public void onPluginInitialized(String instanceName) {
-    _Test_PluginCoreSystem.onObserverInitWasCalled.is = true;
+    initWasCalled.is = true;
   }
   
   @Override
   public void onPluginStarted(String instanceName) {
-    _Test_PluginCoreSystem.onObserverStartWasCalled.is = true;
+    startWasCalled.is = true;
   }
   
   @Override
   public void onPluginGoesSleeping(String instanceName) {
-    _Test_PluginCoreSystem.onObserverSleepingWasCalled.is = true;
+    sleepingWasCalled.is = true;
   }
   
   @Override
   public void onPluginIsRunning(String instanceName) {
-    _Test_PluginCoreSystem.onObserverRunningWasCalled.is = true;
+    runningWasCalled.is = true;
   }
   
   @Override
   public void onPluginIsReloading(String instanceName) {
-    _Test_PluginCoreSystem.onObserverReloadingWasCalled.is = true;
+    reloadingWasCalled.is = true;
   }
   
   @Override
   public void onPluginStopped(String instanceName) {
-    _Test_PluginCoreSystem.onObserverStopWasCalled.is = true;
+    stopWasCalled.is = true;
   }
   
   @Override
   public void onPluginError(String instanceName, Throwable t) {
-    _Test_PluginCoreSystem.onObserverErrorWasCalled .is = true;
+    errorWasCalled.is = true;
   }
   
 }
