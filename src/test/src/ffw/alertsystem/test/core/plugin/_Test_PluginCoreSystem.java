@@ -21,70 +21,30 @@ package ffw.alertsystem.test.core.plugin;
 
 import static org.junit.Assert.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ffw.alertsystem.core.ApplicationLogger;
-import ffw.alertsystem.core.Application.ApplicationType;
 import ffw.alertsystem.core.plugin.Plugin.PluginState;
+import ffw.alertsystem.test.common.CommonJunitTest;
+import ffw.alertsystem.test.common.PluginObserverTestClass;
+import ffw.alertsystem.test.common._timeout;
 
 
 
-public class _Test_PluginCoreSystem {
+public class _Test_PluginCoreSystem extends CommonJunitTest {
   
-  // flags for the plugin-class itself
-  static BooleanRef onPluginStartWasCalled  = new BooleanRef();
-  static BooleanRef onPluginReloadWasCalled = new BooleanRef();
-  static BooleanRef onPluginRunWasCalled    = new BooleanRef();
-  static BooleanRef onPluginStopWasCalled   = new BooleanRef();
-  static BooleanRef onPluginErrorWasCalled  = new BooleanRef();
-  
-  // flags for the plugin-observer
-  static BooleanRef onObserverInitWasCalled      = new BooleanRef();
-  static BooleanRef onObserverStartWasCalled     = new BooleanRef();
-  static BooleanRef onObserverSleepingWasCalled  = new BooleanRef();
-  static BooleanRef onObserverRunningWasCalled   = new BooleanRef();
-  static BooleanRef onObserverReloadingWasCalled = new BooleanRef();
-  static BooleanRef onObserverStopWasCalled      = new BooleanRef();
-  static BooleanRef onObserverErrorWasCalled     = new BooleanRef();
-  
-  
-  
-  private static ApplicationLogger log;
-  
-  private static Thread loggerThread;
-  
-  @BeforeClass
-  public static void setup() {
-    log = new ApplicationLogger(5, ApplicationType.JUNIT_TESTS, false);
-    
-    loggerThread = new Thread(log);
-    loggerThread.start();
-    
+  static {
     log.info("start junit-tests for plugin-core-system", true);
   }
   
-  @AfterClass
-  public static void cleanup() {
-    log.info("finished junit-tests for plugin-core-system", true);
-    try {
-      log.stop();
-      loggerThread.join();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+  private PluginConfigSourceTestClass cs;
   
-  
-  
-  private PluginConfigSourceTestClass c;
-  
-  private PluginManagerTestClass m;
+  private PluginManagerTestClass pm;
   
   public _Test_PluginCoreSystem() {
-    c = new PluginConfigSourceTestClass();
-    m = new PluginManagerTestClass(c, log);
+    cs = new PluginConfigSourceTestClass();
+    pm = new PluginManagerTestClass(cs, log);
+    
+    pm.addPluginObserver(new PluginObserverTestClass());
   }
   
   
@@ -94,244 +54,244 @@ public class _Test_PluginCoreSystem {
     log.info("++++++++++++++++ running testPluginList ++++++++++++++++", true);
     // expect the plugin-list to be empty before loadAll()-method is called the
     // first time
-    assertTrue(m.plugins().isEmpty());
+    assertTrue(pm.plugins().isEmpty());
     
     // after loading a plugin it is expected that list is still empty, because
     // the loaded plugin is inactive
-    c.loadValidConfig(false);
-    m.loadAll();
-    assertTrue(m.plugins().isEmpty());
+    cs.loadConfig(false);
+    pm.loadAll();
+    assertTrue(pm.plugins().isEmpty());
     
     // set the plugin active -> one plugin in list
-    c.loadValidConfig(true);
-    m.loadAll();
-    assertEquals(1, m.plugins().size());
+    cs.loadConfig(true);
+    pm.loadAll();
+    assertEquals(1, pm.plugins().size());
     
     // load a empty config-list -> no plugins
-    c.loadEmptyList();
-    m.loadAll();
-    assertTrue(m.plugins().isEmpty());
+    cs.loadEmptyList();
+    pm.loadAll();
+    assertTrue(pm.plugins().isEmpty());
   }
   
   @Test
   public void testPluginMethodsWereCalled() {
     log.info("++++++++++ running testPluginMethodsWereCalled ++++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
     // load plugin
-    m.loadAll();
+    pm.loadAll();
     // plugin not started yet -> stop-call should have no effect
-    m.stopAll();
-    assertFalse(onPluginStopWasCalled.is);
+    pm.stopAll();
+    assertFalse(PluginTestClass.stopWasCalled.is);
     
     // start plugin, expect that the plugin's start-method is called
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // plugin was already started, start-method should not be called again
-    assertFalse(onPluginStartWasCalled.is);
-    m.startAll();
-    assertFalse(onPluginStartWasCalled.is);
+    assertFalse(PluginTestClass.startWasCalled.is);
+    pm.startAll();
+    assertFalse(PluginTestClass.startWasCalled.is);
     
     // after reloading the config-source but without any changes it is expected
     // that nothing happens
-    m.loadAll();
-    assertFalse(onPluginReloadWasCalled.is);
+    pm.loadAll();
+    assertFalse(PluginTestClass.reloadWasCalled.is);
     
     // after reloading the config-source with new plugin-properties a
     // reload should be raised
-    c.loadValidConfig(true, "testParamKey", "testParamVal");
-    m.loadAll();
-    _wait(onPluginReloadWasCalled);
+    cs.loadConfig(true, "testParamKey", "testParamVal");
+    pm.loadAll();
+    _timeout.waitfor(PluginTestClass.reloadWasCalled);
     
     // waking the plugin -> run should be called
-    m.wakeUpPlugins();
-    _wait(onPluginRunWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.runWasCalled);
     
     // stop the plugin
-    m.stopAll();
-    _wait(onPluginStopWasCalled);
+    pm.stopAll();
+    _timeout.waitfor(PluginTestClass.stopWasCalled);
     
     // restart after plugin was stopped
-    assertFalse(onPluginStartWasCalled.is);
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    assertFalse(PluginTestClass.startWasCalled.is);
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // throw exception in run-method -> error method should be called
     PluginTestClass.throwUncaughtException = true;
-    m.wakeUpPlugins();
-    _wait(onPluginErrorWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.errorWasCalled);
     
     // and stop again, since we have a plugin-error the stop-method is not
     // called this time
-    assertFalse(onPluginStopWasCalled.is);
-    m.stopAll();
-    assertFalse(onPluginStopWasCalled.is);
+    assertFalse(PluginTestClass.stopWasCalled.is);
+    pm.stopAll();
+    assertFalse(PluginTestClass.stopWasCalled.is);
   }
   
   @Test
   public void testObserverMethodsWereCalled() {
     log.info("+++++++++ running testObserverMethodsWereCalled +++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
     // after loading, the init-method of observers should be called
-    m.loadAll();
-    _wait(onObserverInitWasCalled);
+    pm.loadAll();
+    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
     
     // first start-method
-    m.startAll();
-    _wait(onObserverStartWasCalled);
-    _wait(onObserverSleepingWasCalled);
+    pm.startAll();
+    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
     
     // plugun is not stopped -> no restart
-    assertFalse(onObserverStartWasCalled.is);
-    m.startAll();
-    assertFalse(onObserverStartWasCalled.is);
+    assertFalse(PluginObserverTestClass.startWasCalled.is);
+    pm.startAll();
+    assertFalse(PluginObserverTestClass.startWasCalled.is);
     
     // wake-up plugin should call the run-method
-    assertFalse(onObserverSleepingWasCalled.is);
-    m.wakeUpPlugins();
-    _wait(onObserverRunningWasCalled);
-    _wait(onObserverSleepingWasCalled);
+    assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
     
     // after reloading the config-source but without any changes it is expected
     // that nothing happens
-    m.loadAll();
-    assertFalse(onObserverReloadingWasCalled.is);
+    pm.loadAll();
+    assertFalse(PluginObserverTestClass.reloadingWasCalled.is);
     // after reloading the config-source with new plugin-properties a
     // reload should be raised
-    c.loadValidConfig(true, "testParamKey", "testParamVal");
-    m.loadAll();
-    _wait(onObserverReloadingWasCalled);
+    cs.loadConfig(true, "testParamKey", "testParamVal");
+    pm.loadAll();
+    _timeout.waitfor(PluginObserverTestClass.reloadingWasCalled);
     
     // and stop the plugin
-    m.stopAll();
-    _wait(onObserverStopWasCalled);
+    pm.stopAll();
+    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
     
     // restart
-    m.startAll();
-    _wait(onObserverStartWasCalled);
-    _wait(onObserverSleepingWasCalled);
+    pm.startAll();
+    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
     
     // throw exception in run-method -> error method should be called
     PluginTestClass.throwUncaughtException = true;
-    m.wakeUpPlugins();
-    _wait(onObserverErrorWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
     
     // and stop the plugin
-    m.stopAll();
-    assertFalse(onObserverStopWasCalled.is);
+    pm.stopAll();
+    assertFalse(PluginObserverTestClass.stopWasCalled.is);
   }
   
   @Test
   public void testPluginState() {
     log.info("++++++++++++++++ running testPluginState ++++++++++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
-    m.loadAll();
-    assertEquals(PluginState.INITIALIZED, m.plugins().get(0).state());
+    pm.loadAll();
+    assertEquals(PluginState.INITIALIZED, pm.plugins().get(0).state());
     
     // the STARTED-state is only 'catchable' if we simulate some work in the
     // plugin's start-method, otherwise the plugin goes immediately sleeping
     PluginTestClass.simulateWorkForNextCall = true;
-    m.startAll();
-    _wait(onObserverStartWasCalled);
-    assertEquals(PluginState.STARTED, m.plugins().get(0).state());
-    _wait(onObserverSleepingWasCalled);
-    assertEquals(PluginState.SLEEPING, m.plugins().get(0).state());
+    pm.startAll();
+    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    assertEquals(PluginState.STARTED, pm.plugins().get(0).state());
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // the RUNNING-state is only 'catchable' if we simulate some work in the
     // plugin's run-method, otherwise the plugin goes immediately sleeping
     PluginTestClass.simulateWorkForNextCall = true;
-    assertFalse(onObserverSleepingWasCalled.is);
-    m.wakeUpPlugins();
-    _wait(onObserverRunningWasCalled);
-    assertEquals(PluginState.RUNNING, m.plugins().get(0).state());
-    _wait(onObserverSleepingWasCalled);
-    assertEquals(PluginState.SLEEPING, m.plugins().get(0).state());
+    assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
+    assertEquals(PluginState.RUNNING, pm.plugins().get(0).state());
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // reload; simulate some work in the reload-method so that the RELOADING-
     // state is 'catchable' for the test
     PluginTestClass.simulateWorkForNextCall = true;
-    c.loadValidConfig(true, "testParamKey", "testParamVal");
-    m.loadAll();
-    _wait(onObserverReloadingWasCalled);
-    assertEquals(PluginState.RELOADING, m.plugins().get(0).state());
+    cs.loadConfig(true, "testParamKey", "testParamVal");
+    pm.loadAll();
+    _timeout.waitfor(PluginObserverTestClass.reloadingWasCalled);
+    assertEquals(PluginState.RELOADING, pm.plugins().get(0).state());
     
     // stop plugin
-    m.stopAll();
-    _wait(onObserverStopWasCalled);
-    assertEquals(PluginState.STOPPED, m.plugins().get(0).state());
+    pm.stopAll();
+    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    assertEquals(PluginState.STOPPED, pm.plugins().get(0).state());
     
     // restart plugin (without simulating work this time)
-    assertFalse(onObserverSleepingWasCalled.is);
-    m.startAll();
-    _wait(onObserverSleepingWasCalled);
-    assertEquals(PluginState.SLEEPING, m.plugins().get(0).state());
+    assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
+    pm.startAll();
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // throw exception in run-method -> state should be ERROR
     PluginTestClass.throwUncaughtException = true;
-    m.wakeUpPlugins();
-    _wait(onObserverErrorWasCalled);
-    assertEquals(PluginState.ERROR, m.plugins().get(0).state());
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    assertEquals(PluginState.ERROR, pm.plugins().get(0).state());
     
     // stop the plugin, because of the error the stop method is not called, also
     // the state of the plugin stays in ERROR
-    m.stopAll();
-    assertEquals(PluginState.ERROR, m.plugins().get(0).state());
+    pm.stopAll();
+    assertEquals(PluginState.ERROR, pm.plugins().get(0).state());
     
     // to 'properly' stop the plugin resp. to set the plugin from ERROR to
     // STOPPED -> restart and then stop
-    m.startAll();
-    _wait(onObserverSleepingWasCalled);
-    m.stopAll();
-    assertEquals(PluginState.STOPPED, m.plugins().get(0).state());
+    pm.startAll();
+    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    pm.stopAll();
+    assertEquals(PluginState.STOPPED, pm.plugins().get(0).state());
   }
   
   @Test
   public void testKillPlugin() {
     log.info("++++++++++++++++ running testKillPlugin ++++++++++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
-    m.loadAll();
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    pm.loadAll();
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // simulate some huge workload in run-method
     PluginTestClass.simulateWorkForNextCall = true;
     PluginTestClass.simulateWorkDuration = 100;
-    m.wakeUpPlugins();
-    _wait(onPluginRunWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.runWasCalled);
     
     // now stop, plugin is still running -> framework should first try to stop
     // and then kill it
-    m.stopAll();
-    assertFalse(onPluginStopWasCalled.is);
+    pm.stopAll();
+    assertFalse(PluginTestClass.stopWasCalled.is);
   }
   
   @Test
   public void testWakeUp() {
     log.info("++++++++++++++++++ running testWakeUp ++++++++++++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
-    m.loadAll();
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    pm.loadAll();
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // wake and run with some workload
     PluginTestClass.simulateWorkForNextCall = true;
     PluginTestClass.simulateWorkDuration = 3;
-    m.wakeUpPlugins();
-    _wait(onPluginRunWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.runWasCalled);
     
     // wake again, plugin is still in run-method
-    m.wakeUpPlugins();
-    _wait(onPluginRunWasCalled);
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.runWasCalled);
     
     // log-output for this test should contain:
     //   >> plugin was woken up
@@ -343,77 +303,87 @@ public class _Test_PluginCoreSystem {
   @Test
   public void testPluginRestart() {
     log.info("+++++++++++++++ running testPluginRestart ++++++++++++++", true);
-    resetAll();
-    c.loadValidConfig(true);
+    resetAllFlags();
+    cs.loadConfig(true);
     
-    m.loadAll();
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    pm.loadAll();
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // force restart
-    m.restart(m.plugins().get(0).config().getInstanceName());
-    _wait(onPluginStopWasCalled);
-    _wait(onPluginStartWasCalled);
+    pm.restart(pm.plugins().get(0).config().getInstanceName());
+    _timeout.waitfor(PluginTestClass.stopWasCalled);
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // throw exception in run-method
     PluginTestClass.throwUncaughtException = true;
-    m.wakeUpPlugins();
-    _wait(onPluginErrorWasCalled);
-    assertFalse(onPluginStopWasCalled.is);
-    assertEquals(PluginState.ERROR, m.plugins().get(0).state());
+    pm.wakeUpPlugins();
+    _timeout.waitfor(PluginTestClass.errorWasCalled);
+    assertFalse(PluginTestClass.stopWasCalled.is);
+    assertEquals(PluginState.ERROR, pm.plugins().get(0).state());
     
     // restart: this works because the plugin is in ERROR state
-    m.startAll();
-    _wait(onPluginStartWasCalled);
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
     
     // and stop
-    m.stopAll();
-    _wait(onPluginStopWasCalled);
+    pm.stopAll();
+    _timeout.waitfor(PluginTestClass.stopWasCalled);
+  }
+  
+  @Test
+  public void testGetParam() {
+    log.info("+++++++++++++++ running testGetParam ++++++++++++++", true);
+    resetAllFlags();
+    
+    cs.loadConfig(true, "testParamName", "testParamValue");
+    pm.loadAll();
+    
+    // param should be available before start
+    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
+    assertEquals(
+      "testParamValue",
+      pm.plugins().get(0).config().paramList().get("testParamName")
+    );
+    
+    // and of course after start
+    pm.startAll();
+    _timeout.waitfor(PluginTestClass.startWasCalled);
+    assertEquals(
+      "testParamValue",
+      pm.plugins().get(0).config().paramList().get("testParamName")
+    );
+    assertNotEquals(
+      "someOtherValue",
+      pm.plugins().get(0).config().paramList().get("testParamName")
+    );
+    
+    // param should change when config was changed
+    cs.loadConfig(true, "testParamName", "testParamValue-CHANGED");
+    pm.loadAll();
+    _timeout.waitfor(PluginTestClass.reloadWasCalled);
+    assertEquals(
+      "testParamValue-CHANGED",
+      pm.plugins().get(0).config().paramList().get("testParamName")
+    );
   }
   
   
   
-  private void _wait(BooleanRef flag) {
-    // wait max. 12*250ms = 3s before timeout
-    int timeout = 12;
+  private void resetAllFlags() {
+    PluginTestClass.startWasCalled .is = false;
+    PluginTestClass.reloadWasCalled.is = false;
+    PluginTestClass.runWasCalled   .is = false;
+    PluginTestClass.stopWasCalled  .is = false;
+    PluginTestClass.errorWasCalled .is = false;
     
-    try {
-      while (!flag.is && timeout > 0) {
-        timeout--;
-        Thread.sleep(250);
-      }
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    
-    // reset flag for next test
-    flag.is = false;
-    
-    if (timeout == 0) {
-      fail("Timeout when waiting for flag");
-    }
-  }
-  
-  // since both, the primitive boolean type and the Boolean wrapper class, are
-  // not offering pass-by-reference, we have to implement our own wrapper.
-  static class BooleanRef {
-    boolean is = false;
-  }
-  
-  private void resetAll() {
-    onPluginStartWasCalled .is = false;
-    onPluginReloadWasCalled.is = false;
-    onPluginRunWasCalled   .is = false;
-    onPluginStopWasCalled  .is = false;
-    onPluginErrorWasCalled. is = false;
-    
-    onObserverInitWasCalled     .is = false;
-    onObserverStartWasCalled    .is = false;
-    onObserverSleepingWasCalled .is = false;
-    onObserverRunningWasCalled  .is = false;
-    onObserverReloadingWasCalled.is = false;
-    onObserverStopWasCalled     .is = false;
-    onObserverErrorWasCalled    .is = false;
+    PluginObserverTestClass.initWasCalled     .is = false;
+    PluginObserverTestClass.startWasCalled    .is = false;
+    PluginObserverTestClass.sleepingWasCalled .is = false;
+    PluginObserverTestClass.runningWasCalled  .is = false;
+    PluginObserverTestClass.reloadingWasCalled.is = false;
+    PluginObserverTestClass.stopWasCalled     .is = false;
+    PluginObserverTestClass.errorWasCalled    .is = false;
   }
   
 }

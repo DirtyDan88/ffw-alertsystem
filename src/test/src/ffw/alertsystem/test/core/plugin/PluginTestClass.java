@@ -20,6 +20,7 @@
 package ffw.alertsystem.test.core.plugin;
 
 import ffw.alertsystem.core.plugin.Plugin;
+import ffw.alertsystem.test.common._timeout.BooleanRef;
 
 
 
@@ -27,26 +28,29 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   
   static boolean simulateWorkForNextCall = false;
   static int     simulateWorkDuration    = 1;
+  static boolean throwUncaughtException  = false;
   
-  static boolean throwUncaughtException = false;
-  
-  
+  static BooleanRef startWasCalled  = new BooleanRef();
+  static BooleanRef reloadWasCalled = new BooleanRef();
+  static BooleanRef runWasCalled    = new BooleanRef();
+  static BooleanRef stopWasCalled   = new BooleanRef();
+  static BooleanRef errorWasCalled  = new BooleanRef();
   
   @Override
   protected void onPluginStart() {
-    _Test_PluginCoreSystem.onPluginStartWasCalled.is = true;
+    startWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onPluginReload() {
-    _Test_PluginCoreSystem.onPluginReloadWasCalled.is = true;
+    reloadWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onRun() {
-    _Test_PluginCoreSystem.onPluginRunWasCalled.is = true;
+    runWasCalled.is = true;
     simulateWork();
     
     if (throwUncaughtException) {
@@ -57,17 +61,15 @@ public class PluginTestClass extends Plugin<PluginConfigTestClass> {
   
   @Override
   protected void onPluginStop() {
-    _Test_PluginCoreSystem.onPluginStopWasCalled.is = true;
+    stopWasCalled.is = true;
     simulateWork();
   }
   
   @Override
   protected void onPluginError(Throwable t) {
-    _Test_PluginCoreSystem.onPluginErrorWasCalled.is = true;
+    errorWasCalled.is = true;
     simulateWork();
   }
-  
-  
   
   public void wakeMeUp() {
     callRun();

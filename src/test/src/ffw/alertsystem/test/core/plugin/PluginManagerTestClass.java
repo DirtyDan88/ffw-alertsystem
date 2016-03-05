@@ -29,10 +29,7 @@ public class PluginManagerTestClass extends PluginManager<PluginTestClass,
   
   public PluginManagerTestClass(PluginConfigSourceTestClass c, Logger log) {
     super(c, log);
-    addPluginObserver(new PluginObserverTestClass());
   }
-  
-  
   
   @Override
   protected PluginTestClass newInstance(PluginConfigTestClass config) {

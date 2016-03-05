@@ -19,81 +19,42 @@
 
 package ffw.alertsystem.test.core.plugin;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import ffw.alertsystem.core.plugin.PluginConfig;
 import ffw.alertsystem.core.plugin.PluginConfigSource;
+import ffw.alertsystem.plugins.test.config.PluginConfigGenerator;
 
 
 
 public class PluginConfigSourceTestClass implements
                                     PluginConfigSource<PluginConfigTestClass> {
-
-  protected List<PluginConfigTestClass> configs;
   
-  public PluginConfigSourceTestClass() {}
+  private List<PluginConfigTestClass> configs = new LinkedList<>();
   
   
   
-  protected void loadValidConfig(boolean active) {
-    loadValidConfig(active, "", "");
+  void loadConfig(boolean active) {
+    loadConfig(active, "", "");
   }
   
-  protected void loadValidConfig(boolean active, String paramKey,
-                                                 String paramVal) {
-    Map<String, String> params = new HashMap<>();
-    params.put(paramKey, paramVal);
+  void loadConfig(boolean isActive, String paramKey, String paramVal) {
+    Map<String, String> paramList = new HashMap<>();
+    paramList.put(paramKey, paramVal);
     
-    PluginConfigTestClass c1 = createPluginConfig(
-                                 "TestPlugin-1", active,
-                                 params
-                               );
-    
-    configs = new ArrayList<>();
-    configs.add(c1);
-  }
-  
-  protected void loadEmptyList() {
-    configs = new ArrayList<>();
-  }
-  
-  
-  
-  private PluginConfigTestClass createPluginConfig(String instanceName,
-                                                   boolean active,
-                                                   Map<String, String> params) {
     PluginConfigTestClass config = new PluginConfigTestClass();
+    PluginConfigGenerator.fill(
+      "ffw.alertsystem.test.core.plugin", "PluginTestClass",
+      "JUNIT_TEST_PLUGIN", isActive, paramList, config
+    );
     
-    try {
-      Method method;
-      
-      method = PluginConfig.class.getDeclaredMethod(
-                 "setInstanceName", String.class
-               );
-      method.setAccessible(true);
-      method.invoke(config, instanceName);
-      
-      method = PluginConfig.class.getDeclaredMethod(
-                 "setActive", boolean.class
-               );
-      method.setAccessible(true);
-      method.invoke(config, active);
-      
-      method = PluginConfig.class.getDeclaredMethod(
-                 "setParamList", Map.class
-               );
-      method.setAccessible(true);
-      method.invoke(config, params);
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    return config;
+    configs.add(config);
+  }
+  
+  void loadEmptyList() {
+    configs = new LinkedList<>();
   }
   
   
