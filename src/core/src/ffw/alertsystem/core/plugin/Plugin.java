@@ -223,12 +223,12 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
    */
   @Override
   public final void run() {
+    stopped = false;
+    
     log.debug("plugin was started");
     state = PluginState.STARTED;
     notifyObserver();
     onPluginStart();
-    
-    stopped = false;
     
     while (!stopped) {
       if (keepOnRunning) {
