@@ -87,12 +87,15 @@ public class DateAndTime {
     return date;
   }
   
-  public static String getTime() {
-    Date now = new java.util.Date();
-    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
-    String time = sdfTime.format(now);
+  public static String getTime(long time) {
+    Date date = new java.util.Date(time);
     
-    return time;
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+    return sdfTime.format(date);
+  }
+  
+  public static String getTime() {
+    return getTime(System.currentTimeMillis());
   }
   
   public static String getYearAndMonthName() {

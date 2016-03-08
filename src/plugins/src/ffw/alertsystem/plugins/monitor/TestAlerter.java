@@ -40,9 +40,13 @@ public class TestAlerter extends MonitorPlugin {
     t.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        if (state() == PluginState.STOPPED ||
+        if (state() == PluginState.INITIALIZED ||
+            state() == PluginState.STOPPED ||
             state() == PluginState.ERROR) {
+          log.info("canceled test-alert timer", true);
           t.cancel();
+          t.purge();
+          return;
         }
         
         String time = config().paramList().get("time");
