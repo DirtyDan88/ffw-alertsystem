@@ -26,7 +26,7 @@ import org.junit.Test;
 import ffw.alertsystem.core.plugin.Plugin.PluginState;
 import ffw.alertsystem.test.common.CommonJunitTest;
 import ffw.alertsystem.test.common.PluginObserverTestClass;
-import ffw.alertsystem.test.common._timeout;
+import ffw.alertsystem.test.common._waitfor;
 
 
 
@@ -87,7 +87,7 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     // start plugin, expect that the plugin's start-method is called
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // plugin was already started, start-method should not be called again
     assertFalse(PluginTestClass.startWasCalled.is);
@@ -103,25 +103,25 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // reload should be raised
     cs.loadConfig(true, "testParamKey", "testParamVal");
     pm.loadAll();
-    _timeout.waitfor(PluginTestClass.reloadWasCalled);
+    _waitfor.timeout(PluginTestClass.reloadWasCalled);
     
     // waking the plugin -> run should be called
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.runWasCalled);
+    _waitfor.timeout(PluginTestClass.runWasCalled);
     
     // stop the plugin
     pm.stopAll();
-    _timeout.waitfor(PluginTestClass.stopWasCalled);
+    _waitfor.timeout(PluginTestClass.stopWasCalled);
     
     // restart after plugin was stopped
     assertFalse(PluginTestClass.startWasCalled.is);
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // throw exception in run-method -> error method should be called
     PluginTestClass.throwUncaughtException = true;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.errorWasCalled);
+    _waitfor.timeout(PluginTestClass.errorWasCalled);
     
     // and stop again, since we have a plugin-error the stop-method is not
     // called this time
@@ -138,12 +138,12 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     // after loading, the init-method of observers should be called
     pm.loadAll();
-    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.initWasCalled);
     
     // first start-method
     pm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     
     // plugun is not stopped -> no restart
     assertFalse(PluginObserverTestClass.startWasCalled.is);
@@ -153,8 +153,8 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // wake-up plugin should call the run-method
     assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.runningWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     
     // after reloading the config-source but without any changes it is expected
     // that nothing happens
@@ -164,21 +164,21 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // reload should be raised
     cs.loadConfig(true, "testParamKey", "testParamVal");
     pm.loadAll();
-    _timeout.waitfor(PluginObserverTestClass.reloadingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.reloadingWasCalled);
     
     // and stop the plugin
     pm.stopAll();
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
     
     // restart
     pm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     
     // throw exception in run-method -> error method should be called
     PluginTestClass.throwUncaughtException = true;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.errorWasCalled);
     
     // and stop the plugin
     pm.stopAll();
@@ -198,9 +198,9 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // plugin's start-method, otherwise the plugin goes immediately sleeping
     PluginTestClass.simulateWorkForNextCall = true;
     pm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
     assertEquals(PluginState.STARTED, pm.plugins().get(0).state());
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // the RUNNING-state is only 'catchable' if we simulate some work in the
@@ -208,9 +208,9 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     PluginTestClass.simulateWorkForNextCall = true;
     assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.runningWasCalled);
     assertEquals(PluginState.RUNNING, pm.plugins().get(0).state());
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // reload; simulate some work in the reload-method so that the RELOADING-
@@ -218,24 +218,24 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     PluginTestClass.simulateWorkForNextCall = true;
     cs.loadConfig(true, "testParamKey", "testParamVal");
     pm.loadAll();
-    _timeout.waitfor(PluginObserverTestClass.reloadingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.reloadingWasCalled);
     assertEquals(PluginState.RELOADING, pm.plugins().get(0).state());
     
     // stop plugin
     pm.stopAll();
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
     assertEquals(PluginState.STOPPED, pm.plugins().get(0).state());
     
     // restart plugin (without simulating work this time)
     assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
     pm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     assertEquals(PluginState.SLEEPING, pm.plugins().get(0).state());
     
     // throw exception in run-method -> state should be ERROR
     PluginTestClass.throwUncaughtException = true;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.errorWasCalled);
     assertEquals(PluginState.ERROR, pm.plugins().get(0).state());
     
     // stop the plugin, because of the error the stop method is not called, also
@@ -246,7 +246,7 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // to 'properly' stop the plugin resp. to set the plugin from ERROR to
     // STOPPED -> restart and then stop
     pm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     pm.stopAll();
     assertEquals(PluginState.STOPPED, pm.plugins().get(0).state());
   }
@@ -259,13 +259,13 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     pm.loadAll();
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // simulate some huge workload in run-method
     PluginTestClass.simulateWorkForNextCall = true;
     PluginTestClass.simulateWorkDuration = 100;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.runWasCalled);
+    _waitfor.timeout(PluginTestClass.runWasCalled);
     
     // now stop, plugin is still running -> framework should first try to stop
     // and then kill it
@@ -281,17 +281,17 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     pm.loadAll();
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // wake and run with some workload
     PluginTestClass.simulateWorkForNextCall = true;
     PluginTestClass.simulateWorkDuration = 3;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.runWasCalled);
+    _waitfor.timeout(PluginTestClass.runWasCalled);
     
     // wake again, plugin is still in run-method
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.runWasCalled);
+    _waitfor.timeout(PluginTestClass.runWasCalled);
     
     // log-output for this test should contain:
     //   >> plugin was woken up
@@ -308,27 +308,27 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     pm.loadAll();
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // force restart
     pm.restart(pm.plugins().get(0).config().getInstanceName());
-    _timeout.waitfor(PluginTestClass.stopWasCalled);
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.stopWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // throw exception in run-method
     PluginTestClass.throwUncaughtException = true;
     pm.wakeUpPlugins();
-    _timeout.waitfor(PluginTestClass.errorWasCalled);
+    _waitfor.timeout(PluginTestClass.errorWasCalled);
     assertFalse(PluginTestClass.stopWasCalled.is);
     assertEquals(PluginState.ERROR, pm.plugins().get(0).state());
     
     // restart: this works because the plugin is in ERROR state
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     
     // and stop
     pm.stopAll();
-    _timeout.waitfor(PluginTestClass.stopWasCalled);
+    _waitfor.timeout(PluginTestClass.stopWasCalled);
   }
   
   @Test
@@ -340,7 +340,7 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     pm.loadAll();
     
     // param should be available before start
-    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.initWasCalled);
     assertEquals(
       "testParamValue",
       pm.plugins().get(0).config().paramList().get("testParamName")
@@ -348,7 +348,7 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     
     // and of course after start
     pm.startAll();
-    _timeout.waitfor(PluginTestClass.startWasCalled);
+    _waitfor.timeout(PluginTestClass.startWasCalled);
     assertEquals(
       "testParamValue",
       pm.plugins().get(0).config().paramList().get("testParamName")
@@ -361,7 +361,7 @@ public class _Test_PluginCoreSystem extends CommonJunitTest {
     // param should change when config was changed
     cs.loadConfig(true, "testParamName", "testParamValue-CHANGED");
     pm.loadAll();
-    _timeout.waitfor(PluginTestClass.reloadWasCalled);
+    _waitfor.timeout(PluginTestClass.reloadWasCalled);
     assertEquals(
       "testParamValue-CHANGED",
       pm.plugins().get(0).config().paramList().get("testParamName")

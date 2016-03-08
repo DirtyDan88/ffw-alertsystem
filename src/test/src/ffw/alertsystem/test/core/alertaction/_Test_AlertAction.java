@@ -30,7 +30,7 @@ import ffw.alertsystem.plugins.test.AlertActionTestManager;
 import ffw.alertsystem.plugins.test.config.AlertActionConfigGenerator;
 import ffw.alertsystem.test.common.CommonJunitTest;
 import ffw.alertsystem.test.common.PluginObserverTestClass;
-import ffw.alertsystem.test.common._timeout;
+import ffw.alertsystem.test.common._waitfor;
 
 
 
@@ -85,9 +85,9 @@ public class _Test_AlertAction extends CommonJunitTest {
       assertFalse(AlertActionTestClass.executeWasCalled.is);
       
       aam.startAll(null);
-      _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-      _timeout.waitfor(AlertActionTestClass.executeWasCalled);
-      _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+      _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+      _waitfor.timeout(AlertActionTestClass.executeWasCalled);
+      _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
       
       assertEquals(PluginState.STOPPED, aam.plugins().get(0).state());
     }
@@ -101,18 +101,18 @@ public class _Test_AlertAction extends CommonJunitTest {
     aam.loadAll();
     
     // after load, init should be called
-    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.initWasCalled);
     
     // start the action
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
     // action stops after its execution
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
     
     // start again, this time with error during execution
     AlertActionTestClass.throwUncaughtException = true;
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.errorWasCalled);
     
     // action can never have one of the following states, hence observer-methods
     // will never be called
@@ -135,12 +135,12 @@ public class _Test_AlertAction extends CommonJunitTest {
     // plugin's start-method, otherwise the plugin goes immediately sleeping
     AlertActionTestClass.simulateWorkForNextCall = true;
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
     assertEquals(PluginState.STARTED, aam.plugins().get(0).state());
     
     // alert-actions skip the plugin-execution loop and stop immediately after
     // the start-method
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
     assertEquals(PluginState.STOPPED, aam.plugins().get(0).state());
   }
   
@@ -154,15 +154,15 @@ public class _Test_AlertAction extends CommonJunitTest {
     // start and throw exception
     AlertActionTestClass.throwUncaughtException = true;
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(AlertActionTestClass.executeWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(AlertActionTestClass.executeWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.errorWasCalled);
     
     // restart, expect normal execution
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(AlertActionTestClass.executeWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(AlertActionTestClass.executeWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
   }
   
   @Test
@@ -176,8 +176,8 @@ public class _Test_AlertAction extends CommonJunitTest {
     AlertActionTestClass.simulateWorkForNextCall = true;
     AlertActionTestClass.simulateWorkDuration = 10;
     aam.startAll(null);
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(AlertActionTestClass.executeWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(AlertActionTestClass.executeWasCalled);
 
     // TODO: Atm nothing happens in this situation, the action cannot be started
     // again because it has the STARTED and ignores the message. Is this the

@@ -21,7 +21,7 @@ package ffw.alertsystem.test.core.monitor;
 
 import ffw.alertsystem.core.message.Message;
 import ffw.alertsystem.core.monitor.MonitorPlugin;
-import ffw.alertsystem.test.common._timeout.BooleanRef;
+import ffw.alertsystem.test.common._waitfor.BooleanRef;
 
 
 

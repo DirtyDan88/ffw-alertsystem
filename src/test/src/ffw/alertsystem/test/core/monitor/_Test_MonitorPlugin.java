@@ -31,7 +31,7 @@ import ffw.alertsystem.plugins.test.config.MonitorPluginConfigGenerator;
 import ffw.alertsystem.test.common.CommonJunitTest;
 import ffw.alertsystem.test.common.MessageTestClass;
 import ffw.alertsystem.test.common.PluginObserverTestClass;
-import ffw.alertsystem.test.common._timeout;
+import ffw.alertsystem.test.common._waitfor;
 
 
 
@@ -71,20 +71,20 @@ public class _Test_MonitorPlugin extends CommonJunitTest {
       assertFalse(MonitorPluginTestClass.stopWasCalled.is);
       
       mpm.startAll();
-      _timeout.waitfor(MonitorPluginTestClass.startWasCalled);
-      _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+      _waitfor.timeout(MonitorPluginTestClass.startWasCalled);
+      _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
       
       for (int j = 0; j < 3; ++j) {
         assertFalse(MonitorPluginTestClass.recvMessageWasCalled.is);
         assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
         
         mpm.receivedMessage(new MessageTestClass());
-        _timeout.waitfor(MonitorPluginTestClass.recvMessageWasCalled);
-        _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+        _waitfor.timeout(MonitorPluginTestClass.recvMessageWasCalled);
+        _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
       }
       
       mpm.stopAll();
-      _timeout.waitfor(MonitorPluginTestClass.stopWasCalled);
+      _waitfor.timeout(MonitorPluginTestClass.stopWasCalled);
     }
     
     assertEquals(PluginState.STOPPED, mpm.plugins().get(0).state());
@@ -97,27 +97,27 @@ public class _Test_MonitorPlugin extends CommonJunitTest {
     loadDefaultMonitorPlugin();
     
     mpm.loadAll();
-    _timeout.waitfor(PluginObserverTestClass.initWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.initWasCalled);
     
     mpm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     
     mpm.receivedMessage(new MessageTestClass());
-    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.runningWasCalled);
     
     // TODO: reloadingWasCalled
     
     mpm.stopAll();
-    _timeout.waitfor(PluginObserverTestClass.stopWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.stopWasCalled);
     
     // start again
     mpm.startAll();
-    _timeout.waitfor(PluginObserverTestClass.startWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.startWasCalled);
     MonitorPluginTestClass.throwUncaughtException = true;
     mpm.receivedMessage(new MessageTestClass());
-    _timeout.waitfor(PluginObserverTestClass.runningWasCalled);
-    _timeout.waitfor(PluginObserverTestClass.errorWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.runningWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.errorWasCalled);
     assertFalse(PluginObserverTestClass.stopWasCalled.is);
   }
   
@@ -135,7 +135,7 @@ public class _Test_MonitorPlugin extends CommonJunitTest {
     // plugin's start-method, otherwise the plugin goes immediately sleeping
     MonitorPluginTestClass.simulateWorkForNextCall = true;
     mpm.startAll();
-    _timeout.waitfor(MonitorPluginTestClass.startWasCalled);
+    _waitfor.timeout(MonitorPluginTestClass.startWasCalled);
     assertEquals(PluginState.STARTED, mpm.plugins().get(0).state());
     
     // simulate some work to catch RUNNING-state and insert two message in the
@@ -143,14 +143,14 @@ public class _Test_MonitorPlugin extends CommonJunitTest {
     MonitorPluginTestClass.simulateWorkForNextCall = true;
     mpm.receivedMessage(new MessageTestClass());
     mpm.receivedMessage(new MessageTestClass());
-    _timeout.waitfor(MonitorPluginTestClass.recvMessageWasCalled);
+    _waitfor.timeout(MonitorPluginTestClass.recvMessageWasCalled);
     assertEquals(PluginState.RUNNING, mpm.plugins().get(0).state());
     // after processing the first message, the plugin should not go back
     // sleeping but processing the next message in the queue
     assertFalse(PluginObserverTestClass.sleepingWasCalled.is);
-    _timeout.waitfor(MonitorPluginTestClass.recvMessageWasCalled);
+    _waitfor.timeout(MonitorPluginTestClass.recvMessageWasCalled);
     // after processing every message in the queue -> sleeping
-    _timeout.waitfor(PluginObserverTestClass.sleepingWasCalled);
+    _waitfor.timeout(PluginObserverTestClass.sleepingWasCalled);
     assertEquals(PluginState.SLEEPING, mpm.plugins().get(0).state());
     
     // and stop

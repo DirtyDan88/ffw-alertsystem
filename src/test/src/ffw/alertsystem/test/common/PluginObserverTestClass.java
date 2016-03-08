@@ -20,7 +20,7 @@
 package ffw.alertsystem.test.common;
 
 import ffw.alertsystem.core.plugin.PluginObserver;
-import ffw.alertsystem.test.common._timeout.BooleanRef;
+import ffw.alertsystem.test.common._waitfor.BooleanRef;
 
 
 

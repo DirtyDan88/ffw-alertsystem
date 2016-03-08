@@ -21,13 +21,18 @@ package ffw.alertsystem.test.common;
 
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import ffw.alertsystem.util.Logger;
 
 
-public class _timeout {
+
+public class _waitfor {
   
-  public static void waitfor(BooleanRef flag) {
-    // wait max. 12*250ms = 3s before timeout
-    int timeout = 12;
+  public static void timeout(BooleanRef flag, int time) {
+    int timeout = (time*1000) / 250;
     
     try {
       while (!flag.is && timeout > 0) {
@@ -46,10 +51,40 @@ public class _timeout {
     }
   }
   
+  public static void timeout(BooleanRef flag) {
+    timeout(flag, 3);
+  }
+  
   // since both, the primitive boolean type and the Boolean wrapper class, are
   // not offering pass-by-reference, we have to implement our own wrapper.
   public static class BooleanRef {
     public boolean is = false;
+  }
+  
+  
+  
+  public static void user(Logger log) {
+    BufferedReader cin = new BufferedReader(
+      new InputStreamReader(System.in)
+    );
+    
+    log.info("Press enter to continue execution", true);
+    
+    try {
+      cin.read();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  
+  
+  public static void countdown(int sec) {
+    try {
+      Thread.sleep(sec * 1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
   
 }
