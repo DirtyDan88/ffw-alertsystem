@@ -24,6 +24,9 @@ LOCATION=$(dirname "$(readlink -e "$0")")
 CLASSPATH="$LOCATION/../3rdparty/jcommander-1.48.jar"
 CLASSPATH=$CLASSPATH":$LOCATION/../3rdparty/javax.mail.jar"
 CLASSPATH=$CLASSPATH":$LOCATION/../3rdparty/jetty/*"
+CLASSPATH=$CLASSPATH":$LOCATION/../3rdparty/mqtt-client-0.4.0.jar"
+CLASSPATH=$CLASSPATH":$LOCATION/../3rdparty/bcpkix-jdk15on-154.jar"
+CLASSPATH=$CLASSPATH":$LOCATION/../3rdparty/bcprov-jdk15on-154.jar"
 
 JAVASRC="$LOCATION/src/ffw/alertsystem/core/*.java
          $LOCATION/src/ffw/alertsystem/core/receiver/*.java
@@ -32,7 +35,8 @@ JAVASRC="$LOCATION/src/ffw/alertsystem/core/*.java
          $LOCATION/../util/src/ffw/alertsystem/util/JettyWebSocket.java
          $LOCATION/../util/src/ffw/alertsystem/util/JettyLogger.java
          $LOCATION/../util/src/ffw/alertsystem/util/DateAndTime.java
-         $LOCATION/../util/src/ffw/alertsystem/util/XMLFile.java"
+         $LOCATION/../util/src/ffw/alertsystem/util/XMLFile.java
+         $LOCATION/../util/src/ffw/alertsystem/util/SSLContextCreator.java"
 
 BUILDFILE="$LOCATION/build-receiver.xml"
 

@@ -32,12 +32,17 @@
           <xs:sequence>
             <!-- local port -->
             <xs:element name="receiver-port" type="xs:int"/>
-            <!-- public server port -->
-            <xs:element name="server-port" type="xs:int"/>
-            <xs:element name="server-keystore" type="xs:string"/>
-            <xs:element name="server-keystore-password" type="xs:string"/>
-            <xs:element name="server-keymanager-password" type="xs:string"/>
-            <xs:element name="websocket-timeout" type="xs:int"/>
+            <!-- publisher class -->
+            <xs:element name="publisher-package" type="xs:string"/>
+            <xs:element name="publisher-class" type="xs:string"/>
+            <!-- publisher params -->
+            <xs:element name="publisher-params">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>

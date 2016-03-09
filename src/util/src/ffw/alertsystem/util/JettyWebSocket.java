@@ -82,11 +82,11 @@ public abstract class JettyWebSocket {
   
   
   
-  protected static void sendAll(List<JettyWebSocket> sockets, String txt) {
+  public static void sendAll(List<JettyWebSocket> sockets, String txt) {
     sendAll(sockets, txt, false);
   }
   
-  protected static void sendAll(List<JettyWebSocket> sockets, String txt,
+  public static void sendAll(List<JettyWebSocket> sockets, String txt,
                                 boolean withLog) {
     List<JettyWebSocket> invalidSockets = new ArrayList<>();
     

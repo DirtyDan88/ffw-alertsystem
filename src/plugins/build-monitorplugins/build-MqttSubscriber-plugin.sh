@@ -22,14 +22,14 @@
 LOCATION=$(dirname "$(readlink -e "$0")")
 
 CLASSPATH="build/ffw-alertsystem-monitor.jar"
-CLASSPATH=$CLASSPATH":$LOCATION/../../3rdparty/jetty/*"
+CLASSPATH=$CLASSPATH":$LOCATION/../../3rdparty/mqtt-client-0.4.0.jar"
+CLASSPATH=$CLASSPATH":$LOCATION/../../3rdparty/bcpkix-jdk15on-154.jar"
+CLASSPATH=$CLASSPATH":$LOCATION/../../3rdparty/bcprov-jdk15on-154.jar"
 
-JAVASRC="$LOCATION/../src/ffw/alertsystem/plugins/monitor/MessageListener.java
-         $LOCATION/../../core/src/ffw/alertsystem/core/receiver/WebSocketPublisher.java
-         $LOCATION/../../util/src/ffw/alertsystem/util/JettyLogger.java
-         $LOCATION/../../util/src/ffw/alertsystem/util/JettyWebSocket.java"
+JAVASRC="$LOCATION/../src/ffw/alertsystem/plugins/monitor/MqttSubscriber.java
+         $LOCATION/../../util/src/ffw/alertsystem/util/SSLContextCreator.java" 
 
-BUILDFILE="$LOCATION/build-MessageListener-plugin.xml"
+BUILDFILE="$LOCATION/build-MqttSubscriber-plugin.xml"
 
-sh $LOCATION/../../core/build.sh "MessageListener-plugin" \
+sh $LOCATION/../../core/build.sh "MqttSubscriber-plugin" \
    $LOCATION $CLASSPATH "$JAVASRC" $BUILDFILE

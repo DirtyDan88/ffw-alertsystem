@@ -19,20 +19,13 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 -->
 
-<project default="create_run_jar" name="Create runnable jar-file 'ffw-alertsystem-receiver'">
+<project default="create_plugin_jar" name="Create plugin 'MqttSubscriber'">
   <!--ANT 1.7 is required -->
-  <property name="lib-dir" value="../3rdparty"/>
-  <target name="create_run_jar">
-    <jar destfile="../../build/ffw-alertsystem-receiver.jar" 
-         filesetmanifest="mergewithoutmain">
-      <manifest>
-        <attribute name="Main-Class" value="ffw.alertsystem.core.receiver.ReceiverApplication"/>
-        <attribute name="Class-Path" value="."/>
-      </manifest>
+  <property name="lib-dir" value="../../3rdparty"/>
+  <target name="create_plugin_jar">
+    <jar destfile="../../../build/monitorplugins/MqttSubscriber.jar" 
+         filesetmanifest="skip">  
       <fileset dir="bin"/>
-      <zipgroupfileset dir="${lib-dir}" includes="jcommander-1.48.jar"/>
-      <zipgroupfileset dir="${lib-dir}" includes="javax.mail.jar"/>
-      <zipgroupfileset dir="${lib-dir}" includes="jetty/*.jar"/>
       <zipgroupfileset dir="${lib-dir}" includes="mqtt-client-0.4.0.jar"/>
       <zipfileset src="${lib-dir}/bcpkix-jdk15on-154.jar" excludes="**/*.SF, **/*.DSA"/>
       <zipfileset src="${lib-dir}/bcprov-jdk15on-154.jar" excludes="**/*.SF, **/*.DSA"/>

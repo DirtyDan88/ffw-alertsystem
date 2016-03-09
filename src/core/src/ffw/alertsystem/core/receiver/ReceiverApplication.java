@@ -24,15 +24,15 @@ import ffw.alertsystem.core.Application;
 
 
 /**
- * The ffw-alertsystem-receiver is responsible for receiving and distributing
+ * The ffw-alertsystem-receiver is responsible for receiving and publishing
  * (POCSAG-)messages. It receives strings via the local network sent from the
  * receiver script which is connected to the antenna. After parsing and
- * seperating the messages the distribution happens through a websocket-based
- * server.<br>
+ * seperating the messages the @MessageReceiver hands it over to a publisher,
+ * which is responsible for distribution of the message.<br>
  * 
  * @see @Application
  * @see @MessageReceiver
- * @see @ReceiverServer
+ * @see @MessagePublisher
  */
 public class ReceiverApplication extends Application {
   
@@ -50,6 +50,10 @@ public class ReceiverApplication extends Application {
   
   private Thread receiverThread;
   
+  private MessagePublisher publisher;
+  
+  
+  
   public ReceiverApplication(String[] args) {
     super(Application.ApplicationType.ALERTRECEIVER, args);
   }
@@ -58,7 +62,11 @@ public class ReceiverApplication extends Application {
   
   @Override
   protected void onApplicationStarted() {
-    receiver = new MessageReceiver(this);
+    publisher = createPublisher();
+    publisher.init(config, log);
+    publisher.start();
+    
+    receiver = new MessageReceiver(this, publisher);
     
     receiverThread = new Thread(receiver);
     receiverThread.setName("receiver-thread");
@@ -72,11 +80,46 @@ public class ReceiverApplication extends Application {
     if (receiver != null) {
       receiver.stop();
     }
+    
+    if (publisher != null) {
+      publisher.stop();
+    }
   }
   
   @Override
   protected void onApplicationErrorOccured(Throwable t) {
     //receiver.receiverErrorOccured(t);
+  }
+  
+  
+  
+  /**
+   * Creates a @MessagePublisher based on the applications configuration-file.
+   * @return The ffw-alertreceiver message-publisher
+   */
+  private MessagePublisher createPublisher() {
+    MessagePublisher publisher = null;
+    
+    try {
+      ClassLoader loader = Class.forName(
+                             config.getParam("publisher-package") + "." +
+                             config.getParam("publisher-class")
+                           ).getClassLoader();
+      
+      publisher = (MessagePublisher) loader.loadClass(
+                                       config.getParam("publisher-package") + "." +
+                                       config.getParam("publisher-class")
+                                     ).newInstance();
+      
+      log.info("created publisher of type " +
+               config.getParam("publisher-class"), true);
+      
+    } catch (ClassNotFoundException | InstantiationException |
+             IllegalAccessException | SecurityException e) {
+      log.error("could not create a message-publisher instance", e, true);
+    }
+    
+    return publisher;
   }
   
 }

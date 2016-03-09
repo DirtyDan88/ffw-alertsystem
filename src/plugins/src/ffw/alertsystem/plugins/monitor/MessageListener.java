@@ -33,7 +33,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import ffw.alertsystem.core.monitor.MonitorPlugin;
-import ffw.alertsystem.core.receiver.ReceiverServer;
+import ffw.alertsystem.core.receiver.WebSocketPublisher;
 import ffw.alertsystem.util.JettyLogger;
 import ffw.alertsystem.util.JettyWebSocket;
 
@@ -93,7 +93,7 @@ public class MessageListener extends MonitorPlugin {
         new ListenerWebSocket(),
         URI.create(
           "wss://" + config().paramList().get("receiver-uri") +
-          ReceiverServer.receiverURL
+          WebSocketPublisher.receiverURL
         )
       );
       
@@ -135,7 +135,7 @@ public class MessageListener extends MonitorPlugin {
       
       @Override
       public void run() {
-        if (state() != PluginState.ERROR) {
+        if (state() == PluginState.STOPPED) {
           log.info("cancel reconnect-try");
           reconncetIsRunning = false;
           timer.cancel();
@@ -168,6 +168,8 @@ public class MessageListener extends MonitorPlugin {
     
     return sslCtx;
   }
+  
+  
   
   @WebSocket
   public class ListenerWebSocket extends JettyWebSocket {

@@ -35,7 +35,7 @@ import ffw.alertsystem.core.ApplicationLogger;
  * Heart of the ffw-alertsystem-receiver application. Waits for new incoming
  * strings from the antenna (dataflow is: antenna -> receiver-script -> local
  * network broadcast), slot together (if necessay) the string fragments and
- * forwards complete messages to all connected listener via websockets.
+ * forwards complete messages to the message-publisher.
  */
 public class MessageReceiver implements Runnable {
   
@@ -43,13 +43,13 @@ public class MessageReceiver implements Runnable {
   
   private final ApplicationConfig config;
   
+  private final MessagePublisher publisher;
+  
   private StringBuilder  buffer;
   
   private int            port;
   
   private DatagramSocket socket;
-  
-  private ReceiverServer server;
   
   private boolean stopped = false;
   
@@ -60,10 +60,13 @@ public class MessageReceiver implements Runnable {
    * done in {@link MessageReceiver#init()}.
    * @param app The @Application object which provides logger, config and
    *            error-handling.
+   * @param publisher The message-publisher to forward complete messages for
+   *                  distribution.
    */
-  public MessageReceiver(Application app) {
-    this.log    = app.log;
-    this.config = app.config;
+  public MessageReceiver(Application app, MessagePublisher publisher) {
+    this.log      = app.log;
+    this.config   = app.config;
+    this.publisher = publisher;
   }
   
   
@@ -106,31 +109,24 @@ public class MessageReceiver implements Runnable {
   }
   
   /**
-   * Setup the local network interface (receiving messages) and the
-   * @ReceiverServer (distributing messages).
+   * Setup the local network interface for receiving messages.
    */
   private void init() {
-    // init the local interface
     buffer = new StringBuilder();
     port   = Integer.parseInt(config.getParam("receiver-port"));
     
     try {
       socket = new DatagramSocket(port);
       socket.setSoTimeout(10);
-      log.debug("created local-socket");
     } catch (SocketException e) {
       log.error("could not create local-socket on port " + port, e, true);
     }
-    
-    // init the server interface
-    server = ReceiverServer.create(config, log);
-    server.start();
   }
   
   /**
    * Checks if the {@link MessageReceiver#buffer} contains complete messages,
-   * and if so, forwards them to the @ReceiverWebSocket which distributes the
-   * message to all connected listeners.
+   * and if so, forwards them to the @MessagePublisher which distributes the
+   * message.
    */
   private void checkMessageComplete() {
     while (buffer.indexOf("#") != -1) {
@@ -146,7 +142,7 @@ public class MessageReceiver implements Runnable {
       } else if (start < end) {
         String message = buffer.substring(start, end);
         
-        ReceiverWebSocket.sendAll(message);
+        publisher.newMessage(message);
         
         buffer.delete(0, end+1);
         log.debug("message delivered and buffer refreshed, is now: " +
@@ -160,11 +156,6 @@ public class MessageReceiver implements Runnable {
    */
   public final synchronized void stop() {
     stopped = true;
-    
-    if (server != null) {
-      server.stop();
-    }
-    
     log.info("receiver stopped", true);
   }
   
