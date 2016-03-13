@@ -19,6 +19,9 @@
 
 package ffw.alertsystem.core.message;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,6 +180,79 @@ public abstract class Message {
     }
     
     return text;
+  }
+  
+  
+  
+  public static String getSqlCreateTable() {
+    return "CREATE TABLE IF NOT EXISTS `Message` (" +
+             "`ID`             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+             "`timestamp`      TEXT NOT NULL," +
+  
+             "`address`        TEXT NOT NULL," +
+             "`function`       TEXT NOT NULL," +
+             
+             "`isComplete`         INTEGER NOT NULL," +
+             "`isEncrypted`        INTEGER NOT NULL," +
+             "`isTestAlert`        INTEGER NOT NULL," +
+             "`isFireAlert`        INTEGER NOT NULL," +
+             "`unknownMessageType` INTEGER NOT NULL," +
+             
+             "`alertNumber`    TEXT," +
+             "`alertSymbol`    TEXT," +
+             "`alertLevel`     TEXT," +
+             "`alertKeyword`   TEXT," +
+             
+             "`hasCoordinates`   INTEGER NOT NULL," +
+             "`latitude`         TEXT," +
+             "`longitude`        TEXT," +
+             "`street`           TEXT," +
+             "`village`          TEXT," +
+             "`furtherPlaceDesc` TEXT," +
+             
+             "`keywords` TEXT," +
+             "`messageString`  TEXT" +
+           ");";
+  }
+  
+  public static String getSqlInsertMessage() {
+    return "INSERT INTO Message (" +
+             "timestamp, address, function," +
+             "isComplete, isEncrypted, isTestAlert, isFireAlert," +
+             "unknownMessageType," +
+             "alertNumber, alertSymbol, alertLevel, alertKeyword," +
+             "hasCoordinates, latitude, longitude, street, village," +
+             "furtherPlaceDesc, keywords, messageString)" +
+           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
+                   "?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+  }
+  
+  public void fillSqlStatement(PreparedStatement sql) throws SQLException {
+    sql.setString( 1, getTimestamp());
+    sql.setString( 2, getAddress());
+    sql.setString( 3, getFunction());
+    
+    sql.setInt   ( 4, ((isComplete())           ? 1 : 0));
+    sql.setInt   ( 5, ((isEncrypted())          ? 1 : 0));
+    sql.setInt   ( 6, ((isTestAlert())          ? 1 : 0));
+    sql.setInt   ( 7, ((isFireAlert())          ? 1 : 0));
+    sql.setInt   ( 8, ((isUnknownMessageType()) ? 1 : 0));
+    
+    sql.setString( 9, getAlertNumber());
+    sql.setString(10, getAlertSymbol());
+    sql.setString(11, getAlertLevel());
+    sql.setString(12, getAlertKeyword());
+    
+    sql.setInt   (13, ((hasCoordinates()) ? 1 : 0));
+    sql.setString(14, getLatitude());
+    sql.setString(15, getLongitude());
+    
+    sql.setString(16, getStreet());
+    sql.setString(17, getVillage());
+    sql.setString(18, getFurtherPlaceDescAsString());
+    
+    sql.setString(19, getKeywordsAsString());
+    sql.setString(20, getMessageString());
   }
   
   

@@ -26,10 +26,6 @@
     <jar destfile="../../../build/monitorplugins/DatabaseWriter.jar" 
          filesetmanifest="mergewithoutmain">  
       <fileset dir="bin"/>
-      <fileset dir="../plugin-data/DatabaseWriter/sql-commands">
-        <include name="sql-createAlertMessageTable.sql"/>
-        <include name="sql-insertAlertMessage.sql"/>
-      </fileset>
       <zipgroupfileset dir="${lib-dir}" includes="sqlite-jdbc-3.8.11.1.jar"/>
     </jar>
   </target>

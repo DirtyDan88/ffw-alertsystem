@@ -29,35 +29,38 @@ import java.sql.*;
  */
 public class SQLiteConnection {
   
-  private Connection connection;
+  private Connection con;
+  
+  private final Logger log;
+  
+  public SQLiteConnection(Logger log) {
+    this.log = log;
+  }
   
   
   
   public void openCurrent(String dir) {
     String dbDir  = dir + DateAndTime.getYearAndMonthName();
-    String dbName = "" + DateAndTime.getDate() + ".db";
+    String dbName = ""  + DateAndTime.getDate() + ".db";
     
     open(dbDir, dbName);
   }
   
   public void open(String dbDir, String dbName) {
-    try {
-      File databaseDir = new File(dbDir);
-      databaseDir.mkdirs();
-      
-      open(dbDir + "/" + dbName);
-    } catch (Exception e) {
-      
-    }
+    File databaseDir = new File(dbDir);
+    databaseDir.mkdirs();
+    
+    open(dbDir + "/" + dbName);
   }
   
   public boolean open(String db) {
-    connection = null;
+    con = null;
     
     try {
       Class.forName("org.sqlite.JDBC");
-      connection = DriverManager.getConnection("jdbc:sqlite:" + db);
+      con = DriverManager.getConnection("jdbc:sqlite:" + db);
     } catch (Exception e) {
+      log.error("could not open database: " + db, e, true);
       return false;
     }
     
@@ -65,14 +68,15 @@ public class SQLiteConnection {
   }
   
   public Connection getHandle() {
-    return connection;
+    return con;
   }
   
   public boolean close() {
     try {
-      connection.close();
-      connection = null;
+      con.close();
+      con = null;
     } catch (Exception e) {
+      log.error("could not close database", e, true);
       return false;
     }
     

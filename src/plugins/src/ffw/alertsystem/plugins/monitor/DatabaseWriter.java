@@ -19,39 +19,20 @@
 
 package ffw.alertsystem.plugins.monitor;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 import ffw.alertsystem.core.message.Message;
 import ffw.alertsystem.core.monitor.MonitorPlugin;
-import ffw.alertsystem.util.FileReader;
 import ffw.alertsystem.util.SQLiteConnection;
 
 
 
 public class DatabaseWriter extends MonitorPlugin {
   
-  private String sqlStringCreateTable;
-  
-  private String sqlStringInsertMessage;
-  
-  
-  
-  @Override
-  protected void onMonitorPluginStart() {
-    loadSQLStrings();
-  }
-  
-  @Override
-  protected void onMonitorPluginReload() {
-    loadSQLStrings();
-  }
-  
   @Override
   protected void onReceivedMessage(Message message) {
-    SQLiteConnection con = new SQLiteConnection();
+    SQLiteConnection con = new SQLiteConnection(log);
     con.openCurrent(config().paramList().get("database-dir"));
     
     Statement         sqlStmt  = null;
@@ -60,36 +41,12 @@ public class DatabaseWriter extends MonitorPlugin {
     try {
       // create table if it not exists
       sqlStmt = con.getHandle().createStatement();
-      sqlStmt.executeUpdate(sqlStringCreateTable);
+      sqlStmt.executeUpdate(Message.getSqlCreateTable());
       sqlStmt.close();
       
       // insert the alert-message
-      sqlPStmt = con.getHandle().prepareStatement(sqlStringInsertMessage);
-      
-      sqlPStmt.setString( 1, message.getTimestamp());
-      sqlPStmt.setString( 2, message.getAddress());
-      sqlPStmt.setString( 3, message.getFunction());
-      
-      sqlPStmt.setInt   ( 4, ((message.isComplete())           ? 1 : 0));
-      sqlPStmt.setInt   ( 5, ((message.isEncrypted())          ? 1 : 0));
-      sqlPStmt.setInt   ( 6, ((message.isTestAlert())          ? 1 : 0));
-      sqlPStmt.setInt   ( 7, ((message.isFireAlert())          ? 1 : 0));
-      sqlPStmt.setInt   ( 8, ((message.isUnknownMessageType()) ? 1 : 0));
-      
-      sqlPStmt.setString( 9, message.getAlertNumber());
-      sqlPStmt.setString(10, message.getAlertSymbol());
-      sqlPStmt.setString(11, message.getAlertLevel());
-      sqlPStmt.setString(12, message.getAlertKeyword());
-      
-      sqlPStmt.setInt   (13, ((message.hasCoordinates()) ? 1 : 0));
-      sqlPStmt.setString(14, message.getLatitude());
-      sqlPStmt.setString(15, message.getLongitude());
-      sqlPStmt.setString(16, message.getStreet());
-      sqlPStmt.setString(17, message.getVillage());
-      sqlPStmt.setString(18, message.getFurtherPlaceDescAsString());
-      
-      sqlPStmt.setString(19, message.getKeywordsAsString());
-      sqlPStmt.setString(20, message.getMessageString());
+      sqlPStmt = con.getHandle().prepareStatement(Message.getSqlInsertMessage());
+      message.fillSqlStatement(sqlPStmt);
       
       sqlPStmt.executeUpdate();
       sqlPStmt.close();
@@ -101,36 +58,6 @@ public class DatabaseWriter extends MonitorPlugin {
     }
     
     con.close();
-  }
-  
-  
-  
-  private void loadSQLStrings() {
-    log.info("reading SQL-strings ...");
-    
-    try {
-      InputStream in = getClass().getResourceAsStream("../../../../sql-createAlertMessageTable.sql");
-      sqlStringCreateTable = FileReader.getContent(new InputStreamReader(in));
-      
-      if (sqlStringCreateTable == null) {
-          throw new Exception("could not get sql-string from file " +
-                              "sql-createAlertMessageTable.sql");
-      }
-      
-      in = getClass().getResourceAsStream("../../../../sql-insertAlertMessage.sql");
-      sqlStringInsertMessage = FileReader.getContent(new InputStreamReader(in));
-      
-      if (sqlStringInsertMessage == null) {
-        throw new Exception("could not get sql-string from file " +
-                            "sql-insertAlertMessage.sql");
-      }
-      
-    } catch (Exception e) {
-      log.error("could not read SQL-string", e);
-      return;
-    }
-    
-    log.info("done!");
   }
   
 }
