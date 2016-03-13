@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+    All rights reserved.
+
+  This file is part of ffw-alertsystem, which is free software: you
+  can redistribute it and/or modify it under the terms of the GNU
+  General Public License as published by the Free Software Foundation,
+  either version 2 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+  <!-- load the application-xsd -->
+  <xs:include schemaLocation="../../src/core/schema-application-config.xsd"/>
+
+  <!-- root node -->
+  <xs:element name="ffw-log2db-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ffw-application-config">
+          <xs:sequence>
+            <xs:element name="logfile-dir"  type="xs:string"/>
+            <xs:element name="database-dir" type="xs:string"/>
+
+            <!-- ! RICs in csv format ! -->
+            <xs:element name="rics"                 type="xs:string"/> 
+            <xs:element name="use-invalid-messages" type="xs:boolean"/>
+            <xs:element name="use-message-copies"   type="xs:boolean"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

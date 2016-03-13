@@ -1,0 +1,5 @@
+Log2DB
+======
+
+Reads log-files generated from the MessageLogger-Plugin and writes them to 
+database-files.

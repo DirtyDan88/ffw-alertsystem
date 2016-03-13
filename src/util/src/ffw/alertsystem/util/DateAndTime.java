@@ -20,6 +20,7 @@
 package ffw.alertsystem.util;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -60,11 +61,24 @@ public class DateAndTime {
   
   
   public static String getTimestamp() {
-    return String.valueOf(new java.util.Date().getTime() / 1000);
+    return String.valueOf(new Date().getTime() / 1000);
+  }
+  
+  public static String getTimestamp(String date) {
+    SimpleDateFormat sdfDateAndTime = new SimpleDateFormat("dd-MM-yyyy # HH:mm:ss");
+    
+    Date time = null;
+    try {
+      time = sdfDateAndTime.parse(date);
+    } catch (ParseException e) {
+      return null;
+    }
+    
+    return String.valueOf(time.getTime() / 1000);
   }
   
   public static String get() {
-    long timestamp = new java.util.Date().getTime() / 1000;
+    long timestamp = new Date().getTime() / 1000;
     return get(String.valueOf(timestamp));
   }
   
@@ -80,15 +94,24 @@ public class DateAndTime {
   }
   
   public static String getDate() {
-    Date now = new java.util.Date();
+    Date now = new Date();
     SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy");
     String date = sdfDate.format(now);
     
     return date;
   }
   
+  public static String getDate(String timestamp) {
+    Date date = new Date(
+                      new Timestamp(Long.parseLong(timestamp) * 1000).getTime()
+                    );
+    SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy");
+    
+    return sdfDate.format(date);
+  }
+  
   public static String getTime(long time) {
-    Date date = new java.util.Date(time);
+    Date date = new Date(time);
     
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
     return sdfTime.format(date);
@@ -99,13 +122,31 @@ public class DateAndTime {
   }
   
   public static String getYearAndMonthName() {
-    Date now = new java.util.Date();
+    //Date now = new java.util.Date();
+    return getYearAndMonthName(getTimestamp());
+    
+//    SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+//    SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
+//    
+//    int monthNumber = Integer.parseInt(sdfMonth.format(now));
+//    String yearAndMonthName = sdfYear.format(now) + "-" + 
+//                              sdfMonth.format(now) + "-" +
+//                              monthNames[monthNumber - 1];
+//    
+//    return yearAndMonthName;
+  }
+  
+  public static String getYearAndMonthName(String timestamp) {
     SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
     SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
     
-    int monthNumber = Integer.parseInt(sdfMonth.format(now));
-    String yearAndMonthName = sdfYear.format(now) + "-" + 
-                              sdfMonth.format(now) + "-" +
+    Date date = new Date(
+                      new Timestamp(Long.parseLong(timestamp) * 1000).getTime()
+                    );
+
+    int monthNumber = Integer.parseInt(sdfMonth.format(date));
+    String yearAndMonthName = sdfYear.format(date) + "-" + 
+                              sdfMonth.format(date) + "-" +
                               monthNames[monthNumber - 1];
     
     return yearAndMonthName;
