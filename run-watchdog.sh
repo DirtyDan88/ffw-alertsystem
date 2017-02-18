@@ -22,7 +22,7 @@
 # start/stop the watchdog
 LOCATION=$(dirname "$(readlink -e "$0")")
 LOCKFILE=$LOCATION"/.watchdog.lock"
-JARFILE=$LOCATION"/build/ffw-alertsystem-watchdog.jar"
+JARFILE=$LOCATION"/ffw-alertsystem-watchdog/target/ffw-alertsystem-watchdog-0.0.1-SNAPSHOT.jar"
 
 case "$1" in
   start)

@@ -22,7 +22,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            elementFormDefault="qualified">
   <!-- load the application-xsd -->
-  <xs:include schemaLocation="../core/schema-application-config.xsd"/>
+  <xs:include schemaLocation="schema-application-config.xsd"/>
 
   <!-- root node -->
   <xs:element name="ffw-watchdog-config">
@@ -34,9 +34,10 @@
             <xs:element name="watchdog-port" type="xs:int"/>
             <!-- timeout in minutes -->
             <xs:element name="watchdog-timeout" type="xs:int"/>
-            
+            <!-- a descriptive name -->
+            <xs:element name="watchdog-name" type="xs:string"/>
+            <!-- the emMail recipients in case of a timeout -->
             <xs:element name="email-watchdog-recipients" type="xs:string"/>
-
             <!-- after this number of timeouts additional to the eMail also an
                  SMS will be sent -->
             <xs:element name="sms-threshold" type="xs:int"/>

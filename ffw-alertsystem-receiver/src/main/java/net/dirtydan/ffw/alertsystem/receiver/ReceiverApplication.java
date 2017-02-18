@@ -17,9 +17,10 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core.receiver;
+package net.dirtydan.ffw.alertsystem.receiver;
 
-import ffw.alertsystem.core.Application;
+import net.dirtydan.ffw.alertsystem.common.application.Application;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
 
 
 
@@ -46,6 +47,8 @@ public class ReceiverApplication extends Application {
   
   
   
+  private final Logger log = Logger.getApplicationLogger();
+  
   private MessageReceiver receiver;
   
   private Thread receiverThread;
@@ -55,24 +58,26 @@ public class ReceiverApplication extends Application {
   
   
   public ReceiverApplication(String[] args) {
-    super(Application.ApplicationType.ALERTRECEIVER, args);
+    super("alertreceiver", "schema-receiver-config.xsd", args);
   }
   
   
   
   @Override
-  protected void onApplicationStarted() {
+  protected boolean onApplicationStarted() {
     publisher = createPublisher();
-    publisher.init(config, log);
+    if (publisher == null) return false;
+    
+    publisher.init(config);
     publisher.start();
     
     receiver = new MessageReceiver(this, publisher);
-    
     receiverThread = new Thread(receiver);
     receiverThread.setName("receiver-thread");
     receiverThread.setUncaughtExceptionHandler(errHandler);
-    
     receiverThread.start();
+      
+    return true;
   }
   
   @Override
@@ -80,7 +85,6 @@ public class ReceiverApplication extends Application {
     if (receiver != null) {
       receiver.stop();
     }
-    
     if (publisher != null) {
       publisher.stop();
     }
@@ -89,6 +93,7 @@ public class ReceiverApplication extends Application {
   @Override
   protected void onApplicationErrorOccured(Throwable t) {
     //receiver.receiverErrorOccured(t);
+    log.warn("uncaught exception occured", true);
   }
   
   
@@ -105,7 +110,6 @@ public class ReceiverApplication extends Application {
                              config.getParam("publisher-package") + "." +
                              config.getParam("publisher-class")
                            ).getClassLoader();
-      
       publisher = (MessagePublisher) loader.loadClass(
                                        config.getParam("publisher-package") + "." +
                                        config.getParam("publisher-class")

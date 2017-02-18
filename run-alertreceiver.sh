@@ -22,7 +22,7 @@
 # start/stop the receiver
 LOCATION=$(dirname "$(readlink -e "$0")")
 LOCKFILE=$LOCATION"/.alertreceiver.lock"
-JARFILE=$LOCATION"/build/ffw-alertsystem-receiver.jar"
+JARFILE=$LOCATION"/ffw-alertsystem-receiver/target/ffw-alertsystem-receiver-0.0.1-SNAPSHOT.jar"
 
 case "$1" in
   start)

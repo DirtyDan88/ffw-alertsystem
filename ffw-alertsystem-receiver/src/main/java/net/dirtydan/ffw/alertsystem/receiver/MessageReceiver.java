@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core.receiver;
+package net.dirtydan.ffw.alertsystem.receiver;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -25,9 +25,9 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-import ffw.alertsystem.core.Application;
-import ffw.alertsystem.core.ApplicationConfig;
-import ffw.alertsystem.core.ApplicationLogger;
+import net.dirtydan.ffw.alertsystem.common.application.Application;
+import net.dirtydan.ffw.alertsystem.common.application.ApplicationConfig;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
 
 
 
@@ -39,7 +39,7 @@ import ffw.alertsystem.core.ApplicationLogger;
  */
 public class MessageReceiver implements Runnable {
   
-  private final ApplicationLogger log;
+  private final Logger log = Logger.getApplicationLogger();
   
   private final ApplicationConfig config;
   
@@ -51,7 +51,7 @@ public class MessageReceiver implements Runnable {
   
   private DatagramSocket socket;
   
-  private boolean stopped = false;
+  private volatile boolean stopped = false;
   
   
   
@@ -64,7 +64,6 @@ public class MessageReceiver implements Runnable {
    *                  distribution.
    */
   public MessageReceiver(Application app, MessagePublisher publisher) {
-    this.log      = app.log;
     this.config   = app.config;
     this.publisher = publisher;
   }
@@ -78,8 +77,8 @@ public class MessageReceiver implements Runnable {
    */
   @Override
   public void run() {
-    init();
-    log.info("local-socket is listening on port " + port);
+    if (!init()) return;
+    log.info("receiver is listening on local port " + port, true);
     
     while (!stopped) {
       // waiting for messages
@@ -105,21 +104,23 @@ public class MessageReceiver implements Runnable {
     }
     
     socket.close();
-    log.info("local-socket closed (port: " + port + ")");
+    log.info("local receiver socket closed (port: " + port + ")", true);
   }
   
   /**
    * Setup the local network interface for receiving messages.
    */
-  private void init() {
+  private boolean init() {
     buffer = new StringBuilder();
     port   = Integer.parseInt(config.getParam("receiver-port"));
     
     try {
       socket = new DatagramSocket(port);
       socket.setSoTimeout(10);
+      return true;
     } catch (SocketException e) {
       log.error("could not create local-socket on port " + port, e, true);
+      return false;
     }
   }
   

@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.watchdog;
+package net.dirtydan.ffw.alertsystem.watchdog;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -27,15 +27,22 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import ffw.alertsystem.util.DateAndTime;
-import ffw.alertsystem.util.Mail;
-import ffw.alertsystem.util.TwilioSMS;
-import ffw.alertsystem.util.TwilioSMS.TwilioAccount;
-import ffw.alertsystem.core.Application;
+import net.dirtydan.ffw.alertsystem.common.application.Application;
+import net.dirtydan.ffw.alertsystem.common.util.DateAndTime;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
+import net.dirtydan.ffw.alertsystem.common.util.Mail;
 
 
 
 public class Watchdog extends Application implements Runnable {
+  
+  public static void main(String[] args) {
+    new Watchdog(args).start();
+  }
+  
+  
+  
+  private final Logger log = Logger.getApplicationLogger();
   
   private DatagramSocket socket;
   
@@ -47,29 +54,28 @@ public class Watchdog extends Application implements Runnable {
   
   
   
-  public static void main(String[] args) {
-    new Watchdog(args).start();
-  }
-  
-  
-  
   public Watchdog(String[] args) {
-    super(Application.ApplicationType.WATCHDOG, args);
+    super("watchdog", "schema-watchdog-config.xsd", args);
   }
   
   @Override
-  protected void onApplicationStarted() {
+  protected boolean onApplicationStarted() {
     watchdogThread = new Thread(this);
-    
     watchdogThread.setName("watchdog-thread");
     watchdogThread.setUncaughtExceptionHandler(errHandler);
-    
     watchdogThread.start();
+    
+    return true;
   }
   
   @Override
   protected void onApplicationStopped() {
     stopped = true;
+    
+    try {
+      socket.close();
+      watchdogThread.join();
+    } catch (InterruptedException e) {}
   }
   
   
@@ -108,7 +114,9 @@ public class Watchdog extends Application implements Runnable {
         watchdogTimeout();
         
       } catch (IOException e) {
-        log.error("error while waiting for watchdog-reset message", e, true);
+        if (!stopped) {
+          log.error("error while waiting for watchdog-reset message", e, true);
+        }
       }
     }
     
@@ -153,38 +161,40 @@ public class Watchdog extends Application implements Runnable {
     String subject  = "[ffw-alertsystem] !! watchdog timeout !!";
     String text     = getTimeoutText();
     
-    Mail.send(userName, passWord, recipients, subject, text, log);
-    log.info("sent mail to: " + recipients);
+    Mail.send(userName, passWord, recipients, subject, text);
   }
   
   private void sendSMS(String recipients) {
-    String text = getTimeoutText();
-    
-    String[] fileNames = recipients.split(",");
-    for (String fileName : fileNames) {
-      if (!fileName.trim().isEmpty()) {
-        TwilioAccount acc = TwilioSMS.getTwilioAccFromTextFile(fileName);
-        boolean ok = TwilioSMS.send(acc, text);
-        if (ok) {
-          log.info("sent SMS to: " + acc.foreName + " " + acc.surName +
-                   " (" + acc.To + ")");
-        } else {
-          log.error("could not send watchdog-SMS to: " + acc.foreName + 
-                    " " + acc.surName + " (" + acc.To + ")", new Exception());
-        }
-      }
-    }
+    // TODO: send SMS
+//    String text = getTimeoutText();
+//    
+//    String[] fileNames = recipients.split(",");
+//    for (String fileName : fileNames) {
+//      if (!fileName.trim().isEmpty()) {
+//        TwilioAccount acc = TwilioSMS.getTwilioAccFromTextFile(fileName);
+//        boolean ok = TwilioSMS.send(acc, text);
+//        if (ok) {
+//          log.info("sent SMS to: " + acc.foreName + " " + acc.surName +
+//                   " (" + acc.To + ")");
+//        } else {
+//          log.error("could not send watchdog-SMS to: " + acc.foreName + 
+//                    " " + acc.surName + " (" + acc.To + ")", new Exception());
+//        }
+//      }
+//    }
   }
   
   private String getTimeoutText() {
-    String text = "Watchdog timeout at " + DateAndTime.get() + "\n";
+    StringBuilder text = new StringBuilder();
+    text.append("Watchdog timeout at " + DateAndTime.get() + "\n");
+    text.append("Watchdog name: " + config.getParam("watchdog-name") + "\n");
     try {
-      text += "Watchdog on host: " + InetAddress.getLocalHost();
+      text.append("         host: " + InetAddress.getLocalHost().getHostName());
     } catch (UnknownHostException e) {
       log.error("Could not get host of watchdog", e);
     }
     
-    return text;
+    return text.toString();
   }
   
 }

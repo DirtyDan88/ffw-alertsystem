@@ -1,4 +1,4 @@
-package ffw.alertsystem.core.receiver;
+package net.dirtydan.ffw.alertsystem.receiver;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -6,9 +6,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
-import ffw.alertsystem.core.ApplicationConfig;
-import ffw.alertsystem.core.ApplicationLogger;
-import ffw.alertsystem.util.SSLContextCreator;
+import net.dirtydan.ffw.alertsystem.common.application.ApplicationConfig;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
+import net.dirtydan.ffw.alertsystem.common.util.SSLContextCreator;;
 
 
 
@@ -18,9 +18,9 @@ import ffw.alertsystem.util.SSLContextCreator;
  */
 public class MqttPublisher implements MessagePublisher {
   
-  private ApplicationConfig config;
+  private Logger log = Logger.getApplicationLogger();
   
-  private ApplicationLogger log;
+  private ApplicationConfig config;
   
   private MqttClient client;
   
@@ -31,9 +31,8 @@ public class MqttPublisher implements MessagePublisher {
   
   
   @Override
-  public void init(ApplicationConfig config, ApplicationLogger log) {
+  public void init(ApplicationConfig config) {
     this.config = config;
-    this.log    = log;
   }
   
   @Override
@@ -70,12 +69,13 @@ public class MqttPublisher implements MessagePublisher {
   
   @Override
   public void newMessage(String message) {
-    log.info("publish message: " + message);
+    log.info("publish message: " + message, true);
     MqttTopic t = client.getTopic(topic);
     
     try {
       t.publish(new MqttMessage(message.getBytes()));
     } catch (MqttException e) {
+      //TODO errHandler.reportError(t);
       log.error("could not publish message", e, true);
     }
   }

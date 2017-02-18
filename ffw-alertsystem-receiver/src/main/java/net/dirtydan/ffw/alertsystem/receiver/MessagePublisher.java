@@ -17,10 +17,9 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core.receiver;
+package net.dirtydan.ffw.alertsystem.receiver;
 
-import ffw.alertsystem.core.ApplicationConfig;
-import ffw.alertsystem.core.ApplicationLogger;
+import net.dirtydan.ffw.alertsystem.common.application.ApplicationConfig;
 
 
 
@@ -35,7 +34,7 @@ public interface MessagePublisher {
    * @param config The application-config which might contain some config-params
    *               for the message-publisher.
    */
-  public void init(ApplicationConfig config, ApplicationLogger log);
+  public void init(ApplicationConfig config);
   
   /**
    * Intended to run some init-code, like connecting to server etc. Is called
