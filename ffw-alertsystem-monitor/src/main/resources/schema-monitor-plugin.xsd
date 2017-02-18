@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+    All rights reserved.
+
+  This file is part of ffw-alertsystem, which is free software: you
+  can redistribute it and/or modify it under the terms of the GNU
+  General Public License as published by the Free Software Foundation,
+  either version 2 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+  <!-- load the plugin-type -->
+  <xs:include schemaLocation="schema-plugin-config.xsd"/>
+  
+  <!-- extends the plugin-type by a RIC-list -->
+  <xs:complexType name="monitor-plugin-type">  
+    <xs:complexContent>
+      <xs:extension base="plugin-type">
+        <xs:sequence>
+          <!-- list with RICs (Radio Identification Code) for which this plugin  
+               will be called; if no RIC is set the plugin will not be called 
+               called at all -->
+          <xs:element name="rics" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="ric" type="xs:string" maxOccurs="unbounded"/> 
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <!-- determines if the plugins processes invalid (empty or encrypted)
+               messages (optional, standard is false) -->
+          <xs:element name="use-invalid-messages" type="xs:boolean" minOccurs="0"/>
+          <!-- determines if the plugins processes message copies (already
+               received messages; optional, standard is false) -->
+          <xs:element name="use-message-copies" type="xs:boolean" minOccurs="0"/>
+          <!-- determines how many messages the plugin stores as previous
+               messages (optional, standard is 20) -->
+          <xs:element name="message-history" type="xs:int" minOccurs="0"/>
+          <!-- determines whether the plugin is an monitor-observer and is called
+               from the monitor for certain updates (like a new plugin was added)
+               or not (optional, standard is false) -->
+          <xs:element name="monitor-observer" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- list with plugins -->   
+  <xs:element name="monitor-plugins">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="monitor-plugin" type="monitor-plugin-type" 
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
