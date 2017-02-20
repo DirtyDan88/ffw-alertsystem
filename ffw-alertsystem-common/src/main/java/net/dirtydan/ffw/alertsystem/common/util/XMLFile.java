@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,9 +17,10 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.util;
+package net.dirtydan.ffw.alertsystem.common.util;
 
 import java.io.File;
+import java.net.URL;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -38,33 +39,37 @@ import org.w3c.dom.Document;
 
 
 /**
- * Provides access to content of XML-files; also is able to validate XML-files
- * against a XSD-schema-file.
+ * Provides access to the content of XML-files; also is able to validate
+ * XML-files against a XSD-schema-file.
  */
 public class XMLFile {
+  
+  private final Logger log = Logger.getApplicationLogger();
   
   private final String xsdFileName;
   
   private final String xmlFileName;
   
-  private final Logger log;
   
   
-  
-  public XMLFile(String xsdFileName, String xmlFileName, Logger log) {
+  public XMLFile(String xsdFileName, String xmlFileName) {
     this.xsdFileName = xsdFileName;
     this.xmlFileName = xmlFileName;
-    this.log = log;
   }
   
-  
+  public long getLastModifiedTime() {
+    return new File(xmlFileName).lastModified();
+  }
   
   public Document open() {
     try {
-      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-      dbFactory.setSchema(loadSchema());
+      Schema xsdSchema = loadSchema();
+      if (xsdSchema == null || !isValid(xsdSchema)) return null;
       
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      dbFactory.setSchema(xsdSchema);
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      
       Document xmlFile = dBuilder.parse(new File(xmlFileName));
       xmlFile.getDocumentElement().normalize();
       
@@ -72,9 +77,8 @@ public class XMLFile {
       
     } catch (Exception e) {
       log.error("could not open xml-file: " + xmlFileName, e);
+      return null;
     }
-    
-    return null;
   }
   
   public void write(Document xmlFile) {
@@ -88,45 +92,35 @@ public class XMLFile {
       
     } catch (TransformerFactoryConfigurationError |
              TransformerException e) {
-      log.error("could not write xml-file: " + xmlFileName, e);
+      log.error("could not write xml-file: " + xmlFileName, e, true);
     }
   }
   
-  public boolean isValid() {
-    try {
-      Schema schema = loadSchema();
-      schema.newValidator().validate(
-        new StreamSource(xmlFileName)
-      );
-      
-      return true;
-      
-    } catch (Exception e) {
-      log.error("xml-file not valid: " + xmlFileName, e);
-      return false;
-    }
-  }
   
-  public long getLastModifiedTime() {
-    return new File(xmlFileName).lastModified();
-  }
   
   private Schema loadSchema() {
     try {
-      SchemaFactory factory = SchemaFactory.newInstance(
-        XMLConstants.W3C_XML_SCHEMA_NS_URI
-      );
-      Schema schema = factory.newSchema(
-        new StreamSource(xsdFileName)
-      );
-      
-      return schema;
+      SchemaFactory schemaFactory = SchemaFactory.newInstance(
+                                      XMLConstants.W3C_XML_SCHEMA_NS_URI
+                                    );
+      URL schemaURL = getClass().getResource("/" + xsdFileName);
+      return schemaFactory.newSchema(schemaURL);
       
     } catch (Exception e) {
-      log.error("could not open schema-file: " + xsdFileName, e);
+      log.error("could not process schema-file: " + xsdFileName, e, true);
+      return null;
     }
-    
-    return null;
+  }
+  
+  private boolean isValid(Schema schema) {
+    try {
+      schema.newValidator().validate(new StreamSource(xmlFileName));
+      return true;
+      
+    } catch (Exception e) {
+      log.error("xml-file not valid: " + xmlFileName, e, true);
+      return false;
+    }
   }
   
 }

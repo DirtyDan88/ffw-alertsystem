@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.util;
+package net.dirtydan.ffw.alertsystem.common.util;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -49,7 +49,11 @@ import java.security.cert.X509Certificate;
 
 
 
-public class SSLContextCreator {
+public final class SSLContextCreator {
+  
+  private SSLContextCreator() {}
+  
+  
   
   public static SSLContext create(String certCAFile, String certClientFile,
                                   String keyFile, String password) {

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core.plugin;
+package net.dirtydan.ffw.alertsystem.common.util;
 
 import java.io.File;
 import java.util.HashMap;
@@ -29,8 +29,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ffw.alertsystem.util.Logger;
-import ffw.alertsystem.util.XMLFile;
+import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig;
+import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig.PluginParam;
+import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfigSource;
 
 
 
@@ -44,12 +45,12 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   /**
    * The name of the XML-file which contains plugin definitions.
    */
-  private final XMLFile xmlFile;
+  private final XMLFile _xmlFile;
   
   /**
    * Last time the XML-file was read (e.g. checked for new plugins).
    */
-  private long lastReadTime = -1;
+  private long _lastReadTime = -1;
   
   
   
@@ -60,10 +61,9 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
    *                    course this also applies to all sub-classes of this
    *                    class resp. of the @PluginConfig-class.
    * @param xmlFileName The name of the XML-file with the plugin descriptions.
-   * @param log         @Logger object.
    */
-  public XMLPluginSource(String xsdFileName, String xmlFileName, Logger log) {
-    xmlFile = new XMLFile(xsdFileName, xmlFileName, log);
+  public XMLPluginSource(String xsdFileName, String xmlFileName) {
+    _xmlFile = new XMLFile(xsdFileName, xmlFileName);
   }
   
   
@@ -74,7 +74,7 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   
   @Override
   public boolean hasChanged() {
-    if (lastReadTime == xmlFile.getLastModifiedTime()) {
+    if (_lastReadTime == _xmlFile.getLastModifiedTime()) {
       return false;
     }
     
@@ -85,21 +85,16 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   public List<PluginConfigT> getPluginConfigs(boolean setLastReadTime) {
     LinkedList<PluginConfigT> configList = new LinkedList<>();
     
-    if (xmlFile.isValid()) {
-      if (setLastReadTime) lastReadTime = xmlFile.getLastModifiedTime();
-      Document configFile = xmlFile.open();
-      
-      if (configFile != null) {
-        NodeList pluginNodes = configFile.getElementsByTagName(XMLPluginNodeName());
-        for (int i = 0; i < pluginNodes.getLength(); i++) {
-          Element pluginXML = (Element) pluginNodes.item(i);
-          
-          PluginConfigT config = newInstance();
-          initPluginConfig  (config, pluginXML);
-          extendPluginConfig(config, pluginXML);
-          
-          configList.add(config);
-        }
+    Document configFile = _xmlFile.open();
+    if (setLastReadTime) _lastReadTime = _xmlFile.getLastModifiedTime();
+    
+    if (configFile != null) {
+      NodeList pluginNodes = configFile.getElementsByTagName(XMLPluginNodeName());
+      for (int i = 0; i < pluginNodes.getLength(); i++) {
+        Element pluginXML = (Element) pluginNodes.item(i);
+        configList.add(
+          newInstance(createBasicConfig(pluginXML), pluginXML)
+        );
       }
     }
     
@@ -119,74 +114,74 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   
   
   /**
-   * Sets the basic properties of a @Plugin, defined in the base-class of all
-   * plugin-configs: @PluginConfig.
-   * @param config The plugin-config object.
-   * @param xml    The XML-tree of the plugin-config.
+   * The plugin-config-source is not able to know at compile-time, which kind of
+   * plugin-configs it is supposed to deliver, hence the creation of the object
+   * has to be done in the concrete implementation of this class.
+   * @param basicConfig Contains the basic information about a plugin, defined
+   *                    in the @PluginConfig class.
+   * @param xml         The XML-tree of the plugin-config.
+   * 
+   * @return A new instance of the plugin-config-class this config-source shall
+   *         provide.
    */
-  private void initPluginConfig(PluginConfigT config, Element xml) {
-    String instanceName = xml.getAttribute("instanceName");
-    String jarFileName  = xml.getElementsByTagName("jarfile").
-                                item(0).getTextContent();
-    String packageName  = xml.getElementsByTagName("packageName").
-                                item(0).getTextContent();
-    String className    = xml.getElementsByTagName("className").
-                                item(0).getTextContent();
-    String isActive     = xml.getElementsByTagName("active").
-                                item(0).getTextContent();
-    String description  = xml.getElementsByTagName("description").
-                                item(0).getTextContent();
-    // the parameter-list of the plugin
-    Map<String, String> paramList = new HashMap<>();
-    NodeList paramNodes = xml.getElementsByTagName("param");
-    for (int j = 0; j < paramNodes.getLength(); j++) {
-      Element param = (Element) paramNodes.item(j);
-      paramList.put(param.getAttribute("name"), param.getTextContent());
-    }
-    
-    // set the basics, all mandatory
-    config.setInstanceName(instanceName);
-    config.setJarFile     (jarFileName);
-    config.setPackageName (packageName);
-    config.setClassName   (className);
-    config.setDescription (description);
-    config.setActive      ((isActive.equals("true")) ? true : false);
-    config.setParamList   (paramList);
-    
-    // debug-mode is optional, default is false
-    NodeList node = xml.getElementsByTagName("debug-mode");
-    if (node.getLength() != 0) {
-      String debugMode = node.item(0).getTextContent();
-      config.setDebugMode((debugMode.equals("true")) ? true : false);
-    }
-    
-    // last modified time of jar-file
-    config.setLastModifiedTime(new File(jarFileName).lastModified());
-  }
-  
-  /**
-   * This method is supposed to read additional properties defined by sub-
-   * classes which extends the PluginConfigT.
-   * @param config The plugin-config object.
-   * @param xml    The XML-tree of the plugin-config.
-   */
-  protected abstract void extendPluginConfig(PluginConfigT config, Element xml);
-  
-  
+  protected abstract PluginConfigT newInstance(PluginConfig basicConfig, Element xml);
   
   /**
    * @return The XML-node-name of a plugin in the XML-plugin-config-file.
    */
   protected abstract String XMLPluginNodeName();
   
+  
+  
   /**
-   * The plugin-config-source is not able to know at compile-time, which kind of
-   * plugin-configs it is supposed to deliver, hence the creation of the object
-   * has to be done in the concrete implementation of this class.
-   * @return A new instance of the plugin-config-class this config-source shall
-   *         provide.
+   * Sets the basic properties of a @Plugin, defined in the base-class of all
+   * plugin-configs: @PluginConfig.
+   * @param xml The XML-tree of the plugin-config.
+   * @return A @PluginConfig object based on the XML input.
    */
-  protected abstract PluginConfigT newInstance();
+  private PluginConfig createBasicConfig(Element xml) {
+    String instanceName = xml.getAttribute("instanceName");
+    String jarFileName  = xml.getElementsByTagName("jarfile")
+                                .item(0).getTextContent();
+    String packageName  = xml.getElementsByTagName("packageName")
+                                .item(0).getTextContent();
+    String className    = xml.getElementsByTagName("className")
+                                .item(0).getTextContent();
+    String isActive     = xml.getElementsByTagName("active")
+                                .item(0).getTextContent();
+    String description  = xml.getElementsByTagName("description")
+                                .item(0).getTextContent();
+    // the parameter-list of the plugin
+    Map<String, PluginParam> paramList = new HashMap<>();
+    NodeList paramNodes = xml.getElementsByTagName("param");
+    for (int j = 0; j < paramNodes.getLength(); ++j) {
+      Element param = (Element) paramNodes.item(j);
+      paramList.put(
+                  param.getAttribute("name"),
+                  new PluginParam(
+                    param.getTextContent(),
+                    param.getAttribute("hide").equals("true") ? true : false
+                  )
+                );
+    }
+    
+    // log-level is optional, default is INFO (= 4)
+    int logLevel = -1;
+    NodeList node = xml.getElementsByTagName("log-level");
+    if (node.getLength() != 0) {
+      logLevel = Integer.parseInt(node.item(0).getTextContent());
+    }
+    
+    return PluginConfig.build(jarFileName,
+                               packageName,
+                               className,
+                               instanceName,
+                               (isActive.equals("true")) ? true : false,
+                               description,
+                               paramList,
+                               logLevel,
+                               new File(jarFileName).lastModified());
+  }
   
   /**
    * Writes the value of a given XML-property (e.g. XML-tag) of a given plugin.
@@ -195,7 +190,7 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
    * @param value        The new value to write.
    */
   private void write(String instanceName, String nodeName, String value) {
-    Document configFile = xmlFile.open();
+    Document configFile = _xmlFile.open();
     
     NodeList pluginNodes = configFile.getElementsByTagName(XMLPluginNodeName());
     for (int i = 0; i < pluginNodes.getLength(); i++) {
@@ -205,7 +200,7 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
         NodeList node = pluginXML.getElementsByTagName("active");
         if (node.getLength() != 0) {
           node.item(0).setTextContent(value);
-          xmlFile.write(configFile);
+          _xmlFile.write(configFile);
         }
         break;
       }

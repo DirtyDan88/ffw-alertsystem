@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.util;
+package net.dirtydan.ffw.alertsystem.common.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,37 +55,46 @@ public abstract class Logger {
   public static final int DEBUG = 5;
   
   /**
+   * @return A string which describes a log-level.
+   */
+  public static String getLogLevelName(int logLevel) {
+    switch (logLevel) {
+      case OFF:   return "OFF";
+      case ERROR: return "ERROR";
+      case WARN:  return "WARN";
+      case INFO:  return "INFO";
+      case DEBUG: return "DEBUG";
+      default:    return "UNKNOWN";
+    }
+  }
+  
+  
+  
+  /**
    * The choosen log-level of the logger, see granularity of log-levels above.
    */
-  private final int logLevel;
-  
-  
+  public int logLevel;
   
   /**
    * Only the constructor is able to set the log-level.
    * @param logLevel The desired log-level of the logger.
    */
-  public Logger(int logLevel) {
-    this.logLevel = logLevel;
+  public Logger(int _logLevel) {
+    logLevel = _logLevel;
   }
   
-  /**
-   * @return Just returns the log-level of the logger.
-   */
-  public final int getLogLevel() {
-    return logLevel;
-  }
+  
   
   /**
    * The only method a derived logger-class has to implement is the log-method,
    * where it is decided what actually to do with the log-message (write to
    * file, to standard output or whatever). <br>
    * It is called from every log-method below.
-   * @param message       The String with the log-message.
+   * @param text          The String with the log-message.
    * @param printWithTime True if the printage of the time of this message is
    *                      desired.
    */
-  public abstract void log(String message, boolean printWithTime);
+  public abstract void log(String text, boolean printWithTime);
   
   
   
@@ -124,8 +133,6 @@ public abstract class Logger {
   }
   
   public void info(String text) {
-    
-    
     info(text, false);
   }
   
@@ -137,6 +144,38 @@ public abstract class Logger {
   
   public void debug(String text) {
     debug(text, false);
+  }
+  
+  
+  
+  /**
+   * The global @Logger object.
+   */
+  private static Logger applicationLogger;
+  
+  /**
+   * Sets a global @Logger object which can be application-wide.
+   * @param log The global @Logger object.
+   */
+  public static void setApplicationLogger(Logger log) {
+    applicationLogger = log;
+  }
+  
+  /**
+   * @return The global @Logger object. If the global @Logger is not set, the
+   * function returns a dummy @Logger implementation which does not log
+   * anything.
+   */
+  public static Logger getApplicationLogger() {
+    if (applicationLogger == null) {
+      // mock a Logger-object if no Logger is available
+      return new Logger(1) {
+               @Override
+               public void log(String message, boolean printWithTime) {}
+             };
+    }
+    
+    return applicationLogger;
   }
   
 }

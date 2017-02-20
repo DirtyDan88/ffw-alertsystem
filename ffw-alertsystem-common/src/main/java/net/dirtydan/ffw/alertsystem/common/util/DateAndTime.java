@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.util;
+package net.dirtydan.ffw.alertsystem.common.util;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -29,7 +29,10 @@ import java.util.Date;
 /**
  * Collection of helper methods for timestamp <-> date transformation.
  */
-public class DateAndTime {
+public final class DateAndTime {
+  
+  // prevent instantiation: class is static
+  private DateAndTime() {}
   
   // in order to get the english day names, independent of system-locale
   private static String[] dayNames = {
@@ -124,16 +127,6 @@ public class DateAndTime {
   public static String getYearAndMonthName() {
     //Date now = new java.util.Date();
     return getYearAndMonthName(getTimestamp());
-    
-//    SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
-//    SimpleDateFormat sdfMonth = new SimpleDateFormat("MM");
-//    
-//    int monthNumber = Integer.parseInt(sdfMonth.format(now));
-//    String yearAndMonthName = sdfYear.format(now) + "-" + 
-//                              sdfMonth.format(now) + "-" +
-//                              monthNames[monthNumber - 1];
-//    
-//    return yearAndMonthName;
   }
   
   public static String getYearAndMonthName(String timestamp) {
