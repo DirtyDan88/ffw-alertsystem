@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core;
+package net.dirtydan.ffw.alertsystem.common.application;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,7 +25,8 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import ffw.alertsystem.util.Mail;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
+import net.dirtydan.ffw.alertsystem.common.util.Mail;
 
 
 
@@ -37,6 +38,8 @@ import ffw.alertsystem.util.Mail;
  */
 public class ApplicationErrorHandler implements UncaughtExceptionHandler {
   
+  private final Logger log = Logger.getApplicationLogger();
+  
   private final Application app;
   
   public ApplicationErrorHandler(Application app) {
@@ -47,16 +50,14 @@ public class ApplicationErrorHandler implements UncaughtExceptionHandler {
   
   @Override
   public void uncaughtException(Thread t, Throwable e) {
-    app.log.error("uncaught exception in " + app.appType, e);
+    log.error("uncaught exception in " + app.applicationName, e);
     
     app.onApplicationErrorOccured(e);
     reportError(e);
   }
   
-  
-  
   public final void reportError(Throwable t) {
-    String subject = app.appType.error() +
+    String subject = "Error in " + app.applicationName + " " +
                      "'" + app.config.getParam("application-name") + "'";
     reportError(subject, t);
   }
@@ -66,12 +67,13 @@ public class ApplicationErrorHandler implements UncaughtExceptionHandler {
     
     String text;
     try {
-      text = app.appType + " on host: " + InetAddress.getLocalHost() + "\n";
+      text = app.applicationName + " on host: "
+                                 + InetAddress.getLocalHost() + "\n";
     } catch (UnknownHostException e) {
-      text = app.appType + " on host: unknown\n";
+      text = app.applicationName + " on host: unknown\n";
     }
     
-    text += app.appType + "-name: " +
+    text += app.applicationName + "-name: " +
             app.config.getParam("application-name") +
             "\n\n";
     
@@ -87,8 +89,7 @@ public class ApplicationErrorHandler implements UncaughtExceptionHandler {
     String passWord   = app.config.getParam("email-password");
     String recipients = app.config.getParam("email-error-recipients");
     
-    Mail.send(userName, passWord, recipients, subject, text, app.log);
-    app.log.info("sent mail-notification to: " + recipients, true);
+    Mail.send(userName, passWord, recipients, subject, text);
   }
   
 }

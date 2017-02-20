@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,7 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.core;
+package net.dirtydan.ffw.alertsystem.common.application;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,9 +26,8 @@ import java.io.PrintStream;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ffw.alertsystem.core.Application.ApplicationType;
-import ffw.alertsystem.util.DateAndTime;
-import ffw.alertsystem.util.Logger;
+import net.dirtydan.ffw.alertsystem.common.util.Logger;
+import net.dirtydan.ffw.alertsystem.common.util.DateAndTime;
 
 
 
@@ -44,47 +43,49 @@ import ffw.alertsystem.util.Logger;
 public class ApplicationLogger extends Logger
                                implements Runnable {
   
-  private boolean stopped = false;
-  private final boolean inFile;
-  private final ApplicationType app;
-  private final Queue<Pair<String, Boolean>> messageBuffer;
+  private final String _appName;
+  
+  private final boolean _inFile;
+  
+  private final Queue<Pair<String, Boolean>> _messageBuffer;
+  
+  private boolean _stopped = false;
   
   
   
-  public ApplicationLogger(int logLevel, ApplicationType app, boolean inFile) {
+  public ApplicationLogger(String appName, int logLevel, boolean inFile) {
     super(logLevel);
     
-    this.app    = app;
-    this.inFile = inFile;
-    
-    messageBuffer = new ConcurrentLinkedQueue<>();
+    _appName = appName;
+    _inFile = inFile;
+    _messageBuffer = new ConcurrentLinkedQueue<>();
     
     // print the logger settings
     log("================================================================", true);
     log("Logger setting: logLevel=" + logLevel +
-                       " application="+ app +
+                       " application=" + appName +
                        " inFile=" + inFile, true);
   }
   
   
   
   @Override
-  public synchronized void log(String message, boolean printWithTime) {
-    if (getLogLevel() == DEBUG) {
-      message = message + " [" + Thread.currentThread().getName() + "]";
+  public synchronized void log(String text, boolean printWithTime) {
+    if (logLevel == DEBUG) {
+      text = text + " [" + Thread.currentThread().getName() + "]";
     }
     
-    messageBuffer.add(new Pair<String, Boolean>(message, printWithTime));
+    _messageBuffer.add(new Pair<String, Boolean>(text, printWithTime));
   }
-    
+  
   @Override
   public final void run() {
     Pair<String, Boolean> message;
     
-    while (!stopped || messageBuffer.size() > 0) {
+    while (!_stopped || _messageBuffer.size() > 0) {
       PrintStream s = getPrintStream();
       
-      while ((message = messageBuffer.poll()) != null) {
+      while ((message = _messageBuffer.poll()) != null) {
         String dateAndTime = "";
         if (message.printWithTime()) {
             dateAndTime = "[" + DateAndTime.get() + "] ";
@@ -95,17 +96,17 @@ public class ApplicationLogger extends Logger
         s.println(dateAndTime + message.getText());
       }
       
-      if (inFile) {
+      if (_inFile) {
         s.close();
       } else {
         s.flush();
       }
       
       try {
-        // Writing the logs into a file it is also sufficient to do this only
-        // every 2 seconds -> reduces file operations.
+        // when writing the logs into a file it is also sufficient to do this
+        // only every 2 seconds -> reduces file operations
         int sleepTime;
-        if (inFile) {
+        if (_inFile) {
           sleepTime = 2000;
         } else {
           sleepTime = 100;
@@ -118,17 +119,17 @@ public class ApplicationLogger extends Logger
   }
   
   public final synchronized void stop() {
-    stopped = true;
+    _stopped = true;
   }
   
   
   
   private final PrintStream getPrintStream() {
-    if (inFile) {
-      File logFileDir = new File("data/logs/" + DateAndTime.getYearAndMonthName());
+    if (_inFile) {
+      File logFileDir = new File("log/" + DateAndTime.getYearAndMonthName());
       logFileDir.mkdirs();
       
-      String fileName = "log-" + DateAndTime.getDate() + "-" + app + ".txt";
+      String fileName = "log-" + DateAndTime.getDate() + "-" + _appName + ".txt";
       File logFile = new File(logFileDir, fileName);
       
       FileOutputStream fos = null;
