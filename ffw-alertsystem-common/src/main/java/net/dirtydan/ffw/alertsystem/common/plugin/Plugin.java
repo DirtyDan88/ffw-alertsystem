@@ -134,17 +134,23 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
   }
   
   /**
-   * Sets the config-file of the plugin. Has to be called from @PluginManager
-   * when and only when a plugin is newly created.
+   * Sets the config-file of the plugin and creates the @PluginLogger.
    * @param config The plugins config-file.
    */
-  protected final void created(PluginConfigT config) {
+  protected final void setConfig(PluginConfigT config) {
     _config = config;
     
     log = new PluginLogger(Logger.getApplicationLogger(),
             _config.getInstanceName(),
             _config.getLogLevel()
           );
+  }
+  
+  /**
+   * Can be called from the @PluginManager when and only when a plugin is newly
+   * created.
+   */
+  protected final void created() {
     notifyObserver();
 //    onPluginCreated();
   }
@@ -200,11 +206,10 @@ public abstract class Plugin<PluginConfigT extends PluginConfig>
    * with user code is not called here in order to avoid an exception or
    * blocking code, which would affect the core-system.
    * 
-   * @param newConfig The plugins updated config-file.
+   * @param config The plugins updated config-file.
    */
-  protected final void reload(PluginConfigT newConfig) {
-    _config = newConfig;
-    log.logLevel = _config.getLogLevel();
+  protected final void reload(PluginConfigT config) {
+    setConfig(config);
     
     _raiseReload = true;
     callRun();

@@ -334,11 +334,11 @@ public abstract class PluginManager<PluginT       extends Plugin<PluginConfigT>,
     PluginT plugin = newInstance(config);
     
     if (plugin != null) {
-      _dependencyInjector.inject(plugin);
-      _pluginObserver.forEach(observer -> plugin.addObserver(observer));
       _plugins.add(plugin);
-      
-      plugin.created(config);
+      plugin.setConfig(config);
+      _pluginObserver.forEach(observer -> plugin.addObserver(observer));
+      _dependencyInjector.inject(plugin);
+      plugin.created();
       
       log.info("created new " + pluginTypeName() + ": " +
                config.getInstanceName() + " [log-level: " +
