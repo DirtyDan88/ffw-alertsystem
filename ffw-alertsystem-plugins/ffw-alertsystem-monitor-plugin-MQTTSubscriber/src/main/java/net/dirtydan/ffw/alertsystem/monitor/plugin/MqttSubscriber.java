@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,7 +17,11 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.plugins.monitor;
+package net.dirtydan.ffw.alertsystem.monitor.plugin;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -26,12 +30,16 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import ffw.alertsystem.core.monitor.MonitorPlugin;
-import ffw.alertsystem.util.SSLContextCreator;
+import net.dirtydan.ffw.alertsystem.common.plugin.PluginDependency;
+import net.dirtydan.ffw.alertsystem.common.util.SSLContextCreator;
+import net.dirtydan.ffw.alertsystem.monitor.MessageConsumer;
 
 
 
 public class MqttSubscriber extends MonitorPlugin {
+  
+  @PluginDependency
+  private MessageConsumer monitor;
   
   private MqttClient client;
   
@@ -53,12 +61,26 @@ public class MqttSubscriber extends MonitorPlugin {
     closeMqttConnection();
   }
   
+  @Override
+  protected void onPluginError(Throwable t) {
+    log.info("restart plugin in 3s", true);
+    
+    ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+    exec.scheduleWithFixedDelay(new Runnable() {
+      @Override
+      public void run() {
+        restart();
+        exec.shutdown();
+      }
+    }, 3, 1, TimeUnit.SECONDS);
+  }
+  
   
   
   private void openMqttConnection() {
-    String topic     = config().paramList().get("topic");
-    String brokerURI = config().paramList().get("broker-uri");
-    String clientId  = config().paramList().get("client-id");
+    String topic     = config().paramList().get("topic").val();
+    String brokerURI = config().paramList().get("broker-uri").val();
+    String clientId  = config().paramList().get("client-id").val();
     
     try {
       client = new MqttClient(brokerURI, clientId);
@@ -67,9 +89,9 @@ public class MqttSubscriber extends MonitorPlugin {
       MqttConnectOptions options = new MqttConnectOptions();
       options.setSocketFactory(
                 SSLContextCreator.create(
-                  config().paramList().get("ca-certificate"),
-                  config().paramList().get("client-certificate"),
-                  config().paramList().get("client-keyfile"), ""
+                  config().paramList().get("ca-certificate").val(),
+                  config().paramList().get("client-certificate").val(),
+                  config().paramList().get("client-keyfile").val(), ""
                 ).getSocketFactory()
               );
       client.connect(options);
@@ -79,12 +101,13 @@ public class MqttSubscriber extends MonitorPlugin {
       
     } catch (MqttException e) {
       log.error("could not connect to broker " + brokerURI, e, true);
+      errorOccured(e);
     }
   }
   
   private void closeMqttConnection() {
-    String topic     = config().paramList().get("topic");
-    String brokerURI = config().paramList().get("broker-uri");
+    String topic     = config().paramList().get("topic").val();
+    String brokerURI = config().paramList().get("broker-uri").val();
     
     try {
       client.disconnect();
@@ -112,7 +135,6 @@ public class MqttSubscriber extends MonitorPlugin {
     
     @Override
     public void connectionLost(Throwable t) {
-      //log.error("connection lost", t, true);
       errorOccured(t);
     }
     

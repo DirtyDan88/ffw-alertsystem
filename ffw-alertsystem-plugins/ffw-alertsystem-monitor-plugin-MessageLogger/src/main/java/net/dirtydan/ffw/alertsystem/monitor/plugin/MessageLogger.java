@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you
@@ -17,16 +17,15 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.plugins.monitor;
+package net.dirtydan.ffw.alertsystem.monitor.plugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import ffw.alertsystem.core.message.Message;
-import ffw.alertsystem.core.monitor.MonitorPlugin;
-import ffw.alertsystem.util.DateAndTime;
+import net.dirtydan.ffw.alertsystem.common.message.Message;
+import net.dirtydan.ffw.alertsystem.common.util.DateAndTime;
 
 
 
@@ -34,12 +33,12 @@ public class MessageLogger extends MonitorPlugin {
   
   @Override
   protected void onReceivedMessage(Message message) {
-    File logFileDir = new File(config().paramList().get("log-dir") + 
+    File logFileDir = new File(config().paramList().get("log-dir").val() +
                                DateAndTime.getYearAndMonthName());
     logFileDir.mkdirs();
     
     String fileName = "log-" + DateAndTime.getDate() + "-" +
-                      config().paramList().get("log-file-name") + ".txt";
+                      config().paramList().get("log-file-name").val() + ".txt";
     File logFile = new File(logFileDir, fileName);
     
     FileOutputStream fos = null;

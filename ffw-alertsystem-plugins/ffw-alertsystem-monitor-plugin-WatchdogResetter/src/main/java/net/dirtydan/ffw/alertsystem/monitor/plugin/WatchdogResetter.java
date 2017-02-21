@@ -17,15 +17,14 @@
   along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
-package ffw.alertsystem.plugins.monitor;
+package net.dirtydan.ffw.alertsystem.monitor.plugin;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import ffw.alertsystem.core.message.Message;
-import ffw.alertsystem.core.monitor.MonitorPlugin;
+import net.dirtydan.ffw.alertsystem.common.message.Message;
 
 
 
@@ -33,8 +32,8 @@ public class WatchdogResetter extends MonitorPlugin {
   
   @Override
   protected void onReceivedMessage(Message message) {
-    int port       = Integer.parseInt(config().paramList().get("watchdog-port"));
-    String addrStr =                  config().paramList().get("watchdog-addr");
+    String addrStr =                  config().paramList().get("watchdog-addr").val();
+    int port       = Integer.parseInt(config().paramList().get("watchdog-port").val());
     byte[] buf     = "I am alive!".getBytes();
     
     try {
@@ -49,7 +48,6 @@ public class WatchdogResetter extends MonitorPlugin {
       socket.close();
       
       log.info("reseted watchdog on: " + addrStr + ":" + port);
-        
     } catch (IOException e) {
       log.error("watchdog could not sent alive-message", e);
     }
