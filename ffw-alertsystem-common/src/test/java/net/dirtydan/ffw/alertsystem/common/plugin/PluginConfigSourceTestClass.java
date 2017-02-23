@@ -30,9 +30,9 @@ import net.dirtydan.ffw.alertsystem.common.util.Logger;
 
 
 public class PluginConfigSourceTestClass implements
-                                    PluginConfigSource<PluginConfigTestClass> {
+                                    PluginConfigSource<PluginConfig> {
   
-  private List<PluginConfigTestClass> configs = new LinkedList<>();
+  private List<PluginConfig> _configs = new LinkedList<>();
   
   
   
@@ -44,20 +44,18 @@ public class PluginConfigSourceTestClass implements
     Map<String, PluginParam> paramList = new HashMap<>();
     paramList.put(paramKey, new PluginParam(paramVal, false));
     
-    PluginConfigTestClass config = new PluginConfigTestClass();
-    config.setJarFile("");
-    config.setPackageName("net.dirtydan.ffw.alertsystem.common.plugin");
-    config.setClassName("PluginTestClass");
-    config.setInstanceName("JUNIT_TEST_PLUGIN");
-    config.setActive(isActive);
-    config.setParamList(paramList);
-    config.setLogLevel(Logger.DEBUG);
-    
-    configs.add(config);
+    _configs.add(
+      new PluginConfig.Builder()
+        .withInstanceName("JUNIT_TEST_PLUGIN")
+        .withIsActive(isActive)
+        .withParamList(paramList)
+        .withLogLevel(Logger.DEBUG)
+        .build()
+      );
   }
   
   void loadEmptyList() {
-    configs = new LinkedList<>();
+    _configs = new LinkedList<>();
   }
   
   
@@ -68,8 +66,8 @@ public class PluginConfigSourceTestClass implements
   }
   
   @Override
-  public List<PluginConfigTestClass> getPluginConfigs(boolean setLastReadTime) {
-    return configs;
+  public List<PluginConfig> getPluginConfigs(boolean setLastReadTime) {
+    return _configs;
   }
   
   @Override

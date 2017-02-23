@@ -26,12 +26,13 @@ import org.w3c.dom.NodeList;
 
 import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig;
 import net.dirtydan.ffw.alertsystem.common.util.XMLPluginSource;
+import net.dirtydan.ffw.alertsystem.monitor.plugin.MonitorPluginConfig.Builder;
 
 
 
 /**
  * XML-based config-source for @MonitorPlugin objects. Creates and
- * delivers @MonitorPluginConfig objects.
+ * provides @MonitorPluginConfig objects.
  * @see Base-class:   @XMLPluginSource
  * @see Config-class: @MonitorPluginConfig
  */
@@ -49,24 +50,19 @@ public class XMLMonitorPluginConfigFile extends XMLPluginSource<MonitorPluginCon
     super(schemaFile, xmlFileName);
   }
   
-  
-  
   @Override
   protected MonitorPluginConfig newInstance(PluginConfig basicConfig, Element xml) {
-    MonitorPluginConfig config = MonitorPluginConfig.buildFrom(basicConfig);
-    readPluginXML(config, xml);
+    Builder builder = new Builder();
+    builder.withJarFile(basicConfig.getJarFile())
+           .withPackageName(basicConfig.getPackageName())
+           .withClassName(basicConfig.getClassName())
+           .withInstanceName(basicConfig.getInstanceName())
+           .withIsActive(basicConfig.isActive())
+           .withDescription(basicConfig.getDescription())
+           .withParamList(basicConfig.paramList())
+           .withLogLevel(basicConfig.getLogLevel())
+           .withLastModifiedTime(basicConfig.getLastModifiedTime());
     
-    return config;
-  }
-  
-  @Override
-  protected String XMLPluginNodeName() {
-    return "monitor-plugin";
-  }
-  
-  
-  
-  private void readPluginXML(MonitorPluginConfig config, Element xml) {
     // optional, default is empty list
     ArrayList<String> ricList = new ArrayList<>();
     NodeList ricNodes = xml.getElementsByTagName("ric");
@@ -74,37 +70,39 @@ public class XMLMonitorPluginConfigFile extends XMLPluginSource<MonitorPluginCon
       Element ric = (Element) ricNodes.item(j);
       ricList.add(ric.getTextContent());
     }
-    config.setRicList(ricList);
+    builder.withRicList(ricList);
     
+    // the following properties are optional; the builder-method will be called
+    // only if the value is present
     NodeList node;
     
-    // optional, default is false
     node = xml.getElementsByTagName("use-invalid-messages");
     if (node.getLength() != 0) {
-      String useInvalidMessage = node.item(0).getTextContent();
-      config.useInvalidMessages((useInvalidMessage.equals("true")) ? true : false);
+      String value = node.item(0).getTextContent();
+      builder.withUseInvalidMessages((value.equals("true")) ? true : false);
     }
-    
-    // optional, default is false
     node = xml.getElementsByTagName("use-message-copies");
     if (node.getLength() != 0) {
-      String useMessageCopies = node.item(0).getTextContent();
-      config.useMessageCopies((useMessageCopies.equals("true")) ? true : false);
+      String value = node.item(0).getTextContent();
+      builder.withUseMessageCopies((value.equals("true")) ? true : false);
     }
-    
-    // optional, default is 20
     node = xml.getElementsByTagName("message-history");
     if (node.getLength() != 0) {
-      String messageHistory = node.item(0).getTextContent();
-      config.setMessageHistory(Integer.parseInt(messageHistory));
+      String value = node.item(0).getTextContent();
+      builder.withMessageHistory(Integer.parseInt(value));
     }
-    
-    // optional, default is false
     node = xml.getElementsByTagName("monitor-observer");
     if (node.getLength() != 0) {
-      String isMonitorObserver = node.item(0).getTextContent();
-      config.setMonitorObserver((isMonitorObserver.equals("true")) ? true : false);
+      String value = node.item(0).getTextContent();
+      builder.withIsMonitorObserver((value.equals("true")) ? true : false);
     }
+    
+    return builder.build();
+  }
+  
+  @Override
+  protected String XMLPluginNodeName() {
+    return "monitor-plugin";
   }
   
 }

@@ -69,7 +69,7 @@ public interface PluginObserver {
   public void onPluginStopped(String instanceName);
   
   /**
-   * Called in case of an error (can be an intentionally or an uncaught error).
+   * Called in case of an error (can be intentionally or an uncaught error).
    * @param instanceName The unique instance-name of the plugin.
    */
   public void onPluginError(String instanceName, Throwable t);

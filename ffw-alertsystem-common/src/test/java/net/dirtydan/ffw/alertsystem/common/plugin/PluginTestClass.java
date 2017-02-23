@@ -23,7 +23,7 @@ import net.dirtydan.ffw.alertsystem.common.plugin._waitfor.BooleanRef;
 
 
 
-public class PluginTestClass extends Plugin<PluginConfigTestClass> {
+public class PluginTestClass extends Plugin<PluginConfig> {
   
   static boolean simulateWorkForNextCall = false;
   static int     simulateWorkDuration    = 1;

@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig;
+import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig.Builder;
 import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfig.PluginParam;
 import net.dirtydan.ffw.alertsystem.common.plugin.PluginConfigSource;
 
@@ -74,11 +75,7 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
   
   @Override
   public boolean hasChanged() {
-    if (_lastReadTime == _xmlFile.getLastModifiedTime()) {
-      return false;
-    }
-    
-    return true;
+    return !(_lastReadTime == _xmlFile.getLastModifiedTime());
   }
   
   @Override
@@ -149,9 +146,9 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
                                 .item(0).getTextContent();
     String isActive     = xml.getElementsByTagName("active")
                                 .item(0).getTextContent();
-    String description  = xml.getElementsByTagName("description")
-                                .item(0).getTextContent();
-    // the parameter-list of the plugin
+    
+    // the parameter-list of the plugin is optional, default value is an empty
+    // HashMap
     Map<String, PluginParam> paramList = new HashMap<>();
     NodeList paramNodes = xml.getElementsByTagName("param");
     for (int j = 0; j < paramNodes.getLength(); ++j) {
@@ -165,22 +162,31 @@ public abstract class XMLPluginSource<PluginConfigT extends PluginConfig>
                 );
     }
     
-    // log-level is optional, default is INFO (= 4)
-    int logLevel = -1;
-    NodeList node = xml.getElementsByTagName("log-level");
+    Builder builder = new Builder()
+        .withJarFile(jarFileName)
+        .withPackageName(packageName)
+        .withClassName(className)
+        .withInstanceName(instanceName)
+        .withIsActive((isActive.equals("true")) ? true : false)
+        .withParamList(paramList)
+        .withLastModifiedTime(new File(jarFileName).lastModified());
+    
+    // the following properties are optional; the builder-method will be called
+    // only if the value is present
+    NodeList node;
+    
+    node = xml.getElementsByTagName("description");
     if (node.getLength() != 0) {
-      logLevel = Integer.parseInt(node.item(0).getTextContent());
+      builder.withDescription(node.item(0).getTextContent());
+    }
+    // log-level is optional
+    node = xml.getElementsByTagName("log-level");
+    if (node.getLength() != 0) {
+      int logLevel = Integer.parseInt(node.item(0).getTextContent());
+      builder.withLogLevel(logLevel);
     }
     
-    return PluginConfig.build(jarFileName,
-                               packageName,
-                               className,
-                               instanceName,
-                               (isActive.equals("true")) ? true : false,
-                               description,
-                               paramList,
-                               logLevel,
-                               new File(jarFileName).lastModified());
+    return builder.build();
   }
   
   /**

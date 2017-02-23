@@ -22,14 +22,14 @@ package net.dirtydan.ffw.alertsystem.common.plugin;
 
 
 public class PluginManagerTestClass extends PluginManager<PluginTestClass,
-                                                          PluginConfigTestClass> {
+                                                          PluginConfig> {
   
-  public PluginManagerTestClass(PluginConfigSourceTestClass config) {
-    super(config);
+  public PluginManagerTestClass(PluginConfigSourceTestClass configSource) {
+    super(configSource);
   }
   
   @Override
-  protected PluginTestClass newInstance(PluginConfigTestClass config) {
+  protected PluginTestClass newInstance(PluginConfig config) {
     return new PluginTestClass();
   }
   
