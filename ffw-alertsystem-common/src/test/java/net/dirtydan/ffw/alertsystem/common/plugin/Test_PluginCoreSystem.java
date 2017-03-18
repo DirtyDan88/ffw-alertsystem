@@ -29,7 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.dirtydan.ffw.alertsystem.common.plugin.Plugin.PluginState;
-import net.dirtydan.ffw.alertsystem.common.util.JunitLogger;
 import net.dirtydan.ffw.alertsystem.common.util.Logger;
 
 

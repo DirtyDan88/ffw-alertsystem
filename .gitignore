@@ -1,13 +1,18 @@
-build/
-data/
-bin/
+# Maven
+target/
+*.jar
 
+# Eclipse IDE
+**/.settings/
+.metadata/
+.recommenders/
+.classpath
+.project
+
+# ffw-alertsystem
+log/
+certificates/
 config-*.xml
-
 .alertmonitor.lock
 .alertreceiver.lock
 .watchdog.lock
-
-.classpath
-.project
-.settings

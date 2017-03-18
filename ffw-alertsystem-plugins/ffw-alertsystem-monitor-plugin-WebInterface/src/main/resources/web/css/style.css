@@ -1,0 +1,318 @@
+
+* {
+  margin: 0px;
+  padding: 0px;
+  font-family: Arial;
+}
+html, body {
+  height: 100%;
+  width: 100%;
+}
+body {
+  background: url(../images/bg.jpg) repeat left top;
+}
+
+/******************************************************************************/
+
+table.wrapper {
+  height: 100%;
+  width: 100%;
+}
+table.wrapper td.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 10;
+}
+table.wrapper td.content {
+  height: 100%;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+table.wrapper td.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+}
+
+/******************************************************************************/
+
+div.header {
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border-bottom: 4px solid black;
+  background:#cc3333;
+  color: white;
+}
+div.header .header-image img {
+  padding-top: 30px;
+  width: 140px;
+  height: 140px;
+}
+div.header .headline {
+  font-size: 50px;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-left: 30px;
+  white-space: nowrap;
+}
+div.header #subheadline {
+  font-size: 20px;
+  padding-left: 70px;
+}
+
+/******************************************************************************/
+
+table.hwInfo {
+
+  margin-top: 7px;
+  margin-left: 60px;
+  padding: 5px;
+
+  border: 2px solid black;
+  border-top: none; 4px dashed black;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  background:#cc3333;
+
+}
+table.hwInfo td {
+  padding-right: 5px;
+  padding-left: 10px;
+}
+
+
+/******************************************************************************/
+
+
+table.send-message-form-container {
+  z-index: 10;
+  position: absolute;
+  margin-top: -70px;
+  background: #dddddd;
+
+  border: 2px solid grey;
+  border-radius: 4px;
+}
+
+
+div.send-message-form {
+  margin-top: 5px;
+  width:100%;
+}
+div.send-message-form input {
+  border:1px solid grey;
+  box-sizing: border-box;
+  padding: 6px;
+  margin-bottom:6px;
+  width:100%;
+
+  border-radius: 2px;
+}
+div.send-message-form input:not([type="button"]):focus {
+  outline: none;
+  border-color: #cc3333;
+  box-shadow: 0 0 10px #cc3333;
+}
+div.send-message-form input#btn-send-message {
+  margin-bottom: 0px;
+}
+div.send-message-form input#btn-send-message:hover {
+  cursor: pointer;
+  outline: none;
+  border-color: #cc3333;
+  box-shadow: 0 0 10px #cc3333;
+}
+
+div#send-message-form-info {
+  border: 1px solid grey;
+  padding: 5px;
+  margin-bottom:6px;
+  border-radius: 4px;
+  color:white;
+}
+div#send-message-form-info.form-success {
+  background: #9ecaed;
+}
+div#send-message-form-info.form-error {
+  background: #cc3333;
+}
+
+
+
+/******************************************************************************/
+
+div.content {
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+div.content-container {
+  margin-top: 120px;
+  padding: 10px;
+}
+div.opacity-container {
+  border-radius: 4px;
+  margin: -5px;
+  padding: 7px;
+  background: #efefef;
+  background: rgba(150, 150, 150, 0.4);
+}
+div.container-headline {
+  padding: 5px;
+  border-radius: 2px;
+  background: #6a6a6a;
+  font-size: 20px;
+  color: white;
+  white-space: nowrap;
+}
+
+/******************************************************************************/
+
+div.plugin,
+div.action {
+  min-width: 100%;
+  margin-top: 10px;
+  border: 2px solid grey;
+  border-radius: 3px;
+  box-shadow: 7px 7px 3px #bbbbbb;
+}
+table.plugin-head,
+table.action-head {
+  width: 100%;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 20px;
+  padding-right: 5px;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  border-bottom: 1px dashed grey;
+  background: #dddddd;
+}
+div#instance-name {
+  word-break: break-all;
+}
+div#status-icon {
+  width: 50px;
+  height: 50px;
+}
+div#status-icon img {
+  width: 50px;
+  height: 50px;
+}
+table.plugin-body,
+table.action-body {
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 5px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background: white;
+}
+table.action-body {
+  font-size: 14px;
+}
+table.plugin-buttons,
+table.action-buttons {
+  position: absolute;
+  margin-top: 10px;
+  margin-left: -30px;
+  padding: 3px;
+  padding-bottom: 1px;
+  border: 2px solid grey;
+  border-radius: 10px;
+  background: #dddddd;
+  box-shadow: 3px 3px 10px #bbbbbb;
+}
+table.plugin-buttons img,
+table.action-buttons img {
+  cursor:pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+}
+table.plugin-buttons img.disabled,
+table.action-buttons img.disabled {
+  opacity: 0.2;
+  pointer-events:none;
+}
+table.plugin-buttons img:hover,
+table.action-buttons img:hover {
+  box-shadow: 0 0 10px #4B8BB8; #CEE8FA;
+}
+table.plugin-buttons img:active,
+table.action-buttons img:active {
+  box-shadow: 0 0 10px #444444;
+}
+
+/******************************************************************************/
+
+input[type="checkbox"] {
+  cursor: pointer;
+  margin-left: 5px;
+}
+div#message {
+  min-width: 100%;
+  margin-top: 10px;
+  border: 2px solid grey;
+  border-radius: 3px;
+  box-shadow: 7px 7px 3px #bbbbbb;
+  background: white;
+}
+div#message.just-received {
+  border: 2px solid #cc3333;
+  box-shadow: 0 0 10px #cc3333;
+}
+div#message table {
+  padding: 5px;
+}
+div#message #time {
+  white-space: nowrap;
+  padding-right: 20px;
+}
+
+/******************************************************************************/
+
+
+
+div.footer {
+
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+
+  border-top: 2px solid black;
+  background:#cc3333;
+
+  color: white;
+  padding: 10px;
+}
+div.footer td {
+  padding-right: 10px;
+}
+div.footer img {
+  height: 16px;
+}
+
+
+
+
+
+
+
+
+
+div.button {
+  border: 1px solid black;
+  background-color: lightblue;
+  width: 200px;
+  height: 40px;
+}

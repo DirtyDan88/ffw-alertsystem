@@ -20,13 +20,14 @@
 package net.dirtydan.ffw.alertsystem.monitor.plugin;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.dirtydan.ffw.alertsystem.common.message.Message;
 import net.dirtydan.ffw.alertsystem.common.plugin.Plugin;
+import net.dirtydan.ffw.alertsystem.common.util.CollectionHelper;
+import net.dirtydan.ffw.alertsystem.common.util.CollectionHelper.DynamicListSize;
 
 
 
@@ -50,6 +51,8 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
    */
   private List<Message> prevMessages;
   
+  private List<Message> prevValidMessages;
+  
   /**
    * Plugins which are monitor-observers won't be notified by a direct method-
    * call, instead this flag will be set and the actual notification happens
@@ -71,24 +74,15 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
   @Override
   protected final void onPluginStart() {
     messageQueue = new ConcurrentLinkedQueue<>();
-    // List with max <config().messageHistory()> entries, a new entry will
+    
+    // Lists with max <config().messageHistory()> entries, a new entry will
     // remove the oldest one
-    prevMessages = new LinkedList<Message>() {
-      private static final long serialVersionUID = 1L;
-      
-      @Override
-      public boolean add(Message message) {
-        if (config().messageHistory() <= 0) {
-          return false;
-        }
-        
-        if (size() >= config().messageHistory()) {
-          super.removeFirst();
-        }
-        
-        return super.add(message);
-      }
-    };
+    prevMessages = CollectionHelper.getDynamicLimitedList(new DynamicListSize() {
+      @Override public int get() { return config().messageHistory(); }
+    });
+    prevValidMessages = CollectionHelper.getDynamicLimitedList(new DynamicListSize() {
+      @Override public int get() { return config().messageHistory(); }
+    });
     
     onMonitorPluginStart();
   }
@@ -182,6 +176,9 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
       }
       
       prevMessages.add(message);
+      if (message.isValid()) {
+        prevValidMessages.add(message);
+      }
     }
     
     // notify observer if desired
@@ -223,6 +220,10 @@ public abstract class MonitorPlugin extends Plugin<MonitorPluginConfig> {
    */
   public final List<Message> prevMessages() {
     return Collections.unmodifiableList(prevMessages);
+  }
+  
+  public final List<Message> prevValidMessages() {
+    return Collections.unmodifiableList(prevValidMessages);
   }
   
 }

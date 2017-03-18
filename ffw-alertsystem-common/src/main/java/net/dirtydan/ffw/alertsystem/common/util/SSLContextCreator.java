@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016, Max Stark <max.stark88@web.de>
+  Copyright (c) 2015-2017, Max Stark <max.stark88@web.de>
     All rights reserved.
   
   This file is part of ffw-alertsystem, which is free software: you

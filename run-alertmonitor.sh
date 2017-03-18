@@ -35,7 +35,7 @@ export DISPLAY=":0"
 # start/stop the alertmonitor
 LOCATION=$(dirname "$(readlink -e "$0")")
 LOCKFILE=$LOCATION"/.alertmonitor.lock"
-JARFILE=$LOCATION"/build/ffw-alertsystem-monitor.jar"
+JARFILE=$LOCATION"/ffw-alertsystem-monitor/target/ffw-alertsystem-monitor-0.0.1-SNAPSHOT.jar"
 
 case "$1" in
   start)
